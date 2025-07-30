@@ -1,0 +1,8 @@
+.vscode
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+ShootThemUp.code-workspace
+*sln
