@@ -2432,171 +2432,171 @@ DebugSet: RequiredTools UnrealFrontend-Linux-Debug ShootThemUpEditor-Linux-Debug
 
 
 ShootThemUp-Android-Debug:
-	 $(BUILD) ShootThemUp Android Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Android Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Android-DebugGame:
-	 $(BUILD) ShootThemUp Android DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Android DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Android-Development:
-	 $(BUILD) ShootThemUp Android Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Android Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Android-Test:
-	 $(BUILD) ShootThemUp Android Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Android Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Android-Shipping:
-	 $(BUILD) ShootThemUp Android Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Android Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-IOS-Debug:
-	 $(BUILD) ShootThemUp IOS Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp IOS Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-IOS-DebugGame:
-	 $(BUILD) ShootThemUp IOS DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp IOS DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-IOS-Development:
-	 $(BUILD) ShootThemUp IOS Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp IOS Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-IOS-Test:
-	 $(BUILD) ShootThemUp IOS Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp IOS Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-IOS-Shipping:
-	 $(BUILD) ShootThemUp IOS Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp IOS Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Linux-Debug:
-	 $(BUILD) ShootThemUp Linux Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Linux Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Linux-DebugGame:
-	 $(BUILD) ShootThemUp Linux DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Linux DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Linux-Development:
-	 $(BUILD) ShootThemUp Linux Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Linux Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Linux-Test:
-	 $(BUILD) ShootThemUp Linux Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Linux Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Linux-Shipping:
-	 $(BUILD) ShootThemUp Linux Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Linux Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-LinuxArm64-Debug:
-	 $(BUILD) ShootThemUp LinuxArm64 Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp LinuxArm64 Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-LinuxArm64-DebugGame:
-	 $(BUILD) ShootThemUp LinuxArm64 DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp LinuxArm64 DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-LinuxArm64-Development:
-	 $(BUILD) ShootThemUp LinuxArm64 Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp LinuxArm64 Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-LinuxArm64-Test:
-	 $(BUILD) ShootThemUp LinuxArm64 Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp LinuxArm64 Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-LinuxArm64-Shipping:
-	 $(BUILD) ShootThemUp LinuxArm64 Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp LinuxArm64 Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Mac-Debug:
-	 $(BUILD) ShootThemUp Mac Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Mac Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Mac-DebugGame:
-	 $(BUILD) ShootThemUp Mac DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Mac DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Mac-Development:
-	 $(BUILD) ShootThemUp Mac Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Mac Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Mac-Test:
-	 $(BUILD) ShootThemUp Mac Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Mac Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Mac-Shipping:
-	 $(BUILD) ShootThemUp Mac Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Mac Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-TVOS-Debug:
-	 $(BUILD) ShootThemUp TVOS Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp TVOS Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-TVOS-DebugGame:
-	 $(BUILD) ShootThemUp TVOS DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp TVOS DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-TVOS-Development:
-	 $(BUILD) ShootThemUp TVOS Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp TVOS Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-TVOS-Test:
-	 $(BUILD) ShootThemUp TVOS Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp TVOS Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-TVOS-Shipping:
-	 $(BUILD) ShootThemUp TVOS Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp TVOS Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-VisionOS-Debug:
-	 $(BUILD) ShootThemUp VisionOS Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp VisionOS Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-VisionOS-DebugGame:
-	 $(BUILD) ShootThemUp VisionOS DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp VisionOS DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-VisionOS-Development:
-	 $(BUILD) ShootThemUp VisionOS Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp VisionOS Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-VisionOS-Test:
-	 $(BUILD) ShootThemUp VisionOS Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp VisionOS Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-VisionOS-Shipping:
-	 $(BUILD) ShootThemUp VisionOS Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp VisionOS Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Win64-Debug:
-	 $(BUILD) ShootThemUp Win64 Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Win64 Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Win64-DebugGame:
-	 $(BUILD) ShootThemUp Win64 DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Win64 DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Win64-Development:
-	 $(BUILD) ShootThemUp Win64 Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Win64 Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Win64-Test:
-	 $(BUILD) ShootThemUp Win64 Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Win64 Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp-Win64-Shipping:
-	 $(BUILD) ShootThemUp Win64 Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUp Win64 Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUp: ShootThemUp-Linux-Development
 
 ShootThemUpEditor-Linux-Debug:
-	 $(BUILD) ShootThemUpEditor Linux Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Linux Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Linux-DebugGame:
-	 $(BUILD) ShootThemUpEditor Linux DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Linux DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Linux-Development:
-	 $(BUILD) ShootThemUpEditor Linux Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Linux Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Linux-Test:
-	 $(BUILD) ShootThemUpEditor Linux Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Linux Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Linux-Shipping:
-	 $(BUILD) ShootThemUpEditor Linux Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Linux Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Mac-Debug:
-	 $(BUILD) ShootThemUpEditor Mac Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Mac Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Mac-DebugGame:
-	 $(BUILD) ShootThemUpEditor Mac DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Mac DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Mac-Development:
-	 $(BUILD) ShootThemUpEditor Mac Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Mac Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Mac-Test:
-	 $(BUILD) ShootThemUpEditor Mac Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Mac Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Mac-Shipping:
-	 $(BUILD) ShootThemUpEditor Mac Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Mac Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Win64-Debug:
-	 $(BUILD) ShootThemUpEditor Win64 Debug  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Win64 Debug  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Win64-DebugGame:
-	 $(BUILD) ShootThemUpEditor Win64 DebugGame  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Win64 DebugGame  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Win64-Development:
-	 $(BUILD) ShootThemUpEditor Win64 Development  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Win64 Development  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Win64-Test:
-	 $(BUILD) ShootThemUpEditor Win64 Test  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Win64 Test  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor-Win64-Shipping:
-	 $(BUILD) ShootThemUpEditor Win64 Shipping  -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" $(ARGS)
+	 $(BUILD) ShootThemUpEditor Win64 Shipping  -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" $(ARGS)
 
 ShootThemUpEditor: ShootThemUpEditor-Linux-Development
 
@@ -9545,6 +9545,6 @@ UnrealServer-Win64-Shipping:
 UnrealServer: UnrealServer-Linux-Development
 
 configure:
-	$(BUILD) -ProjectFiles -Project="/home/andryushka/Documents/Unreal Projects/ShootThemUp 5.6/ShootThemUp.uproject" -Game 
+	$(BUILD) -ProjectFiles -Project="/home/andryushka/Documents/UnrealProjects/ShootThemUp/ShootThemUp.uproject" -Game 
 
 .PHONY: $(TARGETS)
