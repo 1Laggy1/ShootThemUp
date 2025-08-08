@@ -71,16 +71,27 @@ void ASTUBaseCharacter::MoveRight(float Amount)
 void ASTUBaseCharacter::StartSprint()
 {
     isSprintingPressed = true;
-    GetCharacterMovement()->MaxWalkSpeed *= 2.0f; // Double the speed when sprinting
+    GetCharacterMovement()->MaxWalkSpeed *= SprintSpeedMultiplier; // Double the speed when sprinting
 }
 
 void ASTUBaseCharacter::StopSprint()
 {
     isSprintingPressed = false;
-    GetCharacterMovement()->MaxWalkSpeed /= 2.0f; // Reset the speed when stopping sprint
+    GetCharacterMovement()->MaxWalkSpeed /= SprintSpeedMultiplier; // Reset the speed when stopping sprint
 }
 
 bool ASTUBaseCharacter::IsSprinting()
 {
     return isSprintingPressed && isWalking; // Check if the character is both sprinting and walking
+}
+
+float ASTUBaseCharacter::GetMovementDirection() const
+{
+    if (GetVelocity().IsZero())
+        return 0.0f;
+    const auto VelocityNormal = GetVelocity().GetSafeNormal();
+    const auto AngleBetween = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
+    const FVector CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
+    const auto Degress = FMath::RadiansToDegrees(AngleBetween);
+    return CrossProduct.IsZero() ? Degress : Degress * FMath::Sign(CrossProduct.Z);
 }
