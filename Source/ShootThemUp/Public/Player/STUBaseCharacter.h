@@ -30,8 +30,13 @@ class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement", meta = (ClampMin = "1.1", ClampMax = "10.0"))
+    float SprintSpeedMultiplier = 2.0f;
+
     bool isWalking;
     bool isSprintingPressed;
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    float GetMovementDirection() const;
 
   private:
     void MoveForward(float Amount);
