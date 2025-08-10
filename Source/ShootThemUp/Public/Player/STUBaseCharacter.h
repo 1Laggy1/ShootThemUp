@@ -8,9 +8,10 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class USTUHealthActorComponent;
+class UTextRenderComponent;
 
-UCLASS()
-class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
+UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 {
     GENERATED_BODY()
 
@@ -19,6 +20,10 @@ class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     USpringArmComponent *SpringArmComponent;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UCameraComponent *CameraComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    USTUHealthActorComponent *HealthComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UTextRenderComponent *HealthTextComponent;
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
