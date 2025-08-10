@@ -7,7 +7,6 @@
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "STUBaseCharacter.h"
 
 // Sets default values
 ASTUBaseCharacter::ASTUBaseCharacter()
