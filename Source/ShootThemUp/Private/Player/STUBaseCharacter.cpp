@@ -7,12 +7,19 @@
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/DamageType.h"
+#include "GameFramework/Controller.h"
+#include "Engine/DamageEvents.h"
+#include "GameFramework/Controller.h"
+
+DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 // Sets default values
 ASTUBaseCharacter::ASTUBaseCharacter()
 {
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need
     // it.
+
     PrimaryActorTick.bCanEverTick = true;
 
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
@@ -32,15 +39,16 @@ ASTUBaseCharacter::ASTUBaseCharacter()
 void ASTUBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
-    UE_LOG(LogTemp, Warning, TEXT("CameraComponent is %s"), CameraComponent ? TEXT("VALID") : TEXT("NULL"));
+
+    OnHealthChanged(HealthComponent->GetHealth());
+    HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
+    HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
 }
 
 // Called every frame
 void ASTUBaseCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    const auto Health = HealthComponent->GetHealth();
-    HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
 }
 
 // aCalled to bind functionality to input
@@ -93,6 +101,7 @@ bool ASTUBaseCharacter::IsSprinting()
     return isSprintingPressed && isWalking; // Check if the character is both sprinting and walking
 }
 
+
 float ASTUBaseCharacter::GetMovementDirection() const
 {
     if (GetVelocity().IsZero())
@@ -102,4 +111,32 @@ float ASTUBaseCharacter::GetMovementDirection() const
     const FVector CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
     const auto Degress = FMath::RadiansToDegrees(AngleBetween);
     return CrossProduct.IsZero() ? Degress : Degress * FMath::Sign(CrossProduct.Z);
+}
+
+void ASTUBaseCharacter::OnDeath()
+{
+    UE_LOG(BaseCharacterLog, Display, TEXT("Player %s is dead"), *GetName());
+    PlayAnimMontage(DeathAnimMontage);
+
+    GetCharacterMovement()->DisableMovement();
+    SetLifeSpan(LifeSpanTime);
+    if (Controller)
+    {
+        Controller->ChangeState(NAME_Spectating);
+    }
+}
+
+void ASTUBaseCharacter::OnHealthChanged(float Health)
+{
+    HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+}
+
+void ASTUBaseCharacter::Landed(const FHitResult &Hit)
+{
+    Super::Landed(Hit);
+    const auto FallVelocityz = -GetVelocity().Z;
+    if (FallVelocityz < LandedDamageVelocity.X)
+        return;
+    const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityz);
+    TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }
