@@ -2,17 +2,17 @@
 
 #include "Player/STUBaseCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/STUHealthActorComponent.h"
-#include "Components/TextRenderComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/DamageType.h"
-#include "GameFramework/Controller.h"
-#include "Engine/DamageEvents.h"
 #include "Components/STUWeaponComponent.h"
+#include "Components/TextRenderComponent.h"
+#include "Engine/DamageEvents.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/DamageType.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Weapon/STUBaseWeapon.h"
-#include "Components/CapsuleComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
@@ -69,7 +69,9 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
     PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ASTUBaseCharacter::Jump);
     PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ASTUBaseCharacter::StartSprint);
     PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ASTUBaseCharacter::StopSprint);
-    PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Released, WeaponComponent, &USTUWeaponComponent::Fire);
+    PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Pressed, WeaponComponent,
+                                     &USTUWeaponComponent::StartFire);
+    PlayerInputComponent->BindAction("Fire", EInputEvent ::IE_Released, WeaponComponent, &USTUWeaponComponent::StopFire);
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -107,7 +109,6 @@ bool ASTUBaseCharacter::IsSprinting()
 {
     return isSprintingPressed && isWalking; // Check if the character is both sprinting and walking
 }
-
 
 float ASTUBaseCharacter::GetMovementDirection() const
 {
@@ -148,5 +149,3 @@ void ASTUBaseCharacter::Landed(const FHitResult &Hit)
     const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityz);
     TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }
-
-
