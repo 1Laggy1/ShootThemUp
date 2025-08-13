@@ -14,14 +14,15 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
 
   public:
     USTUWeaponComponent();
-    void Fire();
+    void StartFire();
+    void StopFire();
 
   protected:
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     TSubclassOf<ASTUBaseWeapon> WeaponClass;
     virtual void BeginPlay() override;
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    FName WeaponAttachPointName = "WeaponPointer";
+    FName WeaponAttachPointName = "WeaponPoint";
 
   private:
     UPROPERTY()

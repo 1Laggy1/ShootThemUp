@@ -14,7 +14,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 
   public:
     ASTUBaseWeapon();
-    virtual void Fire();
+    virtual void StartFire();
+    virtual void StopFire();
 
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -23,17 +24,21 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     FName MuzzleSocketName = "MuzzleFlashSocket";
     UPROPERTY(EditAnywhere, Category = "Stats")
     float Damage = 10.0f;
-    float TraceMaxDistance = 1500.0f;
+    UPROPERTY(EditAnywhere, Category = "Stats")
+    float TraceMaxDistance = 5000.0f;
+    
     APlayerController *Controller;
     APlayerController *GetPlayerController() const;
     bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const;
     FVector GetMuzzleWorldLocation() const;
-    bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+    
     void MakeHit(FHitResult &HitResult, const FVector &TraceStart, const FVector &TraceEnd);
-    void MakeDamage(AActor *ActorToHit);
+    
     virtual void BeginPlay() override;
 
-    void MakeShot();
+    virtual void MakeShot();
+    virtual bool GetTraceData(FVector &TraceStart, FVector &TraceEnd) const;
 
-  private:
+  
+
 };
