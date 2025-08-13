@@ -10,7 +10,9 @@
 #include "GameFramework/DamageType.h"
 #include "GameFramework/Controller.h"
 #include "Engine/DamageEvents.h"
-#include "GameFramework/Controller.h"
+#include "Components/STUWeaponComponent.h"
+#include "Weapon/STUBaseWeapon.h"
+#include "Components/CapsuleComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
@@ -25,6 +27,7 @@ ASTUBaseCharacter::ASTUBaseCharacter()
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
     SpringArmComponent->SetupAttachment(GetRootComponent());
     SpringArmComponent->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+    SpringArmComponent->SocketOffset = FVector(0.0f, 100.0f, 80.0f);
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
     CameraComponent->SetupAttachment(SpringArmComponent);
@@ -33,6 +36,9 @@ ASTUBaseCharacter::ASTUBaseCharacter()
 
     HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
     HealthTextComponent->SetupAttachment(GetRootComponent());
+    HealthTextComponent->bOwnerNoSee = true;
+
+    WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +69,7 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
     PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ASTUBaseCharacter::Jump);
     PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ASTUBaseCharacter::StartSprint);
     PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ASTUBaseCharacter::StopSprint);
+    PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Released, WeaponComponent, &USTUWeaponComponent::Fire);
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -124,6 +131,7 @@ void ASTUBaseCharacter::OnDeath()
     {
         Controller->ChangeState(NAME_Spectating);
     }
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 }
 
 void ASTUBaseCharacter::OnHealthChanged(float Health)
@@ -140,3 +148,5 @@ void ASTUBaseCharacter::Landed(const FHitResult &Hit)
     const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityz);
     TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }
+
+
