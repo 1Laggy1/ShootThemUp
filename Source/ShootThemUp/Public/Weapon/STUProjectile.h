@@ -22,19 +22,19 @@ public:
     }
 
 protected:
-    UPROPERTY(VisibleDefaultsOnly, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
   USphereComponent *CollisionComponent;
     
-    UPROPERTY(VisibleDefaultsOnly, Category = "Weapon")
+    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
   UProjectileMovementComponent *MovementComponent;
-    UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
+    UPROPERTY(EditDefaultsOnly, Category = "Stat")
   float DamageRadius = 200.0f;
 
-  UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
+  UPROPERTY(EditDefaultsOnly, Category = "Stat")
   float DamageAmount = 50.0f;
-  UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
+  UPROPERTY(EditDefaultsOnly, Category = "Stat")
   bool DoFullDamage = false;
-  UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
+  UPROPERTY(EditDefaultsOnly, Category = "Stat")
   float LifeSeconds = 5.0f;
 	virtual void BeginPlay() override;
 

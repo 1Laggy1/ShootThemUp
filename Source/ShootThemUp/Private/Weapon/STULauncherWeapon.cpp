@@ -6,13 +6,15 @@
 
 void ASTULauncherWeapon::StartFire()
 {
-    MakeShot();
+    GetWorldTimerManager().SetTimer(BurstTimerHandle, this, &ASTULauncherWeapon::MakeBurstShot, ShotInterval, true);
 }
+
+
 
 void ASTULauncherWeapon::MakeShot()
 {
 
-    if (!GetWorld())
+    if (!GetWorld() || IsAmmoEmpty())
         return;
 
     if (Controller == nullptr)
@@ -44,5 +46,19 @@ void ASTULauncherWeapon::MakeShot()
     }
     // set projectile params
 
+    DecreaseAmmo();
+}
+
+void ASTULauncherWeapon::MakeBurstShot()
+{
+    if (ShotsFires >= ShotsToFire)
+    {
+        ShotsFires = 0;
+        GetWorldTimerManager().ClearTimer(BurstTimerHandle);
+        return;
+    }
+    
+        ShotsFires++;
+        MakeShot();
 
 }
