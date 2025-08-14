@@ -4,6 +4,8 @@
 
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
+#include "Weapon/STUBaseWeapon.h"
+#include "STUCoreTypes.h"
 #include "STUWeaponComponent.generated.h"
 
 class ASTUBaseWeapon;
@@ -16,16 +18,44 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     USTUWeaponComponent();
     void StartFire();
     void StopFire();
-
+    void NextWeapon();
+    void Reload();
+    void EndPlay(const EEndPlayReason::Type EndPlayReason);
   protected:
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    TSubclassOf<ASTUBaseWeapon> WeaponClass;
+    TArray<FWeaponData> WeaponData = {};
     virtual void BeginPlay() override;
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    FName WeaponAttachPointName = "WeaponPoint";
-
+    FName WeaponEquipSocketName = "WeaponPoint";
+    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    FName WeaponArmorySocketName = "ArmorySocket";
+    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    UAnimMontage *EquipAnimMontage;
+    void AttachWeaponToSocket(ASTUBaseWeapon *Weapon, USkeletalMeshComponent *Mesh, FName SocketName);
   private:
     UPROPERTY()
     ASTUBaseWeapon *CurrentWeapon = nullptr;
-    void SpawnWeapon();
+    int32 CurrentWeaponIndex = 0;
+    bool EquipAnimInProgress;
+    bool ReloadAnimInProgress;
+    UPROPERTY()
+    TArray<ASTUBaseWeapon *> Weapons = {};
+    UPROPERTY()
+    UAnimMontage *CurrentReloadAnimMontage = nullptr;
+    void SpawnWeapons();
+    void EquipWeapon(int32 WeaponIndex);
+    
+
+    void PlayAnimMontage(UAnimMontage *Animation);
+    void InitAnimations();
+    void OnEquipFinished(USkeletalMeshComponent* Mesh);
+    void OnReloadFinished(USkeletalMeshComponent *Mesh);
+    bool CanFire() const;
+    bool CanEquip() const;
+    bool CanReload() const;
+
+    void OnEmptyClip();
+    void ChangeClip();
+
+    
 };

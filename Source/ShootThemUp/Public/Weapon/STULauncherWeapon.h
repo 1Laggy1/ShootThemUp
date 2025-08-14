@@ -22,5 +22,11 @@ class SHOOTTHEMUP_API ASTULauncherWeapon : public ASTUBaseWeapon
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     TSubclassOf<ASTUProjectile> ProjectileClass;
     virtual void MakeShot() override;
-	
+    int ShotsFires = 0;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats")
+    int ShotsToFire = 3;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats")
+    float ShotInterval = 0.2f;
+    FTimerHandle BurstTimerHandle;
+    void MakeBurstShot();
 };

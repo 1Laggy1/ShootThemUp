@@ -4,7 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "STUCoreTypes.h"
 #include "STUBaseWeapon.generated.h"
+
+
+
+
+
 
 class USkeletalMeshComponents;
 UCLASS()
@@ -14,9 +20,11 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 
   public:
     ASTUBaseWeapon();
+    FOnClipSignature OnClipEmpty;
     virtual void StartFire();
     virtual void StopFire();
-
+    void ChangeClip();
+    bool CanReload() const;
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent *WeaponMesh;
@@ -26,7 +34,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     float Damage = 10.0f;
     UPROPERTY(EditAnywhere, Category = "Stats")
     float TraceMaxDistance = 5000.0f;
-    
+    UPROPERTY(EditAnywhere, Category = "Stats")
+    FAmmoData DefaultAmmo{15,10,false};
     APlayerController *Controller;
     APlayerController *GetPlayerController() const;
     bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const;
@@ -39,6 +48,13 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     virtual void MakeShot();
     virtual bool GetTraceData(FVector &TraceStart, FVector &TraceEnd) const;
 
-  
+    void DecreaseAmmo();
+    bool IsAmmoEmpty() const;
+    bool isClipEmpty() const;
+    
+    void LogAmmo();
+
+    private:
+    FAmmoData CurrentAmmo;
 
 };

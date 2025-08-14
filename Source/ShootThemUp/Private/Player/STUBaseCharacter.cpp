@@ -39,6 +39,7 @@ ASTUBaseCharacter::ASTUBaseCharacter()
     HealthTextComponent->bOwnerNoSee = true;
 
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
+
 }
 
 // Called when the game starts or when spawned
@@ -72,6 +73,9 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
     PlayerInputComponent->BindAction("Fire", EInputEvent::IE_Pressed, WeaponComponent,
                                      &USTUWeaponComponent::StartFire);
     PlayerInputComponent->BindAction("Fire", EInputEvent ::IE_Released, WeaponComponent, &USTUWeaponComponent::StopFire);
+    PlayerInputComponent->BindAction("NextWeapon", EInputEvent::IE_Pressed, WeaponComponent, &USTUWeaponComponent::NextWeapon);
+    PlayerInputComponent->BindAction("Reload", EInputEvent::IE_Pressed, WeaponComponent,
+                                     &USTUWeaponComponent::Reload);
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -133,6 +137,7 @@ void ASTUBaseCharacter::OnDeath()
         Controller->ChangeState(NAME_Spectating);
     }
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    WeaponComponent->StopFire();
 }
 
 void ASTUBaseCharacter::OnHealthChanged(float Health)

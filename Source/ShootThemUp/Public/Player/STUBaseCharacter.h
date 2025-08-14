@@ -42,6 +42,9 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 
   public:
     ASTUBaseCharacter();
+
+    
+
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
