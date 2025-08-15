@@ -2,10 +2,10 @@
 
 #include "Components/STUWeaponComponent.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
+#include "Animations/AnimUtils.h"
 #include "Animations/STUReloadFinishedAnimNotify.h"
 #include "GameFramework/Character.h"
 #include "Weapon/STUBaseWeapon.h"
-#include "Animations/AnimUtils.h"
 
 #include "Animations/STUEquipFinishedAnimNotify.h"
 
@@ -121,6 +121,39 @@ void USTUWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
     Super::EndPlay(EndPlayReason);
 }
 
+bool USTUWeaponComponent::GetWeaponUIData(FWeaponUIData &UIData) const
+{
+
+    if (CurrentWeapon)
+    {
+        UIData = CurrentWeapon->GetUIData();
+        return true;
+    }
+    return false;
+}
+
+bool USTUWeaponComponent::GetCurrentAmmoData(FAmmoData &Data) const
+{
+    if (CurrentWeapon)
+    {
+        Data = CurrentWeapon->GetCurrentAmmoData();
+        return true;
+    }
+    return false;
+}
+
+bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount)
+{
+    for (const auto Weapon : Weapons)
+    {
+        if (Weapon && Weapon->IsA(WeaponType))
+        {
+            return Weapon->TryToAddAmmo(ClipsAmount);
+        }
+    }
+    return false;
+}
+
 void USTUWeaponComponent::PlayAnimMontage(UAnimMontage *Animation)
 {
     ACharacter *Character = Cast<ACharacter>(GetOwner());
@@ -173,7 +206,7 @@ void USTUWeaponComponent::OnReloadFinished(USkeletalMeshComponent *Mesh)
 
 bool USTUWeaponComponent::CanFire() const
 {
-    
+
     return CurrentWeapon && !EquipAnimInProgress && !ReloadAnimInProgress;
 }
 
@@ -186,9 +219,25 @@ bool USTUWeaponComponent::CanReload() const
     return CurrentWeapon && !EquipAnimInProgress && !ReloadAnimInProgress && CurrentWeapon->CanReload();
 }
 
-void USTUWeaponComponent::OnEmptyClip()
+void USTUWeaponComponent::OnEmptyClip(ASTUBaseWeapon *AmmoEmptyWeapon)
 {
-    ChangeClip();
+    if (!AmmoEmptyWeapon)
+        return;
+    if (CurrentWeapon == AmmoEmptyWeapon)
+    {
+        ChangeClip();
+    }
+    else
+    {
+        for (const auto Weapon : Weapons)
+        {
+            if (Weapon == AmmoEmptyWeapon)
+            {
+                Weapon->ChangeClip();
+            }
+        }
+    }
+    
 }
 void USTUWeaponComponent::ChangeClip()
 {

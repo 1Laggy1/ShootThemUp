@@ -6,6 +6,9 @@
 
 void ASTULauncherWeapon::StartFire()
 {
+    if (GetWorldTimerManager().IsTimerActive(BurstTimerHandle))
+        return;
+
     GetWorldTimerManager().SetTimer(BurstTimerHandle, this, &ASTULauncherWeapon::MakeBurstShot, ShotInterval, true);
 }
 

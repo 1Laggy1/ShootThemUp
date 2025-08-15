@@ -2,7 +2,7 @@
 #include "STUCoreTypes.generated.h"
 // weapon
 class ASTUBaseWeapon;
-DECLARE_MULTICAST_DELEGATE(FOnClipSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipSignature, ASTUBaseWeapon*);
 
 USTRUCT(BlueprintType)
 struct FAmmoData
@@ -25,6 +25,16 @@ struct FWeaponData
 
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     UAnimMontage *ReloadAnimMontage;
+};
+
+USTRUCT(BlueprintType)
+struct FWeaponUIData
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    UTexture2D *MainIcon;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    UTexture2D *CrosshairIcon;
 };
 
 // health

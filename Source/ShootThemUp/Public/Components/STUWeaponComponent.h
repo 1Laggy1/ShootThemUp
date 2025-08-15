@@ -21,6 +21,9 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     void NextWeapon();
     void Reload();
     void EndPlay(const EEndPlayReason::Type EndPlayReason);
+    bool GetWeaponUIData(FWeaponUIData &UIData) const;
+    bool GetCurrentAmmoData(FAmmoData &Data) const;
+    bool TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount);
   protected:
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     TArray<FWeaponData> WeaponData = {};
@@ -54,7 +57,7 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     bool CanEquip() const;
     bool CanReload() const;
 
-    void OnEmptyClip();
+    void OnEmptyClip(ASTUBaseWeapon* AmmoEmptyWeapon);
     void ChangeClip();
 
     
