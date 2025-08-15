@@ -1,18 +1,16 @@
 // Shoot THem Up Game. All Rights Reserved.
 
 #include "Weapon/STUBaseWeapon.h"
+#include "Components/STUWeaponComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/DamageEvents.h"
 #include "Engine/World.h"
+#include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
-#include <Components/STUHealthActorComponent.h>
-#include "GameFramework/Actor.h"
 #include "GameFramework/DamageType.h"
-#include "Engine/DamageEvents.h"
-#include "Components/STUWeaponComponent.h"
-
-
+#include <Components/STUHealthActorComponent.h>
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
@@ -85,12 +83,11 @@ void ASTUBaseWeapon::DecreaseAmmo()
         return;
     }
     CurrentAmmo.Bullets--;
-    LogAmmo();
 
     if (isClipEmpty() && !IsAmmoEmpty())
     {
         StopFire();
-        OnClipEmpty.Broadcast();
+        OnClipEmpty.Broadcast(this);
     }
 }
 
@@ -104,7 +101,10 @@ bool ASTUBaseWeapon::isClipEmpty() const
     return CurrentAmmo.Bullets == 0;
 }
 
-
+bool ASTUBaseWeapon::IsAmmoFull() const
+{
+    return CurrentAmmo.Clips == DefaultAmmo.Clips && CurrentAmmo.Bullets == DefaultAmmo.Bullets;
+}
 
 void ASTUBaseWeapon::ChangeClip()
 {
@@ -126,6 +126,46 @@ bool ASTUBaseWeapon::CanReload() const
     return CurrentAmmo.Bullets < DefaultAmmo.Bullets && CurrentAmmo.Clips > 0;
 }
 
+bool ASTUBaseWeapon::TryToAddAmmo(int32 ClipsAmount)
+{
+    if (CurrentAmmo.Infinite || IsAmmoFull() || ClipsAmount <= 0)
+        return false;
+
+    if (IsAmmoEmpty())
+    {
+        UE_LOG(LogBaseWeapon, Display, TEXT("Ammo was empty: "));
+        LogAmmo();
+        CurrentAmmo.Clips = FMath::Clamp(ClipsAmount, 0, DefaultAmmo.Clips + 1);
+        OnClipEmpty.Broadcast(this);
+    }
+    else if (CurrentAmmo.Clips < DefaultAmmo.Clips)
+    {
+        const auto NextClipsAmount = CurrentAmmo.Clips + ClipsAmount;
+        if (DefaultAmmo.Clips - NextClipsAmount >= 0)
+        {
+            UE_LOG(LogBaseWeapon, Display, TEXT("Only clips were added, was:"));
+            LogAmmo();
+            CurrentAmmo.Clips = NextClipsAmount;
+        }
+        else
+        {
+            UE_LOG(LogBaseWeapon, Display, TEXT("Full of ammo, was: "));
+            LogAmmo();
+            CurrentAmmo.Clips = DefaultAmmo.Clips;
+            CurrentAmmo.Bullets = DefaultAmmo.Bullets;
+        }
+    }
+    else
+    {
+        UE_LOG(LogBaseWeapon, Display, TEXT("Only bullets added, was: "));
+        LogAmmo();
+        CurrentAmmo.Bullets = DefaultAmmo.Bullets;
+    }
+    UE_LOG(LogBaseWeapon, Display, TEXT("Reffiled Ammo:"));
+    LogAmmo();
+    return true;
+}
+
 void ASTUBaseWeapon::LogAmmo()
 {
     FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " / ";
@@ -139,9 +179,6 @@ void ASTUBaseWeapon::MakeHit(FHitResult &HitResult, const FVector &TraceStart, c
         return;
     FCollisionQueryParams CollisionParams;
     CollisionParams.AddIgnoredActor(GetOwner());
-    GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd,
-                                         ECollisionChannel::ECC_Visibility, CollisionParams); // CollisionParams);
+    GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility,
+                                         CollisionParams); // CollisionParams);
 }
-
-
-

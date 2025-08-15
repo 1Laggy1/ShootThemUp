@@ -8,10 +8,6 @@
 #include "STUBaseWeapon.generated.h"
 
 
-
-
-
-
 class USkeletalMeshComponents;
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
@@ -25,6 +21,15 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     virtual void StopFire();
     void ChangeClip();
     bool CanReload() const;
+    FWeaponUIData GetUIData() const
+    {
+        return UIData;
+    }
+    FAmmoData GetCurrentAmmoData() const
+    {
+        return CurrentAmmo;
+    }
+    bool TryToAddAmmo(int32 ClipsAmount);
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent *WeaponMesh;
@@ -35,14 +40,16 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     UPROPERTY(EditAnywhere, Category = "Stats")
     float TraceMaxDistance = 5000.0f;
     UPROPERTY(EditAnywhere, Category = "Stats")
-    FAmmoData DefaultAmmo{15,10,false};
+    FAmmoData DefaultAmmo{15, 10, false};
+    UPROPERTY(EditAnywhere, Category = "UI")
+    FWeaponUIData UIData;
     APlayerController *Controller;
     APlayerController *GetPlayerController() const;
     bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const;
     FVector GetMuzzleWorldLocation() const;
-    
+
     void MakeHit(FHitResult &HitResult, const FVector &TraceStart, const FVector &TraceEnd);
-    
+
     virtual void BeginPlay() override;
 
     virtual void MakeShot();
@@ -51,10 +58,10 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     void DecreaseAmmo();
     bool IsAmmoEmpty() const;
     bool isClipEmpty() const;
-    
+    bool IsAmmoFull() const;
+
     void LogAmmo();
 
-    private:
+  private:
     FAmmoData CurrentAmmo;
-
 };
