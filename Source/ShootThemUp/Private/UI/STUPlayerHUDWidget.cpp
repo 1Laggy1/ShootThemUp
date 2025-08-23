@@ -6,6 +6,22 @@
 #include "Components/STUWeaponComponent.h"
 #include "STUUtils.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
+
+bool USTUPlayerHUDWidget::Initialize()
+{
+    const auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(GetOwningPlayerPawn());
+    if (HealthComponent)
+    {
+        HealthComponent->OnDamaged.AddUObject(this, &USTUPlayerHUDWidget::OnDamaged);
+    }
+    return Super::Initialize();
+}
+
+void USTUPlayerHUDWidget::OnDamaged()
+{
+    OnTakeDamage();
+}
+
 float USTUPlayerHUDWidget::GetHealthPercent() const
 {
     auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(GetOwningPlayerPawn());
@@ -51,5 +67,7 @@ bool USTUPlayerHUDWidget::isPlayerSpectating() const
     const auto Controller = GetOwningPlayer();
     return Controller && Controller->GetStateName() == NAME_Spectating;
 }
+
+
 
 

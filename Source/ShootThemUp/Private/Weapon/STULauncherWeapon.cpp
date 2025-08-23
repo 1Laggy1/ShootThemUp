@@ -50,6 +50,7 @@ void ASTULauncherWeapon::MakeShot()
     // set projectile params
 
     DecreaseAmmo();
+    SpawnMuzzleFX();
 }
 
 void ASTULauncherWeapon::MakeBurstShot()
