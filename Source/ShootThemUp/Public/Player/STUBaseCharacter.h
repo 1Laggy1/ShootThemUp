@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Player/STUPlayerCameraShake.h"
 #include "STUBaseCharacter.generated.h"
 
 class UCameraComponent;
@@ -28,6 +29,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UTextRenderComponent *HealthTextComponent;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUWeaponComponent* WeaponComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    USTUPlayerCameraShake *STUPlayerCameraShake;
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage *DeathAnimMontage;
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
@@ -37,9 +40,12 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
     FVector2D LandedDamage = FVector2D(1.0f, 100.0f);
     
+
+    void OnDamaged();
+    
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
-
+    void SnapCamera();
   public:
     ASTUBaseCharacter();
 
@@ -58,6 +64,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     bool isSprintingPressed;
     UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetMovementDirection() const;
+    
 
   private:
     void MoveForward(float Amount);

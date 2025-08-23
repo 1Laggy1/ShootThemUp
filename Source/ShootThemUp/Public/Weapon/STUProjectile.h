@@ -7,7 +7,7 @@
 #include "STUProjectile.generated.h"
 class USphereComponent;
 class UProjectileMovementComponent;
-
+class USTUWeaponFXComponent;
 UCLASS()
 class SHOOTTHEMUP_API ASTUProjectile : public AActor
 {
@@ -36,6 +36,8 @@ protected:
   bool DoFullDamage = false;
   UPROPERTY(EditDefaultsOnly, Category = "Stat")
   float LifeSeconds = 5.0f;
+  UPROPERTY(VisibleAnywhere, Category = "VFX")
+  USTUWeaponFXComponent *WeaponFXComponent;
 	virtual void BeginPlay() override;
 
 private:

@@ -9,6 +9,8 @@
 
 
 class USkeletalMeshComponents;
+class UNiagaraSystem;
+class UNiagaraComponent;
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 {
@@ -43,6 +45,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     FAmmoData DefaultAmmo{15, 10, false};
     UPROPERTY(EditAnywhere, Category = "UI")
     FWeaponUIData UIData;
+    UPROPERTY(EditAnywhere, Category = "VFX")
+    UNiagaraSystem *MuzzleFX;
     APlayerController *Controller;
     APlayerController *GetPlayerController() const;
     bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const;
@@ -61,6 +65,10 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     bool IsAmmoFull() const;
 
     void LogAmmo();
+
+    
+
+    UNiagaraComponent *SpawnMuzzleFX();
 
   private:
     FAmmoData CurrentAmmo;

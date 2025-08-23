@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 #include "Weapon/STUBaseWeapon.h"
 #include "Components/STUWeaponComponent.h"
@@ -11,6 +11,8 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/DamageType.h"
 #include <Components/STUHealthActorComponent.h>
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
@@ -173,12 +175,26 @@ void ASTUBaseWeapon::LogAmmo()
     UE_LOG(LogBaseWeapon, Display, TEXT("%s"), *AmmoInfo);
 }
 
+
+UNiagaraComponent *ASTUBaseWeapon::SpawnMuzzleFX()
+{
+    return UNiagaraFunctionLibrary::SpawnSystemAttached(MuzzleFX,              //
+                                                 WeaponMesh,            //
+                                                 MuzzleSocketName,      //
+                                                 FVector::ZeroVector,   //
+                                                 FRotator::ZeroRotator, //
+                                                 EAttachLocation::SnapToTarget, true);
+    
+}
+
 void ASTUBaseWeapon::MakeHit(FHitResult &HitResult, const FVector &TraceStart, const FVector &TraceEnd)
 {
     if (!GetWorld())
         return;
     FCollisionQueryParams CollisionParams;
     CollisionParams.AddIgnoredActor(GetOwner());
+    CollisionParams.bReturnPhysicalMaterial = true;
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility,
                                          CollisionParams); // CollisionParams);
 }
+

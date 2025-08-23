@@ -41,6 +41,7 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
 
     FOnDeath OnDeath;
     FOnHealthChanged OnHealthChanged;
+    FOnDamaged OnDamaged;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     bool AutoHeal;

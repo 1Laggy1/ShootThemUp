@@ -27,5 +27,10 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
     bool isPlayerAlive() const;
     UFUNCTION(BlueprintCallable, Category = "UI")
     bool isPlayerSpectating() const;
+    UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+    void OnTakeDamage();
+    virtual bool Initialize() override;
+  private:
+    void OnDamaged();
 	
 };

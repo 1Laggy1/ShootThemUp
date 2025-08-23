@@ -13,6 +13,7 @@
 #include "GameFramework/DamageType.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Weapon/STUBaseWeapon.h"
+#include "Player/STUPlayerCameraShake.h"
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
@@ -40,6 +41,16 @@ ASTUBaseCharacter::ASTUBaseCharacter()
 
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
 
+    STUPlayerCameraShake = CreateDefaultSubobject<USTUPlayerCameraShake>("Player Camera Shake");
+    
+
+}
+
+void ASTUBaseCharacter::OnDamaged()
+{
+    if (HealthComponent->isDead() || !GetController())
+        return;
+    STUPlayerCameraShake->PlayCameraShake(Cast<APlayerController>(GetController()));
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +61,7 @@ void ASTUBaseCharacter::BeginPlay()
     OnHealthChanged(HealthComponent->GetHealth());
     HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
     HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
+    HealthComponent->OnDamaged.AddUObject(this, &ASTUBaseCharacter::OnDamaged);
 }
 
 // Called every frame
@@ -76,6 +88,7 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
     PlayerInputComponent->BindAction("NextWeapon", EInputEvent::IE_Pressed, WeaponComponent, &USTUWeaponComponent::NextWeapon);
     PlayerInputComponent->BindAction("Reload", EInputEvent::IE_Pressed, WeaponComponent,
                                      &USTUWeaponComponent::Reload);
+    PlayerInputComponent->BindAction("SnapCamera", EInputEvent::IE_Pressed, this, &ASTUBaseCharacter::SnapCamera);
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -125,10 +138,16 @@ float ASTUBaseCharacter::GetMovementDirection() const
     return CrossProduct.IsZero() ? Degress : Degress * FMath::Sign(CrossProduct.Z);
 }
 
+void ASTUBaseCharacter::SnapCamera()
+{
+    SpringArmComponent->SocketOffset = FVector(SpringArmComponent->SocketOffset.X, -SpringArmComponent->SocketOffset.Y,
+                                               SpringArmComponent->SocketOffset.Z);
+}
+
 void ASTUBaseCharacter::OnDeath()
 {
     UE_LOG(BaseCharacterLog, Display, TEXT("Player %s is dead"), *GetName());
-    PlayAnimMontage(DeathAnimMontage);
+    //PlayAnimMontage(DeathAnimMontage);
 
     GetCharacterMovement()->DisableMovement();
     SetLifeSpan(LifeSpanTime);
@@ -138,6 +157,9 @@ void ASTUBaseCharacter::OnDeath()
     }
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     WeaponComponent->StopFire();
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    GetMesh()->SetSimulatePhysics(true);
+    GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 }
 
 void ASTUBaseCharacter::OnHealthChanged(float Health)
