@@ -9,6 +9,8 @@
 #include "Weapon/Components/STUWeaponFXComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/Character.h"
 ASTURifleWeapon::ASTURifleWeapon()
 {
     WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
@@ -17,13 +19,17 @@ ASTURifleWeapon::ASTURifleWeapon()
 void ASTURifleWeapon::BeginPlay()
 {
     Super::BeginPlay();
+    
 }
 
 void ASTURifleWeapon::StartFire()
 {
     InitMuzzleFX();
     MakeShot();
-    GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTURifleWeapon::MakeShot, TimeBetweenShots, true);
+    if (!GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
+    {
+        GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTURifleWeapon::MakeShot, TimeBetweenShots, true);
+    }
 }
 void ASTURifleWeapon::StopFire()
 {
@@ -35,28 +41,18 @@ void ASTURifleWeapon::StopFire()
 
 void ASTURifleWeapon::MakeShot()
 {
-
     if (!GetWorld() || IsAmmoEmpty())
     {
         StopFire();
         return;
     }
-        
-
-    if (Controller == nullptr)
-    {
-        Controller = GetPlayerController();
-        if (Controller == nullptr)
-            return;
-    }
-
+    Controller = GetController();
     FVector TraceStart, TraceEnd;
     if (!GetTraceData(TraceStart, TraceEnd))
     {
         StopFire();
         return;
     }
-
     const FVector SocketLocation = GetMuzzleWorldLocation();
 
     FHitResult HitResult;

@@ -22,7 +22,7 @@ void ASTULauncherWeapon::MakeShot()
 
     if (Controller == nullptr)
     {
-        Controller = GetPlayerController();
+        Controller = GetController();
         if (Controller == nullptr)
             return;
     }

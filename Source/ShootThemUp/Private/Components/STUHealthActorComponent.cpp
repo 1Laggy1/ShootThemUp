@@ -58,7 +58,8 @@ void USTUHealthActorComponent::OnTakeAnyDamage(AActor *DamagedActor, float Damag
     HealDelayCurrent = 0;
     Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
     OnHealthChanged.Broadcast(Health);
-    OnDamaged.Broadcast();
+    OnDamaged.Broadcast(DamagedActor, Damage, DamageType,
+                        InstigatedBy, DamageCauser);
     IsVaunded = true;
 
     if (isDead())

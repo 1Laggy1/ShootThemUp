@@ -27,7 +27,7 @@ ASTUBaseWeapon::ASTUBaseWeapon()
 void ASTUBaseWeapon::BeginPlay()
 {
     Super::BeginPlay();
-    Controller = GetPlayerController();
+    Controller = GetController();
     check(WeaponMesh);
     CurrentAmmo = DefaultAmmo;
 }
@@ -43,18 +43,32 @@ void ASTUBaseWeapon::MakeShot()
 {
 }
 
-APlayerController *ASTUBaseWeapon::GetPlayerController() const
+AController *ASTUBaseWeapon::GetController() const
 {
     const auto Player = Cast<ACharacter>(GetOwner());
     if (!Player)
         return nullptr;
 
-    return Player->GetController<APlayerController>();
+    return Player->GetController<AController>();
 }
 
 bool ASTUBaseWeapon::GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const
 {
-    Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+
+    const auto STUCharacter = Cast<ACharacter>(GetOwner());
+    if (!STUCharacter)
+        return false;
+
+    if (STUCharacter->IsPlayerControlled())
+    {
+        Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    }
+    else
+    {
+        ViewLocation = GetMuzzleWorldLocation();
+        ViewRotation = WeaponMesh->GetSocketRotation(MuzzleSocketName);
+    }
+    
     return true;
 }
 

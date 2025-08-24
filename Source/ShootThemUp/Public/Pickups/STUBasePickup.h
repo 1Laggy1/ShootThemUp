@@ -14,6 +14,7 @@ class SHOOTTHEMUP_API ASTUBasePickup : public AActor
 
   public:
     ASTUBasePickup();
+    bool CouldBeTaken();
 
   protected:
     UPROPERTY(VisibleAnywhere, Category = "Pickup")
@@ -22,6 +23,7 @@ class SHOOTTHEMUP_API ASTUBasePickup : public AActor
     float RespawnTime = 5.0f;
     virtual void BeginPlay() override;
     virtual void NotifyActorBeginOverlap(AActor *OtherActor) override;
+    FTimerHandle RespawnTimerHandle;
 
   public:
     virtual void Tick(float DeltaTime) override;

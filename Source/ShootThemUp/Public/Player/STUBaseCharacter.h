@@ -23,8 +23,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     USpringArmComponent *SpringArmComponent;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UCameraComponent *CameraComponent;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    USTUHealthActorComponent *HealthComponent;
+    
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UTextRenderComponent *HealthTextComponent;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -41,14 +40,16 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FVector2D LandedDamage = FVector2D(1.0f, 100.0f);
     
 
-    void OnDamaged();
-    
+    virtual void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
+                           class AController *InstigatedBy, AActor *DamageCauser);
+    virtual void OnDeath();
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
     void SnapCamera();
   public:
-    ASTUBaseCharacter();
-
+    ASTUBaseCharacter(const FObjectInitializer &ObjInit);
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    USTUHealthActorComponent *HealthComponent;
     
 
     // Called every frame
@@ -64,17 +65,18 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     bool isSprintingPressed;
     UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetMovementDirection() const;
-    
-
-  private:
-    void MoveForward(float Amount);
-    void MoveRight(float Amount);
     void StartSprint();
     void StopSprint();
     UFUNCTION(BlueprintCallable, Category = "Movement")
     bool IsSprinting();
 
-    void OnDeath();
+  private:
+    void MoveForward(float Amount);
+    void MoveRight(float Amount);
+    
+    
+
+    
     void OnHealthChanged(float Health);
     void Landed(const FHitResult &Hit) override;
 

@@ -17,6 +17,11 @@ ASTUBasePickup::ASTUBasePickup()
     SetRootComponent(CollisionComponent);
 }
 
+bool ASTUBasePickup::CouldBeTaken()
+{
+    return !GetWorldTimerManager().IsTimerActive(RespawnTimerHandle);
+}
+
 // Called when the game starts or when spawned
 void ASTUBasePickup::BeginPlay()
 {
@@ -54,7 +59,7 @@ void ASTUBasePickup::PickupWasTaken()
         return;
 
     GetRootComponent()->SetVisibility(false, true);
-    FTimerHandle RespawnTimerHandle;
+    
     GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ASTUBasePickup::Respawn, RespawnTime);
 }
 

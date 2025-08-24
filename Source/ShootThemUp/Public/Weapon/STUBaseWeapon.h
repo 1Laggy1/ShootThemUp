@@ -32,6 +32,7 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
         return CurrentAmmo;
     }
     bool TryToAddAmmo(int32 ClipsAmount);
+    bool IsAmmoEmpty() const;
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent *WeaponMesh;
@@ -47,8 +48,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     FWeaponUIData UIData;
     UPROPERTY(EditAnywhere, Category = "VFX")
     UNiagaraSystem *MuzzleFX;
-    APlayerController *Controller;
-    APlayerController *GetPlayerController() const;
+    AController *Controller;
+    AController *GetController() const;
     bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const;
     FVector GetMuzzleWorldLocation() const;
 
@@ -60,7 +61,7 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     virtual bool GetTraceData(FVector &TraceStart, FVector &TraceEnd) const;
 
     void DecreaseAmmo();
-    bool IsAmmoEmpty() const;
+    
     bool isClipEmpty() const;
     bool IsAmmoFull() const;
 
