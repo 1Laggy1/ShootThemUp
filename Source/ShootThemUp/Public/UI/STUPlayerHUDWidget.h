@@ -31,6 +31,7 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
     void OnTakeDamage();
     virtual bool Initialize() override;
   private:
-    void OnDamaged();
+    void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
+                   class AController *InstigatedBy, AActor *DamageCauser);
 	
 };

@@ -17,7 +17,8 @@ bool USTUPlayerHUDWidget::Initialize()
     return Super::Initialize();
 }
 
-void USTUPlayerHUDWidget::OnDamaged()
+void USTUPlayerHUDWidget::OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
+                                    class AController *InstigatedBy, AActor *DamageCauser)
 {
     OnTakeDamage();
 }

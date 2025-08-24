@@ -18,7 +18,7 @@
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 // Sets default values
-ASTUBaseCharacter::ASTUBaseCharacter()
+ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)
 {
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need
     // it.
@@ -42,11 +42,12 @@ ASTUBaseCharacter::ASTUBaseCharacter()
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
 
     STUPlayerCameraShake = CreateDefaultSubobject<USTUPlayerCameraShake>("Player Camera Shake");
-    
+
 
 }
 
-void ASTUBaseCharacter::OnDamaged()
+void ASTUBaseCharacter::OnDamaged(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+                                  class AController* InstigatedBy, AActor* DamageCauser)
 {
     if (HealthComponent->isDead() || !GetController())
         return;
@@ -68,6 +69,14 @@ void ASTUBaseCharacter::BeginPlay()
 void ASTUBaseCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if (GetCharacterMovement()->Velocity.Length() > 5)
+    {
+        isWalking = true;
+    }
+    else
+    {
+        isWalking = false;
+    }
 }
 
 // aCalled to bind functionality to input
@@ -93,14 +102,15 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
 
 void ASTUBaseCharacter::MoveForward(float Amount)
 {
-    if (Amount > 0 && GetCharacterMovement()->Velocity.Length() > 5)
-    {
-        isWalking = true;
-    }
-    else
-    {
-        isWalking = false;
-    }
+    
+    //if (Amount > 0 && GetCharacterMovement()->Velocity.Length() > 5)
+    //{
+    //    isWalking = true;
+    //}
+    //else
+    //{
+    //    isWalking = false;
+    //}
     AddMovementInput(GetActorForwardVector(), Amount);
 }
 
@@ -154,6 +164,7 @@ void ASTUBaseCharacter::OnDeath()
     if (Controller)
     {
         Controller->ChangeState(NAME_Spectating);
+        
     }
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     WeaponComponent->StopFire();
