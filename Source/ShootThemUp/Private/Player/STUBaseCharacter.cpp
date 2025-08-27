@@ -65,6 +65,15 @@ void ASTUBaseCharacter::BeginPlay()
     HealthComponent->OnDamaged.AddUObject(this, &ASTUBaseCharacter::OnDamaged);
 }
 
+void ASTUBaseCharacter::SetPlayerColor(const FLinearColor &Color)
+{
+    const auto MaterialInst = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
+    if (!MaterialInst)
+        return;
+
+    MaterialInst->SetVectorParameterValue(MaterialColorName, Color);
+}
+
 // Called every frame
 void ASTUBaseCharacter::Tick(float DeltaTime)
 {
@@ -122,14 +131,21 @@ void ASTUBaseCharacter::MoveRight(float Amount)
 
 void ASTUBaseCharacter::StartSprint()
 {
-    isSprintingPressed = true;
-    GetCharacterMovement()->MaxWalkSpeed *= SprintSpeedMultiplier; // Double the speed when sprinting
+    if (!isSprintingPressed)
+    {
+        isSprintingPressed = true;
+        GetCharacterMovement()->MaxWalkSpeed *= SprintSpeedMultiplier; // Double the speed when sprinting
+    }
 }
 
 void ASTUBaseCharacter::StopSprint()
 {
-    isSprintingPressed = false;
-    GetCharacterMovement()->MaxWalkSpeed /= SprintSpeedMultiplier; // Reset the speed when stopping sprint
+    if (isSprintingPressed)
+    {
+        isSprintingPressed = false;
+        GetCharacterMovement()->MaxWalkSpeed /= SprintSpeedMultiplier; // Reset the speed when stopping sprint
+    }
+
 }
 
 bool ASTUBaseCharacter::IsSprinting()

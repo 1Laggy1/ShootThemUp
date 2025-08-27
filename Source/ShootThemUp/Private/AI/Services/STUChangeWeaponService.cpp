@@ -16,7 +16,6 @@ USTUChangeWeaponService::USTUChangeWeaponService()
 
 void USTUChangeWeaponService::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *NodeMemory, float DeltaSeconds)
 {
-    UE_LOG(LogController, Warning, TEXT("%f"), DeltaSeconds);
     TimeNow += DeltaSeconds;
     if (TimeNow > ChangeCooldown)
     {

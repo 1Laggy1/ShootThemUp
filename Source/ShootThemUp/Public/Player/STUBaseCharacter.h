@@ -38,8 +38,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FVector2D LandedDamageVelocity = FVector2D(700.0f, 1400.0f);
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
     FVector2D LandedDamage = FVector2D(1.0f, 100.0f);
-    
-
+    UPROPERTY(EditDefaultsOnly, Category = "Material")
+    FName MaterialColorName = "Paint Color";
     virtual void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                            class AController *InstigatedBy, AActor *DamageCauser);
     virtual void OnDeath();
@@ -51,7 +51,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUHealthActorComponent *HealthComponent;
     
-
+    void SetPlayerColor(const FLinearColor &Color);
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
