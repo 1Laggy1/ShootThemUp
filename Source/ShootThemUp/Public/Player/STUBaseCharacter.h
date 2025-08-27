@@ -7,10 +7,8 @@
 #include "Player/STUPlayerCameraShake.h"
 #include "STUBaseCharacter.generated.h"
 
-class UCameraComponent;
-class USpringArmComponent;
+
 class USTUHealthActorComponent;
-class UTextRenderComponent;
 class ASTUBaseWeapon;
 class USTUWeaponComponent;
 
@@ -20,16 +18,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    USpringArmComponent *SpringArmComponent;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    UCameraComponent *CameraComponent;
-    
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    UTextRenderComponent *HealthTextComponent;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUWeaponComponent* WeaponComponent;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    USTUPlayerCameraShake *STUPlayerCameraShake;
+    
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage *DeathAnimMontage;
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
@@ -45,7 +35,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     virtual void OnDeath();
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
-    void SnapCamera();
+    
   public:
     ASTUBaseCharacter(const FObjectInitializer &ObjInit);
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -54,9 +44,10 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     void SetPlayerColor(const FLinearColor &Color);
     // Called every frame
     virtual void Tick(float DeltaTime) override;
-
+    void StartSprint();
+    void StopSprint();
     // Called to bind functionality to input
-    virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
+    
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement", meta = (ClampMin = "1.1", ClampMax = "10.0"))
     float SprintSpeedMultiplier = 2.0f;
@@ -65,17 +56,10 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     bool isSprintingPressed;
     UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetMovementDirection() const;
-    void StartSprint();
-    void StopSprint();
     UFUNCTION(BlueprintCallable, Category = "Movement")
-    bool IsSprinting();
+    virtual bool IsSprinting();
 
   private:
-    void MoveForward(float Amount);
-    void MoveRight(float Amount);
-    
-    
-
     
     void OnHealthChanged(float Health);
     void Landed(const FHitResult &Hit) override;

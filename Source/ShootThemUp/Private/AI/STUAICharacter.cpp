@@ -7,6 +7,7 @@
 #include "Perception/AISense_Damage.h"
 #include "Components/STUAIWeaponComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+DEFINE_LOG_CATEGORY_STATIC(STUAICharacter, All, All);
 
 ASTUAICharacter::ASTUAICharacter(const FObjectInitializer& ObjInit) : Super(ObjInit.SetDefaultSubobjectClass<USTUAIWeaponComponent>("Weapon Component"))
 {
@@ -20,6 +21,7 @@ ASTUAICharacter::ASTUAICharacter(const FObjectInitializer& ObjInit) : Super(ObjI
 void ASTUAICharacter::OnDeath()
 {
     Super::OnDeath();
+
     if (AAIController *AIController = Cast<AAIController>(Controller))
     {
         if (UBrainComponent *Brain = AIController->GetBrainComponent())
@@ -28,6 +30,7 @@ void ASTUAICharacter::OnDeath()
             Brain->Cleanup();
         }
     }
+    UE_LOG(STUAICharacter, Display, TEXT("Bot %s is dead"), *GetName());
 }
 
 void ASTUAICharacter::OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
@@ -47,5 +50,12 @@ void ASTUAICharacter::OnDamaged(AActor *DamagedActor, float Damage, const class 
 void ASTUAICharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    
+    if (GetCharacterMovement()->Velocity.Length() > 5)
+    {
+        isWalking = true;
+    }
+    else
+    {
+        isWalking = false;
+    }
 }

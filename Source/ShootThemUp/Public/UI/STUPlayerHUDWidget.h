@@ -41,4 +41,5 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
     void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                    class AController *InstigatedBy, AActor *DamageCauser);
     ASTUGameModeBase* CurrentGamemode;
+    void OnNewPawn(APawn* NewPawn);
 };
