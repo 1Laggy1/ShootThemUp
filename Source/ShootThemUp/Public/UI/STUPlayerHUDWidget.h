@@ -12,6 +12,7 @@
  */
 class USTUWeaponComponent;
 class USTUHealthActorComponent;
+class ASTUGameModeBase;
 UCLASS()
 class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
 {
@@ -27,11 +28,17 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
     bool isPlayerAlive() const;
     UFUNCTION(BlueprintCallable, Category = "UI")
     bool isPlayerSpectating() const;
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    FString GetCurrentTime();
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    FString GetRoundsInfo();
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    FString GetKills();
     UFUNCTION(BlueprintImplementableEvent, Category = "UI")
     void OnTakeDamage();
     virtual bool Initialize() override;
   private:
     void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                    class AController *InstigatedBy, AActor *DamageCauser);
-	
+    ASTUGameModeBase* CurrentGamemode;
 };

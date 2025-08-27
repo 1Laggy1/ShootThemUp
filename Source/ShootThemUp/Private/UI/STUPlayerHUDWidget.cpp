@@ -5,6 +5,8 @@
 #include "Components/STUHealthActorComponent.h"
 #include "Components/STUWeaponComponent.h"
 #include "STUUtils.h"
+#include "STUGameModeBase.h"
+#include "Player/STUPlayerState.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 bool USTUPlayerHUDWidget::Initialize()
@@ -14,6 +16,7 @@ bool USTUPlayerHUDWidget::Initialize()
     {
         HealthComponent->OnDamaged.AddUObject(this, &USTUPlayerHUDWidget::OnDamaged);
     }
+    CurrentGamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
     return Super::Initialize();
 }
 
@@ -69,6 +72,38 @@ bool USTUPlayerHUDWidget::isPlayerSpectating() const
     return Controller && Controller->GetStateName() == NAME_Spectating;
 }
 
+FString USTUPlayerHUDWidget::GetRoundsInfo()
+{
+    if (!GetWorld() || !CurrentGamemode)
+        return "Rounds: 0/0";
+    FString RoundsInfo = "Rounds: ";
+    FGameData GameData = CurrentGamemode->GetGameData();
+    RoundsInfo = RoundsInfo + FString::FromInt(CurrentGamemode->GetCurrentRound()) + "/" + FString::FromInt(GameData.RoundsNum);
+    return RoundsInfo;
+}
+
+FString USTUPlayerHUDWidget::GetKills()
+{
+    if (!GetWorld() || !CurrentGamemode || !GetOwningPlayerPawn() || !GetOwningPlayerPawn()->Controller)
+        return "Kills: 0";
+    const auto PlayerState = Cast<ASTUPlayerState>(GetOwningPlayerPawn()->Controller->PlayerState);
+    if (!PlayerState)
+        return "Kills: 0";
+    FString Kills = "Kills: ";
+    Kills += FString::FromInt(PlayerState->GetKillsNum());
+    return Kills;
+}
+
+FString USTUPlayerHUDWidget::GetCurrentTime()
+{
+    if (!GetWorld() || !CurrentGamemode)
+        return "00:00";
+    FString Time;
+    int32 Minutes = CurrentGamemode->GetRoundCountDown() / 60;
+    int32 Seconds = CurrentGamemode->GetRoundCountDown() % 60;  
+    Time = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+    return Time;
+}
 
 
 
