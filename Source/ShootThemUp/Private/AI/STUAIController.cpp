@@ -11,12 +11,16 @@ ASTUAIController::ASTUAIController()
 {
     STUAIPerceptionComponent = CreateDefaultSubobject<USTUAIPerceptionComponent>("STUPerceptionComponent");
     SetPerceptionComponent(*STUAIPerceptionComponent);
+    bWantsPlayerState = true;
 }
 
 void ASTUAIController::BeginPlay()
 {
     Super::BeginPlay();
-    Cast<ASTUAICharacter>(GetPawn())->HealthComponent->OnDamaged.AddUObject(this, &ASTUAIController::OnDamaged);
+    if (GetPawn())
+    {
+        Cast<ASTUAICharacter>(GetPawn())->HealthComponent->OnDamaged.AddUObject(this, &ASTUAIController::OnDamaged);
+    }
 }
 
 void ASTUAIController::OnPossess(APawn *InPawn)
