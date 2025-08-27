@@ -11,16 +11,24 @@ DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 bool USTUPlayerHUDWidget::Initialize()
 {
-    const auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(GetOwningPlayerPawn());
+    if (GetOwningPlayer())
+    {
+        GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &USTUPlayerHUDWidget::OnNewPawn);
+        OnNewPawn(GetOwningPlayerPawn());
+    }
+    
+    CurrentGamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
+    return Super::Initialize();
+}
+void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
+{
+    const auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(NewPawn);
     if (HealthComponent)
     {
         HealthComponent->OnDamaged.AddUObject(this, &USTUPlayerHUDWidget::OnDamaged);
     }
-    CurrentGamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
-    return Super::Initialize();
 }
-
-void USTUPlayerHUDWidget::OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
+void USTUPlayerHUDWidget::OnDamaged(AActor * DamagedActor, float Damage, const class UDamageType *DamageType,
                                     class AController *InstigatedBy, AActor *DamageCauser)
 {
     OnTakeDamage();

@@ -53,5 +53,5 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void SetPlayerColor(AController *Controller);
     void LogPlayerInfo();
     void StartRespawn(AController *Controller);
-
+    void GameOver();
 };
