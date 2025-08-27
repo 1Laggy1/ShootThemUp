@@ -44,7 +44,7 @@ AActor *USTUAIPerceptionComponent::GetClosestEnemy() const
         const auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(PercieveActor);
         const auto PercievePawn = Cast<APawn>(PercieveActor);
         const auto AreEnemies = PercievePawn && STUUtils::AreEnemies(Controller, PercievePawn->Controller);
-        if (HealthComponent && !HealthComponent->isDead() && AreEnemies) // TODO: check if teammate or not
+        if (HealthComponent && !HealthComponent->isDead() && AreEnemies)
         {
             const auto CurrentDistance = (PercieveActor->GetActorLocation() - Pawn->GetActorLocation()).Size();
             if (CurrentDistance < BestDistance)

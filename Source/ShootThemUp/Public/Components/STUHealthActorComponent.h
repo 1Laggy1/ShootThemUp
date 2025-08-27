@@ -65,4 +65,5 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     void OnTakeAnyDamage(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                          class AController *InstigatedBy, AActor *DamageCauser);
     void AutoHealHandle(float DeltaTime);
+    void Killed(AController *KillerController);
 };
