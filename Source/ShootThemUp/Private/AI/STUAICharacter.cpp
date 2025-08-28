@@ -30,6 +30,7 @@ void ASTUAICharacter::OnDeath()
             Brain->Cleanup();
         }
     }
+
     UE_LOG(STUAICharacter, Display, TEXT("Bot %s is dead"), *GetName());
 }
 

@@ -90,3 +90,14 @@ struct FGameData
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "0"))
     int32 RespawnTime = 5; // in seconds
 };
+
+UENUM(BlueprintType)
+enum class ESTUMatchState : uint8
+{
+    WaitingToStart = 0, 
+    InProgress,
+    Pause,
+    GameOver
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStateChangeSignature, ESTUMatchState)

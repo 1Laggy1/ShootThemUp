@@ -19,10 +19,7 @@ ASTUAIController::ASTUAIController()
 void ASTUAIController::BeginPlay()
 {
     Super::BeginPlay();
-    if (GetPawn())
-    {
-        Cast<ASTUAICharacter>(GetPawn())->HealthComponent->OnDamaged.AddUObject(this, &ASTUAIController::OnDamaged);
-    }
+    
 }
 
 void ASTUAIController::OnPossess(APawn *InPawn)
@@ -33,6 +30,8 @@ void ASTUAIController::OnPossess(APawn *InPawn)
     {
         if (STUCharacter->BehaviorTreeAsset)
         RunBehaviorTree(STUCharacter->BehaviorTreeAsset);
+        Cast<ASTUAICharacter>(GetPawn())->HealthComponent->OnDamaged.AddUObject(this, &ASTUAIController::OnDamaged);
+        GetBlackboardComponent()->ClearValue(LastEnemyPositionKey);
     }
 }
 
@@ -53,5 +52,8 @@ AActor *ASTUAIController::GetFocusOnActor() const
 void ASTUAIController::OnDamaged(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
                                  class AController* InstigatedBy, AActor* DamageCauser)
 {
-    GetBlackboardComponent()->SetValueAsVector(LastEnemyPositionKey, InstigatedBy->GetPawn()->GetActorLocation());
+    if (InstigatedBy)
+    {
+        GetBlackboardComponent()->SetValueAsVector(LastEnemyPositionKey, InstigatedBy->GetPawn()->GetActorLocation());
+    }
 }

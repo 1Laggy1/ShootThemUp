@@ -27,6 +27,8 @@ void ASTUGameModeBase::StartPlay()
     CreateTeamsInfo();
     CurrentRound = 1;
     StartRound();
+
+     SetMatchState(ESTUMatchState::InProgress);
 }
 
 UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AController *InController)
@@ -200,12 +202,16 @@ void ASTUGameModeBase::GameOver()
             Pawn->DisableInput(nullptr);
         }
     }
+    SetMatchState(ESTUMatchState::GameOver);
 }
+
+
 
 void ASTUGameModeBase::RespawnRequest(AController *Controller)
 {
     ResetOnePlayer(Controller);
 }
+
 void ASTUGameModeBase::Killed(AController *KillerController, AController *VictimController)
 {
     const auto KillerPlayerState = KillerController ? Cast<ASTUPlayerState>(KillerController->PlayerState) : nullptr;
@@ -221,4 +227,33 @@ void ASTUGameModeBase::Killed(AController *KillerController, AController *Victim
         VictimPlayerState->AddDeath();
     }
     StartRespawn(VictimController);
+}
+
+void ASTUGameModeBase::SetMatchState(ESTUMatchState State)
+{
+    if (MatchState == State)
+        return;
+
+    MatchState = State;
+    OnMatchStateChanged.Broadcast(MatchState);
+}
+
+bool ASTUGameModeBase::SetPause(APlayerController *PC, FCanUnpause CanUnpauseDelegate)
+{
+    const auto PauseSet = Super::SetPause(PC, CanUnpauseDelegate);
+    if (PauseSet)
+    {
+        SetMatchState(ESTUMatchState::Pause);
+    }
+    return PauseSet;
+}
+
+bool ASTUGameModeBase::ClearPause()
+{
+    const auto PauseSet = Super::ClearPause();
+    if (PauseSet)
+    {
+        SetMatchState(ESTUMatchState::InProgress);
+    }
+    return PauseSet;
 }
