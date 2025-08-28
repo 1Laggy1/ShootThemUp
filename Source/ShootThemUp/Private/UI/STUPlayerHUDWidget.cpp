@@ -9,8 +9,9 @@
 #include "Player/STUPlayerState.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
-bool USTUPlayerHUDWidget::Initialize()
+void USTUPlayerHUDWidget::NativeOnInitialized()
 {
+    Super::NativeOnInitialized();
     if (GetOwningPlayer())
     {
         GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &USTUPlayerHUDWidget::OnNewPawn);
@@ -18,7 +19,7 @@ bool USTUPlayerHUDWidget::Initialize()
     }
     
     CurrentGamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
-    return Super::Initialize();
+    return;
 }
 void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
 {
