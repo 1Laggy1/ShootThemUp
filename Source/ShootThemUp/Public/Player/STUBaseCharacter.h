@@ -35,6 +35,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     virtual void OnDeath();
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
+    virtual void OnHealthChanged(float Health);
     
   public:
     ASTUBaseCharacter(const FObjectInitializer &ObjInit);
@@ -61,7 +62,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 
   private:
     
-    void OnHealthChanged(float Health);
+    
     void Landed(const FHitResult &Hit) override;
 
     

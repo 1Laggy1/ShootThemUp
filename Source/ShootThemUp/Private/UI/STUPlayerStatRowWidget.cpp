@@ -12,6 +12,7 @@ void USTUPlayerStatRowWidget::SetRowInfo(FStatRowInfo &Info)
     SetText(DeathsTextBlock, Info.DeathsText);
     SetText(TeamTextBlock, Info.TeamText);
     SetPlayerIndicatorVisibility(Info.PlayerIndicatorVisibility);
+    SetTeamColor(Info.TeamColor);
 
 }
 
@@ -32,4 +33,11 @@ void USTUPlayerStatRowWidget::SetPlayerIndicatorVisibility(const bool Visibility
     if (!PlayerIndicatorImage)
         return;
     PlayerIndicatorImage->SetVisibility(VisibilityBool ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+void USTUPlayerStatRowWidget::SetTeamColor(FLinearColor &Color)
+{
+    if (!TeamColorImage)
+        return;
+    TeamColorImage->SetBrushTintColor(FSlateColor(Color));
 }

@@ -17,6 +17,7 @@ class SHOOTTHEMUP_API USTUPlayerStatRowWidget : public UUserWidget
     void SetRowInfo(FStatRowInfo &Info);
     void SetText(UTextBlock* TextBlock, const FString Text);
     void SetPlayerIndicatorVisibility(const bool VisibilityBool);
+    void SetTeamColor(FLinearColor& Color);
   protected:
     UPROPERTY(meta = (BindWidget))
     UTextBlock *PlayerNameTextBlock;
@@ -28,4 +29,6 @@ class SHOOTTHEMUP_API USTUPlayerStatRowWidget : public UUserWidget
     UTextBlock *TeamTextBlock;
     UPROPERTY(meta = (BindWidget))
     UImage *PlayerIndicatorImage;
+    UPROPERTY(meta = (BindWidget))
+    UImage *TeamColorImage;
 };

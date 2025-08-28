@@ -117,6 +117,8 @@ struct FStatRowInfo
     FString TeamText;
     UPROPERTY()
     bool PlayerIndicatorVisibility;
+    UPROPERTY()
+    FLinearColor TeamColor;
     };
 
 USTRUCT(BlueprintType)

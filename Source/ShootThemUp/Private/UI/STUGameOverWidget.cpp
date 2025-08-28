@@ -9,6 +9,7 @@
 #include "STUCoreTypes.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "STUGameModeBase.h"
 
 void USTUGameOverWidget::NativeOnInitialized()
 {
@@ -44,9 +45,12 @@ void USTUGameOverWidget::UpdatePlayersStat()
         if (!PlayerStatRowWidget)
             continue;
         PlayerStatBox->AddChild(PlayerStatRowWidget);
+
         FStatRowInfo RowInfo = {PlayerState->GetPlayerName(), FString::FromInt(PlayerState->GetKillsNum()),
                                 FString::FromInt(PlayerState->GetDeathsNum()),
-                                FString::FromInt(PlayerState->GetTeamID()), Controller->IsPlayerController()};
+                                FString::FromInt(PlayerState->GetTeamID()),
+                                Controller->IsPlayerController(),
+            GetWorld()->GetAuthGameMode<ASTUGameModeBase>()->DetermineColorByTeamID(PlayerState->GetTeamID())};
         PlayerStatRowWidget->SetRowInfo(RowInfo);
 
         
