@@ -2,28 +2,29 @@
 
 #pragma once
 
+#include "UI/STUBaseWidget.h"
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
 #include "STUCoreTypes.h"
 #include "STUPlayerHUDWidget.generated.h"
 
 /**
- * 
+ *
  */
 class USTUWeaponComponent;
 class USTUHealthActorComponent;
 class ASTUGameModeBase;
+class UProgressBar;
 UCLASS()
-class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
+class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
   public:
-	UFUNCTION(BlueprintCallable, Category = "UI")
+    UFUNCTION(BlueprintCallable, Category = "UI")
     float GetHealthPercent() const;
     UFUNCTION(BlueprintCallable, Category = "UI")
     FString GetCurrentAmmo() const;
     UFUNCTION(BlueprintCallable, Category = "UI")
-    bool GetWeaponUIData(FWeaponUIData& UIData) const;
+    bool GetWeaponUIData(FWeaponUIData &UIData) const;
     UFUNCTION(BlueprintCallable, Category = "UI")
     bool isPlayerAlive() const;
     UFUNCTION(BlueprintCallable, Category = "UI")
@@ -37,9 +38,26 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
     UFUNCTION(BlueprintImplementableEvent, Category = "UI")
     void OnTakeDamage();
     virtual void NativeOnInitialized() override;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    float PercentColorThreshold = 0.3f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    FLinearColor GoodColor = FLinearColor::White;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    FLinearColor BadColor = FLinearColor::Red;
   private:
+
+    UPROPERTY(meta = (BindWidget))
+    UProgressBar *HealthProgressBar;
+    UPROPERTY(meta = (BindWidgetAnim), Transient)
+    UWidgetAnimation *DamageAnimation;
+
+    
+    void OnHealthChanged(float Health);
     void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                    class AController *InstigatedBy, AActor *DamageCauser);
-    ASTUGameModeBase* CurrentGamemode;
-    void OnNewPawn(APawn* NewPawn);
+    ASTUGameModeBase *CurrentGamemode;
+    void OnNewPawn(APawn *NewPawn);
+    void UpdateHealthBar();
 };

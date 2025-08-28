@@ -37,7 +37,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 
     virtual bool SetPause(APlayerController *PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
     virtual bool ClearPause() override;
-
+    FLinearColor DetermineColorByTeamID(int32 TeamID) const;
   protected:
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<AAIController> AIControllerClass;
@@ -57,7 +57,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void ResetOnePlayer(AController *Controller);
 
     void CreateTeamsInfo();
-    FLinearColor DetermineColorByTeamID(int32 TeamID) const;
+    
     void SetPlayerColor(AController *Controller);
     void LogPlayerInfo();
     void StartRespawn(AController *Controller);

@@ -9,7 +9,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
 USTUHealthActorComponent::USTUHealthActorComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
-    
+    Health = MaxHealth;
 }
 
 void USTUHealthActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,

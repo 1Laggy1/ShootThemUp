@@ -7,6 +7,7 @@
 #include "STUUtils.h"
 #include "STUGameModeBase.h"
 #include "Player/STUPlayerState.h"
+#include "Components/ProgressBar.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 void USTUPlayerHUDWidget::NativeOnInitialized()
@@ -27,12 +28,27 @@ void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
     if (HealthComponent)
     {
         HealthComponent->OnDamaged.AddUObject(this, &USTUPlayerHUDWidget::OnDamaged);
+        HealthComponent->OnHealthChanged.AddUObject(this, &USTUPlayerHUDWidget::OnHealthChanged);
     }
+    UpdateHealthBar();
+}
+void USTUPlayerHUDWidget::OnHealthChanged(float Health)
+{
+    UpdateHealthBar();
+}
+void USTUPlayerHUDWidget::UpdateHealthBar()
+{
+    if (!HealthProgressBar)
+        return;
+    HealthProgressBar->SetFillColorAndOpacity(GetHealthPercent() > PercentColorThreshold ? GoodColor : BadColor);
 }
 void USTUPlayerHUDWidget::OnDamaged(AActor * DamagedActor, float Damage, const class UDamageType *DamageType,
                                     class AController *InstigatedBy, AActor *DamageCauser)
 {
-    OnTakeDamage();
+    if (!IsAnimationPlaying(DamageAnimation))
+    {
+        PlayAnimation(DamageAnimation);
+    }
 }
 
 float USTUPlayerHUDWidget::GetHealthPercent() const
@@ -40,7 +56,6 @@ float USTUPlayerHUDWidget::GetHealthPercent() const
     auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(GetOwningPlayerPawn());
     if (!HealthComponent)
         return 0.0f;
-
     return HealthComponent->GetHealthPercent();
 }
 
@@ -85,7 +100,7 @@ FString USTUPlayerHUDWidget::GetRoundsInfo()
 {
     if (!GetWorld() || !CurrentGamemode)
         return "Rounds: 0/0";
-    FString RoundsInfo = "Rounds: ";
+    FString RoundsInfo = "Round: ";
     FGameData GameData = CurrentGamemode->GetGameData();
     RoundsInfo = RoundsInfo + FString::FromInt(CurrentGamemode->GetCurrentRound()) + "/" + FString::FromInt(GameData.RoundsNum);
     return RoundsInfo;
