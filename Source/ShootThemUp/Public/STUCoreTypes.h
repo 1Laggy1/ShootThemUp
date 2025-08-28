@@ -101,3 +101,20 @@ enum class ESTUMatchState : uint8
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStateChangeSignature, ESTUMatchState)
+
+// ui
+USTRUCT(BlueprintType) 
+struct FStatRowInfo
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY()
+    FString PlayerNameText;
+    UPROPERTY()
+    FString KillsText;
+    UPROPERTY()
+    FString DeathsText;
+    UPROPERTY()
+    FString TeamText;
+    UPROPERTY()
+    bool PlayerIndicatorVisibility;
+    };
