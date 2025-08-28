@@ -17,7 +17,6 @@ class SHOOTTHEMUP_API USTUPlayerStatRowWidget : public UUserWidget
     void SetRowInfo(FStatRowInfo &Info);
     void SetText(UTextBlock* TextBlock, const FString Text);
     void SetPlayerIndicatorVisibility(const bool VisibilityBool);
-    void NativeConstruct() override;
   protected:
     UPROPERTY(meta = (BindWidget))
     UTextBlock *PlayerNameTextBlock;

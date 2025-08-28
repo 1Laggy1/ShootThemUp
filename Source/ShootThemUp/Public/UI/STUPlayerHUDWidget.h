@@ -36,7 +36,7 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public UUserWidget
     FString GetKills();
     UFUNCTION(BlueprintImplementableEvent, Category = "UI")
     void OnTakeDamage();
-    virtual bool Initialize() override;
+    virtual void NativeOnInitialized() override;
   private:
     void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                    class AController *InstigatedBy, AActor *DamageCauser);

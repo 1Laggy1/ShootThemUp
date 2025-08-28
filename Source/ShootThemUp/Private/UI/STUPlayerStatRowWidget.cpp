@@ -14,15 +14,6 @@ void USTUPlayerStatRowWidget::SetRowInfo(FStatRowInfo &Info)
     SetPlayerIndicatorVisibility(Info.PlayerIndicatorVisibility);
 
 }
-void USTUPlayerStatRowWidget::NativeConstruct()
-{
-    Super::NativeConstruct();
-
-    UE_LOG(LogTemp, Error, TEXT("PlayerNameTextBlock = %p"), PlayerNameTextBlock);
-    UE_LOG(LogTemp, Error, TEXT("KillsTextBlock = %p"), KillsTextBlock);
-    UE_LOG(LogTemp, Error, TEXT("DeathsTextBlock = %p"), DeathsTextBlock);
-    UE_LOG(LogTemp, Error, TEXT("TeamTextBlock = %p"), TeamTextBlock);
-}
 
 void USTUPlayerStatRowWidget::SetText(UTextBlock *TextBlock, const FString Text)
 {
