@@ -8,6 +8,7 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 class USTUWeaponFXComponent;
+class USoundCue;
 UCLASS()
 class SHOOTTHEMUP_API ASTUProjectile : public AActor
 {
@@ -38,6 +39,8 @@ protected:
   float LifeSeconds = 5.0f;
   UPROPERTY(VisibleAnywhere, Category = "VFX")
   USTUWeaponFXComponent *WeaponFXComponent;
+  UPROPERTY(EditDefaultsOnly, Category = "Sound")
+  USoundCue *ExplosionSound;
 	virtual void BeginPlay() override;
 
 private:

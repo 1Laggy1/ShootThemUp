@@ -54,6 +54,12 @@ void ASTUPlayerCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInput
                                      &USTUWeaponComponent::NextWeapon);
     PlayerInputComponent->BindAction("Reload", EInputEvent::IE_Pressed, WeaponComponent, &USTUWeaponComponent::Reload);
     PlayerInputComponent->BindAction("SnapCamera", EInputEvent::IE_Pressed, this, &ASTUPlayerCharacter::SnapCamera);
+
+    DECLARE_DELEGATE_OneParam(FZoomInputSignature, bool);
+    PlayerInputComponent->BindAction<FZoomInputSignature>("Zoom", EInputEvent::IE_Pressed, WeaponComponent,
+                                                          &USTUWeaponComponent::Zoom, true);
+    PlayerInputComponent->BindAction<FZoomInputSignature>("Zoom", EInputEvent::IE_Released, WeaponComponent,
+                                                          &USTUWeaponComponent::Zoom, false);
 }
 
 void ASTUPlayerCharacter::MoveForward(float Amount)
@@ -115,11 +121,13 @@ void ASTUPlayerCharacter::OnDamaged(AActor *DamagedActor, float Damage, const UD
 void ASTUPlayerCharacter::OnDeath()
 {
     Super::OnDeath();
+    WeaponComponent->Zoom(false);
     if (Controller)
     {
         Controller->ChangeState(NAME_Spectating);
     }
     UE_LOG(STUPlayerCharacter, Display, TEXT("Player %s is dead"), *GetName());
+    
 }
 
 void ASTUPlayerCharacter::SnapCamera()

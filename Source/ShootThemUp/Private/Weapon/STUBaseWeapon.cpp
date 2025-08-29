@@ -13,6 +13,8 @@
 #include <Components/STUHealthActorComponent.h>
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
@@ -41,6 +43,7 @@ void ASTUBaseWeapon::StopFire()
 
 void ASTUBaseWeapon::MakeShot()
 {
+   
 }
 
 AController *ASTUBaseWeapon::GetController() const

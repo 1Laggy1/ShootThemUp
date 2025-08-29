@@ -10,6 +10,9 @@ void USTULevelItemWidget::NativeOnInitialized()
     if (LevelSelectButton)
     {
         LevelSelectButton->OnClicked.AddDynamic(this, &USTULevelItemWidget::OnLevelItemClicked);
+        LevelSelectButton->OnHovered.AddDynamic(this, &USTULevelItemWidget::OnLevelItemHover);
+        LevelSelectButton->OnUnhovered.AddDynamic(this, &USTULevelItemWidget::OnLevelItemUnHover);
+
     }
 }
 
@@ -31,6 +34,14 @@ void USTULevelItemWidget::SetLevelData(const FLevelData &Data)
 void USTULevelItemWidget::OnLevelItemClicked()
 {
     OnLevelSelected.Broadcast(LevelData);
+}
+void USTULevelItemWidget::OnLevelItemHover()
+{
+    LevelImage->SetColorAndOpacity(HoverColor);
+}
+void USTULevelItemWidget::OnLevelItemUnHover()
+{
+    LevelImage->SetColorAndOpacity(FLinearColor::White);
 }
 void USTULevelItemWidget::SetSelected(bool isSelected)
 {

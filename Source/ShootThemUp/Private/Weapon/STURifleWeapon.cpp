@@ -11,6 +11,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 ASTURifleWeapon::ASTURifleWeapon()
 {
     WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
@@ -37,13 +39,33 @@ void ASTURifleWeapon::StopFire()
     SetMuzzleFXVisibility(false);
 }
 
+void ASTURifleWeapon::Zoom(bool Enable)
+{
+    const auto Controllerr = Cast<APlayerController>(GetController());
+    if (!Controllerr || !Controllerr->PlayerCameraManager)
+        return;
+
+    const TInterval<float> FOV(ZoomFOV, NoZoomFOV);
+    Controllerr->PlayerCameraManager->SetFOV(Enable ? FOV.Min : FOV.Max);
+}
+
 
 
 void ASTURifleWeapon::MakeShot()
 {
-    if (!GetWorld() || IsAmmoEmpty())
+    if (!GetWorld())
     {
         StopFire();
+        return;
+    }
+    if (IsAmmoEmpty())
+    {
+        StopFire();
+        if (NoAmmoSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
+        }
+        
         return;
     }
     Controller = GetController();
@@ -66,11 +88,15 @@ void ASTURifleWeapon::MakeShot()
         WeaponFXComponent->PlayImpactFX(HitResult);
         if (HitResult.GetActor())
         {
-            MakeDamage(HitResult.GetActor());
+            MakeDamage(HitResult);
         }
     }
     SpawnTraceFX(GetMuzzleWorldLocation(), TraceFXEnd);
-
+    if (FireSound)
+    {
+        UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, MuzzleSocketName);
+    }
+   
     DecreaseAmmo();
 }
 
@@ -88,9 +114,11 @@ bool ASTURifleWeapon::GetTraceData(FVector &TraceStart, FVector &TraceEnd) const
 
     return true;
 }
-void ASTURifleWeapon::MakeDamage(AActor *ActorToHit)
+void ASTURifleWeapon::MakeDamage(const FHitResult &HitResult)
 {
-    ActorToHit->TakeDamage(Damage, FDamageEvent(), Controller, this);
+    FPointDamageEvent PointDamageEvent;
+    PointDamageEvent.HitInfo = HitResult;
+    HitResult.GetActor()->TakeDamage(Damage, PointDamageEvent, Controller, this);
 }
 
 void ASTURifleWeapon::InitMuzzleFX()

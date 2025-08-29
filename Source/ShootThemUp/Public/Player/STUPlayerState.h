@@ -34,6 +34,10 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
     {
         KillsNum++;
     }
+    void RemoveKill()
+    {
+        KillsNum--;
+    }
     int32 GetKillsNum()
     {
         return KillsNum;

@@ -11,6 +11,7 @@
 class USkeletalMeshComponents;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class USoundCue;
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 {
@@ -33,6 +34,10 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     }
     bool TryToAddAmmo(int32 ClipsAmount);
     bool IsAmmoEmpty() const;
+    virtual void Zoom(bool Enable)
+    {
+
+    }
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent *WeaponMesh;
@@ -48,6 +53,16 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     FWeaponUIData UIData;
     UPROPERTY(EditAnywhere, Category = "VFX")
     UNiagaraSystem *MuzzleFX;
+    UPROPERTY(EditAnywhere, Category = "Sound")
+    USoundCue *FireSound;
+    UPROPERTY(EditAnywhere, Category = "Sound")
+    USoundCue *NoAmmoSound;
+    UPROPERTY(EditAnywhere, Category = "Sound")
+    bool CanZoom;
+    UPROPERTY(EditAnywhere, Category = "Sound", meta = (EditCondition = "CanZoom"))
+    float NoZoomFOV = 90.0f;
+    UPROPERTY(EditAnywhere, Category = "Sound", meta = (EditCondition = "CanZoom"))
+    float ZoomFOV = 50.0f;
     AController *Controller;
     AController *GetController() const;
     bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const;

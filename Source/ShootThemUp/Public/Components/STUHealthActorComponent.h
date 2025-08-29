@@ -7,6 +7,8 @@
 #include "STUCoreTypes.h"
 #include "STUHealthActorComponent.generated.h"
 
+class UPhysicalMaterial;
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
 {
@@ -54,6 +56,8 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     float HealAmount = 1.0f;
 
   protected:
+      UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
+    TMap<UPhysicalMaterial *, float> DamageModifiers;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ClampMin = "0"))
     float MaxHealth = 100.0f;
     virtual void BeginPlay() override;
@@ -62,8 +66,15 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     float Health = 0.0f;
     bool IsVaunded = false;
     UFUNCTION()
-    void OnTakeAnyDamage(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                         class AController *InstigatedBy, AActor *DamageCauser);
+    void OnTakePointDamage(AActor *DamagedActor, float Damage, class AController *InstigatedBy, FVector HitLocation,
+                           class UPrimitiveComponent *FHitComponent, FName BoneName, FVector ShotFromDirection,
+                           const class UDamageType *DamageType, AActor *DamageCauser);
+    UFUNCTION()
+    void OnTakeRadialDamage(AActor *DamagedActor, float Damage, const class UDamageType *DamageType, FVector Origin,
+                            const FHitResult &HitInfo, class AController *InstigatedBy, AActor *DamageCauser);
     void AutoHealHandle(float DeltaTime);
     void Killed(AController *KillerController);
+    void ApplyDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy, const UDamageType *DamageType,
+                     AActor *DamageCauser);
+    float GetPointDamageModifier(AActor *DamagedActor, const FName &BoneName);
 };

@@ -7,6 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Weapon/Components/STUWeaponFXComponent.h"
+#include "Sound/SoundCue.h"
 
 ASTUProjectile::ASTUProjectile()
 {
@@ -49,6 +50,7 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
                                         UDamageType::StaticClass(), {}, this, GetController(), DoFullDamage);
     DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 24, FColor::Red, false, 5.0f);
     WeaponFXComponent->PlayImpactFX(Hit);
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
     Destroy();
 }
 AController *ASTUProjectile::GetController() const
