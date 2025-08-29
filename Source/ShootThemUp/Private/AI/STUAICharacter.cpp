@@ -27,6 +27,20 @@ ASTUAICharacter::ASTUAICharacter(const FObjectInitializer& ObjInit) : Super(ObjI
 void ASTUAICharacter::BeginPlay()
 {
     Super::BeginPlay();
+    HealthComponent = FindComponentByClass<USTUHealthActorComponent>();
+    if (HealthComponent)
+    {
+        HealthComponent->OnDeath.AddUObject(this, &ASTUAICharacter::OnDeath);
+        HealthComponent->OnHealthChanged.AddUObject(this, &ASTUAICharacter::OnHealthChanged);
+        HealthComponent->OnDamaged.AddUObject(this, &ASTUAICharacter::OnDamaged);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("No HealthComponent found in AICharacter instance!"));
+    }
+    UE_LOG(LogTemp, Warning, TEXT("AICharacter: %s, HealthComponent: %s, Owner: %s"), *GetNameSafe(this),
+           *GetNameSafe(HealthComponent), *GetNameSafe(HealthComponent ? HealthComponent->GetOwner() : nullptr));
+
     check(HealthWidgetComponent);
 }
 void ASTUAICharacter::OnDeath()

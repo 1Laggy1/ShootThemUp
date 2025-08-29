@@ -11,6 +11,7 @@
 class USTUHealthActorComponent;
 class ASTUBaseWeapon;
 class USTUWeaponComponent;
+class USoundCue;
 
 UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 {
@@ -30,6 +31,12 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FVector2D LandedDamage = FVector2D(1.0f, 100.0f);
     UPROPERTY(EditDefaultsOnly, Category = "Material")
     FName MaterialColorName = "Paint Color";
+    UPROPERTY(EditDefaultsOnly, Category = "Sound")
+    USoundCue *DeathSound;
+    UPROPERTY(EditDefaultsOnly, Category = "Sound")
+    USoundCue *RespawnSound;
+    UPROPERTY(EditDefaultsOnly, Category = "Sound")
+    USoundCue *DamageSound;
     virtual void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                            class AController *InstigatedBy, AActor *DamageCauser);
     virtual void OnDeath();

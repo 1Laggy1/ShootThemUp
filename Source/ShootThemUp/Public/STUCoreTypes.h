@@ -2,6 +2,7 @@
 #include "STUCoreTypes.generated.h"
 // weapon
 class ASTUBaseWeapon;
+class USoundCue;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipSignature, ASTUBaseWeapon*);
 
 USTRUCT(BlueprintType)
@@ -68,6 +69,8 @@ struct FImpactData
     UNiagaraSystem *NiagaraEffect;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
     FDecalData DecalData;
+    UPROPERTY(EditDefaultsOnly, Category = "Sound")
+    USoundCue *ImpactSound;
 };
 USTRUCT(BlueprintType)
 struct FGameData

@@ -21,7 +21,7 @@ class SHOOTTHEMUP_API ASTURifleWeapon : public ASTUBaseWeapon
 
     virtual void StartFire() override;
     virtual void StopFire() override;
-
+    virtual void Zoom(bool Enable) override;
   protected:
     UPROPERTY(EditAnywhere, Category = "Stats")
     float TimeBetweenShots = 0.1f;
@@ -37,7 +37,7 @@ class SHOOTTHEMUP_API ASTURifleWeapon : public ASTUBaseWeapon
     virtual void BeginPlay() override;
     virtual void MakeShot() override;
     virtual bool GetTraceData(FVector &TraceStart, FVector &TraceEnd) const override;
-    void MakeDamage(AActor *ActorToHit);
+    void MakeDamage(const FHitResult& HitResult);
   private:
     FTimerHandle ShotTimerHandle;
     UPROPERTY()

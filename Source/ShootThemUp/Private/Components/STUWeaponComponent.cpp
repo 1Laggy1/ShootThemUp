@@ -12,6 +12,13 @@
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All, All)
 
 constexpr static int32 WeaponNum = 2;
+void USTUWeaponComponent::Zoom(bool Enabled)
+{
+    if (CurrentWeapon)
+    {
+        CurrentWeapon->Zoom(Enabled);
+    }
+}
 USTUWeaponComponent::USTUWeaponComponent()
 {
 
@@ -63,6 +70,7 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
 
     if (CurrentWeapon)
     {
+        Zoom(false);
         CurrentWeapon->StopFire();
         AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponArmorySocketName);
     }

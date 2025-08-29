@@ -24,6 +24,8 @@ class SHOOTTHEMUP_API USTULevelItemWidget : public UUserWidget
     }
     void SetSelected(bool isSelected);
   protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FLinearColor HoverColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f);
     UPROPERTY(meta = (BindWidget))
     UButton *LevelSelectButton;
     UPROPERTY(meta = (BindWidget))
@@ -38,4 +40,8 @@ class SHOOTTHEMUP_API USTULevelItemWidget : public UUserWidget
     FLevelData LevelData;
       UFUNCTION()
     void OnLevelItemClicked();
+      UFUNCTION()
+      void OnLevelItemHover();
+      UFUNCTION()
+    void OnLevelItemUnHover();
 };

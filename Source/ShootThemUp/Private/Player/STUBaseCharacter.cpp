@@ -10,6 +10,8 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/DamageType.h"
 #include "Weapon/STUBaseWeapon.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
@@ -35,6 +37,7 @@ void ASTUBaseCharacter::OnDamaged(AActor* DamagedActor, float Damage, const clas
 {
     if (HealthComponent->isDead() || !GetController())
         return;
+    //UGameplayStatics::PlaySoundAtLocation(GetWorld(), DamageSound, GetActorLocation());
 }
 
 // Called when the game starts or when spawned
@@ -43,9 +46,14 @@ void ASTUBaseCharacter::BeginPlay()
     Super::BeginPlay();
 
     OnHealthChanged(HealthComponent->GetHealth());
+    UE_LOG(LogTemp, Warning, TEXT("HealthComponent pointer: %p, owner: %s"), HealthComponent,
+           *GetNameSafe(HealthComponent->GetOwner()));
+    UE_LOG(LogTemp, Warning, TEXT("Character pointer: %p, name: %s"), this, *GetNameSafe(this));
+
     HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
     HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
     HealthComponent->OnDamaged.AddUObject(this, &ASTUBaseCharacter::OnDamaged);
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), RespawnSound, GetActorLocation());
 }
 
 void ASTUBaseCharacter::SetPlayerColor(const FLinearColor &Color)
@@ -109,6 +117,8 @@ void ASTUBaseCharacter::OnDeath()
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     GetMesh()->SetSimulatePhysics(true);
     GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
 }
 
 void ASTUBaseCharacter::OnHealthChanged(float Health)

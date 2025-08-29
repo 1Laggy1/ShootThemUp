@@ -68,7 +68,7 @@ void ASTUGameModeBase::StartRound()
 
 void ASTUGameModeBase::GameTimerUpdate()
 {
-    UE_LOG(LogSTUGameModeBase, Display, TEXT("Time: %i / Round: %i/%i"), RoundCountDown, CurrentRound, GameData.RoundsNum);
+    // UE_LOG(LogSTUGameModeBase, Display, TEXT("Time: %i / Round: %i/%i"), RoundCountDown, CurrentRound, GameData.RoundsNum);
     if (--RoundCountDown == 0)
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
@@ -228,6 +228,11 @@ void ASTUGameModeBase::Killed(AController *KillerController, AController *Victim
 
     if (KillerPlayerState)
     {
+        if (KillerPlayerState->GetTeamID() == VictimPlayerState->GetTeamID())
+        {
+            KillerPlayerState->RemoveKill();
+        }
+        else
         KillerPlayerState->AddKill();
     }
 

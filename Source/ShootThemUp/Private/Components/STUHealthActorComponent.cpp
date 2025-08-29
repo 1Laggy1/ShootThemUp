@@ -1,8 +1,9 @@
 // Shoot THem Up Game. All Rights Reserved.
 
 #include "Components/STUHealthActorComponent.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Character.h"
 #include "STUGameModeBase.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
 
@@ -44,13 +45,33 @@ void USTUHealthActorComponent::BeginPlay()
     AActor *ComponentOwner = GetOwner();
     if (ComponentOwner)
     {
-        ComponentOwner->OnTakeAnyDamage.AddDynamic(this, &USTUHealthActorComponent::OnTakeAnyDamage);
+        ComponentOwner->OnTakePointDamage.AddDynamic(this, &USTUHealthActorComponent::OnTakePointDamage);
+        ComponentOwner->OnTakeRadialDamage.AddDynamic(this, &USTUHealthActorComponent::OnTakeRadialDamage);
     }
 }
 
+void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,
+                                                 FVector HitLocation, UPrimitiveComponent *FHitComponent,
+                                                 FName BoneName, FVector ShotFromDirection,
+                                                 const UDamageType *DamageType, AActor *DamageCauser)
+{
+    const auto FinalDamage = Damage * GetPointDamageModifier(DamagedActor, BoneName);
+    UE_LOG(LogHealthComponent, Display, TEXT("On point damage: %f, final: %f, bone: %s"), Damage, FinalDamage,
+           *BoneName.ToString());
+    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, DamageCauser);
+}
 
-void USTUHealthActorComponent::OnTakeAnyDamage(AActor *DamagedActor, float Damage, const UDamageType *DamageType,
-                                               AController *InstigatedBy, AActor *DamageCauser)
+void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Damage, const UDamageType *DamageType,
+                                                  FVector Origin, const FHitResult &HitInfo, AController *InstigatedBy,
+                                                  AActor *DamageCauser)
+{
+    UE_LOG(LogHealthComponent, Display, TEXT("On radial damage: %f"), Damage);
+    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, DamageCauser);
+}
+
+void USTUHealthActorComponent::ApplyDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,
+                                           const UDamageType *DamageType,
+                                           AActor *DamageCauser)
 {
     if (Damage <= 0 || isDead())
     {
@@ -59,8 +80,7 @@ void USTUHealthActorComponent::OnTakeAnyDamage(AActor *DamagedActor, float Damag
     HealDelayCurrent = 0;
     Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
     OnHealthChanged.Broadcast(Health);
-    OnDamaged.Broadcast(DamagedActor, Damage, DamageType,
-                        InstigatedBy, DamageCauser);
+    OnDamaged.Broadcast(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
     IsVaunded = true;
 
     if (isDead())
@@ -68,8 +88,21 @@ void USTUHealthActorComponent::OnTakeAnyDamage(AActor *DamagedActor, float Damag
         Killed(InstigatedBy);
         OnDeath.Broadcast();
     }
+}
 
-    
+float USTUHealthActorComponent::GetPointDamageModifier(AActor *DamagedActor, const FName &BoneName)
+{
+    const auto Character = Cast<ACharacter>(DamagedActor);
+    if (!Character || !Character->GetMesh() || !Character->GetMesh()->GetBodyInstance(BoneName) ||
+        !Character->GetMesh()->GetBodyInstance(BoneName)->GetSimplePhysicalMaterial())
+        return 1.0f;
+
+    const auto PhysicalMaterial = Character->GetMesh()->GetBodyInstance(BoneName)->GetSimplePhysicalMaterial();
+    if (!DamageModifiers.Contains(PhysicalMaterial))
+        return 1.0f;
+
+    return DamageModifiers[PhysicalMaterial];
+
 }
 
 void USTUHealthActorComponent::AutoHealHandle(float DeltaTime)
@@ -101,3 +134,5 @@ void USTUHealthActorComponent::Killed(AController *KillerController)
     const auto VictimController = Player ? Player->Controller : nullptr;
     GameMode->Killed(KillerController, VictimController);
 }
+
+
