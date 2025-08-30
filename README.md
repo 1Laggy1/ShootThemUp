@@ -1,17 +1,17 @@
 # ShootThemUp
-A third person shooter built in Unreal Engine 5.6. Demontrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
+A third person shooter built in Unreal Engine 5.6. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
 ## Summary
 ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 years of Unity developing. In this project I have implemented a full gameplay loop (movement, weapons, health, AI, pickups, UI, VFX, sound, and game flow) and is designed to show practical engineering decisions and reusable systems.
 ## Highlights
 - Complete third-person character with animations (`blendspaces`, `montages`, `notifies`, `ragdoll`, `aim offsets`, `F.A.B.R.I.K`).
-- Weapon system using self created Actor component `WeaponComponent` that is controlling weapons that character have (shooting, equiping, reloading), and `ABaseWeapon` class that implementing all of this methods shoot, reload, and inherited classes `RifleWeapon` and `LauncherWeapon` with overrided methods, for their use.
+- Weapon system using self created Actor component `WeaponComponent` that is controlling weapons that character have (shooting, equipping, reloading), and `ABaseWeapon` class that implementing all of this methods shoot, reload, and inherited classes `RifleWeapon` and `LauncherWeapon` with overrided methods, for their use.
 `LineTrace` for rifle weapon, and `UGameplayStatics::ApplyRadialDamage` for Launcher radial damage.
-- Health system using self created Actor component `HealthActorComponent`. Subscribed to GetOwner delegates OnTakeDamage it uses his own methods to determine whether the health will be changed, and broadcasting OnHealthChanged delegate to inform others that Health is changed.
+- Health system using self created Actor component `HealthActorComponent`. Subscribed to GetOwner delegates OnTakeDamage it uses his own methods to determine whether the health will be changed, and broadcasting the OnHealthChanged delegate to notify other systems of health changes.
 - AI using `NavMesh`, `UAIPerception`, `Behavior Tree` + `Blackboard`, built in and self created `EQS tests`, `Tasks`, `Services`.
 - UMG HUD and self created `UserWidgets` driven from c++ with data binding using `BindWidget` and `BindWidgetAnim` (Health, ammo, scoreboard, spectator UI, levels).
-- VFX `Niagara`, rifle line traces, muzzle effects using `sockets` on meshes also bullet decals, camera shakeing, post-process effects.
+- VFX `Niagara`, rifle line traces, muzzle effects using `sockets` on meshes also bullet decals, camera shaking, post-process effects.
 - Full sound integrations (`Sound cues`, `Sound Classes`, `Attenuations`, `Animation notifies`)
-- Clean code organization: Separated gameplay components such as `HealthActorComponent` `WeaponComponent` `WeaponFXComponent`, all code is writed in code where it should be, `Player stat` have everything related to stats, and settings of player like TeamID, Kills, Deaths. `GamemodeBase` driven class have everything related to gamemode
+- Clean code organization: Separated gameplay components such as `HealthActorComponent` `WeaponComponent` `WeaponFXComponent`, all code is writed in places where it should be, `Player stat` have everything related to stats, and settings of player like TeamID, Kills, Deaths. `GamemodeBase` driven class have everything related to gamemode
 (respawning players, score count and show), etc.
 ## Technical details
 - `Actors`, `Pawns`, `Characters`, `Components`, `Gamemode`/`GameState`/`PlayerState`
