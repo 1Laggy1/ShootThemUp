@@ -2,7 +2,10 @@
 
 This is a game maded by me with Unreal Engine 5.6. After 5 years of unity developing I have decided to start learning Unreal engine. And watch a course on Udemy about Unreal Engine with C++ developing that I completed.
 
-I was really scared of unknown things, but I understand now that Unreal Engine it's a really powerful tool for game developing. And C++ is not that bad how I was thinking at first. After this course I know how the engine work, and all the basics stuff.
+<img width="1600" height="1190" alt="image" src="https://github.com/user-attachments/assets/06115ce8-9abb-4cef-9c80-b4ac99030546" />
+
+
+I was scared of unknown things, but I understand now that Unreal Engine it's a really powerful tool for game developing. And C++ is not that bad how I was thinking at first. After this course I know how the engine work, and all the basics stuff.
 
 Because of my Unity knowledge I was learning very fast, everything it's just the same, in some ways easier.
 
@@ -37,11 +40,14 @@ switching visibility of this when character is dead.
 
 ## Pickups
 Here I created in game items like `HealthPickup` that was adding health when equiped, and `AmmoPickup` that was adding ammo when picked up. For this I created `BasePickup` class that was a parent for this pickups, there is OnPickup function, that is overriding by other pickups class, and there they implementing they functions.
+
+<img width="172" height="201" alt="{6C358CCD-36AF-4C9E-9FB8-E3E6040EFD14}" src="https://github.com/user-attachments/assets/da3dc90d-ea48-4438-afdf-ce615c609eae" />
+
 ## VFX, Niagara
 In this section, I learned `Niagara` and `Cascade` system. For cascade system I just read about this, to first know, what system was before, and then I started to learn and practice with `Niagara`. I added `UWeaponFXComponent` for BaseWeapon class, this class controlling everything related to spawning fx on muzzle when shooting, spawning trace.
 I also learned `Decals`, and used them to make holes from bullets when shooting. I also removed my death anim to use more advanced tech called `Ragdoll`. I added shake to the camera when player taking damage, and UI blood effect, using anim and blueprint yet. I also added `Postprocessing` to spectator camera for grain, and grey color effects.
 
-<img width="172" height="201" alt="{6C358CCD-36AF-4C9E-9FB8-E3E6040EFD14}" src="https://github.com/user-attachments/assets/da3dc90d-ea48-4438-afdf-ce615c609eae" />
+<img width="1661" height="1440" alt="{ECA0FB61-086E-4351-8870-BB1BA434FAFD}" src="https://github.com/user-attachments/assets/f991b314-457e-47e0-9c3a-465780f7f532" />
 
 ## AI
 In this section I was learning AI. First what I was looking about is `NavMesh volume` to add navigation to scene, `Behavior tree` and `Blackboard`. I first made ai to move in to random scene position. I learned about `Task` and how to create my own in code. Then I learned `UAIPerceptionComponent`, I added `SightSense` for bot, and in `Behavior tree`
