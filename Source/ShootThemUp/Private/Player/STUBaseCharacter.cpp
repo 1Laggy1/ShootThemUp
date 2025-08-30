@@ -44,15 +44,18 @@ void ASTUBaseCharacter::OnDamaged(AActor* DamagedActor, float Damage, const clas
 void ASTUBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
+    if (HealthComponent)
+    {
+        OnHealthChanged(HealthComponent->GetHealth());
+        UE_LOG(LogTemp, Warning, TEXT("HealthComponent pointer: %p, owner: %s"), HealthComponent,
+               *GetNameSafe(HealthComponent->GetOwner()));
+        UE_LOG(LogTemp, Warning, TEXT("Character pointer: %p, name: %s"), this, *GetNameSafe(this));
 
-    OnHealthChanged(HealthComponent->GetHealth());
-    UE_LOG(LogTemp, Warning, TEXT("HealthComponent pointer: %p, owner: %s"), HealthComponent,
-           *GetNameSafe(HealthComponent->GetOwner()));
-    UE_LOG(LogTemp, Warning, TEXT("Character pointer: %p, name: %s"), this, *GetNameSafe(this));
-
-    HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
-    HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
-    HealthComponent->OnDamaged.AddUObject(this, &ASTUBaseCharacter::OnDamaged);
+        HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
+        HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
+        HealthComponent->OnDamaged.AddUObject(this, &ASTUBaseCharacter::OnDamaged);
+    }
+    
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), RespawnSound, GetActorLocation());
 }
 
