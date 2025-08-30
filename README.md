@@ -20,17 +20,41 @@ ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 y
 
 - AI using `NavMesh`, `UAIPerception`, `Behavior Tree` + `Blackboard`, built in and self created `EQS tests`, `Tasks`, `Services`.
 
+EQS:
+
 ![EQS](https://github.com/user-attachments/assets/22168e59-3486-486c-8c11-9b615b741a67)
 
 ![EQSSecond](https://github.com/user-attachments/assets/3357ee4b-e7bd-4604-b2ab-96a5d9e4031d)
 
+AI finding Healing pickup:
+
 ![EQSHealing](https://github.com/user-attachments/assets/6767bfcb-07d8-4739-a069-bae9e1923d75)
+
+AI going to last enemy position:
+
+![AILastEnemyPosition](https://github.com/user-attachments/assets/3c74d9ec-166c-4a10-af95-34aff7276082)
+
+AI Damage sense:
+
+![SenseDamage](https://github.com/user-attachments/assets/125b15e9-763f-4b99-8e15-9e79fa72c1d5)
 
 <img width="1738" height="659" alt="{0FA8BD63-E554-4B34-8E84-C73549C9F766}" src="https://github.com/user-attachments/assets/f30f95c3-c44f-49cd-a2d1-013b5067cad9" />
 
 - UMG HUD and self created `UserWidgets` driven from c++ with data binding using `BindWidget` and `BindWidgetAnim` (Health, ammo, scoreboard, spectator UI, levels).
+
+<img width="2560" height="1440" alt="{E21245B3-9AF3-4645-84A9-E1F4CB3851C5}" src="https://github.com/user-attachments/assets/2427c077-c97f-4568-8ef4-cd4c827a7ee2" />
+
+<img width="2560" height="1440" alt="{F7E8ED97-B0DE-4327-A53B-949572A10E15}" src="https://github.com/user-attachments/assets/b5e7c98b-1f16-4dbf-9d8b-2a38fcd92783" />
+
+
 - VFX `Niagara`, rifle line traces, muzzle effects using `sockets` on meshes also bullet decals, camera shaking, post-process effects.
+
+![VFXLauncher](https://github.com/user-attachments/assets/908930e7-41a4-4fec-9e93-74385d1ebff5)
+
 - Full sound integrations (`Sound cues`, `Sound Classes`, `Attenuations`, `Animation notifies`)
+
+[Sound test youtube link](https://youtu.be/W4pmJsOnAKk)
+
 - Clean code organization: Separated gameplay components such as `HealthActorComponent` `WeaponComponent` `WeaponFXComponent`, all code is writed in places where it should be, `Player stat` have everything related to stats, and settings of player like TeamID, Kills, Deaths. `GamemodeBase` driven class have everything related to gamemode
 (respawning players, score count and show), etc.
 ## Technical details
@@ -41,7 +65,7 @@ ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 y
 - `Niagara` and `Decal` usage, `Mesh Sockets`, `Physic Materials`, working with `Bone` names.
 - Creating, subscribing and broadcasting `Delegates`, OnTakeDamage, OnHealthChanged, OnAnimEnd etc., working with timers (WorldTimerManager).
 - Full sound creation `Sound Cue`, `Sound wave`, `Attenuation`, `UAudioComponent`, `USoundClass`, `USoundMix`
-## Screenshots
+## [Gameplay youtube link](https://youtu.be/bS7BoY_a3ME)
 
 ## How to run
 ### Project
