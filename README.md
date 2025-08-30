@@ -18,6 +18,7 @@ Then I started to add character. Set up movement, input bindings, camera movemen
 ## Health, damage
 I started to experement with `Take Damage`, `Apply damage`, I created `actor component class` for character `UHealthComponent`, this component was subscribing to owner `OnTakeAnyDamage`, and making some arifmetical operations to add, substract health, I then also added `TakeHeal`, this component also have own delegates `OnDamaged`, `OnHealthChanged`.
 I then added `ASpectatorPawn`, and fall damage.
+
 <img width="1259" height="705" alt="{A9C34B26-86A6-4AC3-A4AF-E1286C820B26}" src="https://github.com/user-attachments/assets/bf39cbc1-e9f1-41e7-b066-853ef526ffd2" />
 
 ## Weapons
@@ -31,6 +32,7 @@ WeaponComponent that he can't shoot or equip right now because of reload, or equ
 ## UMG
 In this section, I learned `Blueprint Widget` or `UUserWidget`, how to use it, how to create it, how to create and control it from code. I added HealthBar using Progress bar, added new crosshair, I was also switching crosshair based on weapon that is character holding right now. I implemented different `UserWidget` for spectator and I was
 switching visibility of this when character is dead.
+
 <img width="1441" height="763" alt="{7C10404A-7E91-4888-892C-37BF708F5F0D}" src="https://github.com/user-attachments/assets/35351858-b7ca-4391-9a58-e7b58930c54b" />
 
 ## Pickups
@@ -45,17 +47,20 @@ I also learned `Decals`, and used them to make holes from bullets when shooting.
 In this section I was learning AI. First what I was looking about is `NavMesh volume` to add navigation to scene, `Behavior tree` and `Blackboard`. I first made ai to move in to random scene position. I learned about `Task` and how to create my own in code. Then I learned `UAIPerceptionComponent`, I added `SightSense` for bot, and in `Behavior tree`
 I made him look at closest enemy, by learning and implementing `Decorator`, and `Service`, I learned how to own in code, and made him shoot, when `Blackboard` object value enemy was not null, that is checked by Decorator. I added new `WeaponComponent` class for AI, to override functions like shoot, so when ammo is zero, he have to switch to the next
 weapon.
+
 <img width="1770" height="720" alt="{FD345CF1-E31E-4C81-A06B-41AB1D4E49C7}" src="https://github.com/user-attachments/assets/09fb19bd-1e6f-4053-a1f9-e44f798ca3d6" />
 
 ### EQS
 Here I learned about `Environment Query System`. I learned how to use context, how to make random locations, based on `EQS` components, and `Tests`. And with this knowledge I implemented search for health and ammo for bot. I used `find by class`, and `Trace`. I also implemented random position for AI, like when he was looking at enemy, he was choosing
 random position, based on EQS, here I was also using my own created `Querier Context` in code, to return enemy that is writed in `Blackboard` object value Enemy. I also created my own `Test` in code, `PickupCouldBeTaken`, it was iterating for each pickup it's found, and set fail to pickups that can't be taken right now, if they respawning for example.
+
 <img width="628" height="311" alt="{CA9EF74D-D731-487F-800D-AA5AA2ABEB0E}" src="https://github.com/user-attachments/assets/b56cd90d-76c6-46da-a778-3b40f4a86eba" />
 <img width="756" height="534" alt="{73423E4F-B303-492D-8539-35F14C51E821}" src="https://github.com/user-attachments/assets/24ab2108-9522-47bf-9e8d-6f892e25c10d" />
 
 ## Game mode
 In this section I learned about `Gamemode` class. I was adding functionality to my own `GamemodeBase` class. I added AI spawns, game time, round number using struct. I learned about `PlayerState` class, I added there information about players kills, deaths, teamid, teamcolor, using struct too. I changed AI to shoot and aim only for
 player from enemy team. I added `PlayerCharacter` based on `ABaseCharacter` because previosly, player was just using `ABaseCharacter` class.
+
 <img width="808" height="484" alt="{E4E595AA-C85E-47C3-BBFB-044F93A05275}" src="https://github.com/user-attachments/assets/b8a87b5a-fa81-40e8-8401-52d516c2dde4" />
 
 ## UI
