@@ -37,6 +37,10 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     USoundCue *RespawnSound;
     UPROPERTY(EditDefaultsOnly, Category = "Sound")
     USoundCue *DamageSound;
+
+    UPROPERTY(Replicated)
+    FRotator AimRotation;
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
     virtual void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                            class AController *InstigatedBy, AActor *DamageCauser);
     virtual void OnDeath();
@@ -62,6 +66,9 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 
     bool isWalking;
     bool isSprintingPressed;
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    FRotator CalculateAimRotation();
+
     UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetMovementDirection() const;
     UFUNCTION(BlueprintCallable, Category = "Movement")
