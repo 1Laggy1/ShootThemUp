@@ -13,24 +13,123 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Player/STUPlayerState.h"
 ASTURifleWeapon::ASTURifleWeapon()
 {
     WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
 }
 
+void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)
+{
+    MakeShotMulticast(ViewLocation, ViewRotation, InstigatorID);
+
+    //DecreaseAmmo();
+}
+
+void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation)
+{
+    
+    const FVector SocketLocation = GetMuzzleWorldLocation();
+    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
+    FHitResult HitResult;
+    MakeHit(HitResult, ViewLocation, TraceEnd);
+    FVector TraceFXEnd = TraceEnd;
+    if (HitResult.bBlockingHit)
+    {
+        TraceFXEnd = HitResult.ImpactPoint;
+        WeaponFXComponent->PlayImpactFX(HitResult);
+    }
+    SpawnTraceFX(GetMuzzleWorldLocation(), TraceFXEnd);
+    if (FireSound)
+    {
+        UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, MuzzleSocketName);
+    }
+}
+
+void ASTURifleWeapon::MakeShotMulticast_Implementation(FVector ViewLocation,
+                                                       FRotator ViewRotation, int32 InstigatorID)
+{
+    if (!Cast<ACharacter>(GetOwner()) || !Cast<ACharacter>(GetOwner())->GetPlayerState() ||
+        !Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID())
+        return;
+
+    int32 InstigatorIDLocal = Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID();
+    if (InstigatorID == InstigatorIDLocal)
+        return;
+    MakeShotFX(ViewLocation, ViewRotation);
+    
+}
+
+void ASTURifleWeapon::MakeShot()
+{
+    if (!GetWorld())
+    {
+        StopFire();
+        return;
+    }
+    if (isClipEmpty())
+    {
+        StopFire();
+        if (IsAmmoEmpty() && NoAmmoSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
+            return;
+        }
+        return;
+    }
+    FVector ViewLocation = FVector();
+    FRotator ViewRotator = FRotator();
+    GetPlayerViewPoint(ViewLocation, ViewRotator);
+    /*if (!GetOwner()->HasAuthority())
+    {
+       */ 
+        DecreaseAmmo();
+    //}
+    MakeShotFX(ViewLocation, ViewRotator);
+
+        const FVector SocketLocation = GetMuzzleWorldLocation();
+    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotator);
+    FHitResult HitResult;
+    MakeHit(HitResult, ViewLocation, TraceEnd);
+    FVector TraceFXEnd = TraceEnd;
+    if (HitResult.bBlockingHit)
+    {
+        TraceFXEnd = HitResult.ImpactPoint;
+        WeaponFXComponent->PlayImpactFX(HitResult);
+        if (HitResult.GetActor())
+        {
+            MakeDamage(HitResult);
+        }
+    }
+    
+    MakeShotServer(ViewLocation, ViewRotator, Controller->PlayerState->GetUniqueID());
+    
+}
+
 void ASTURifleWeapon::BeginPlay()
 {
     Super::BeginPlay();
+    SetReplicates(true);
     
 }
 
 void ASTURifleWeapon::StartFire()
 {
     InitMuzzleFX();
-    MakeShot();
     if (!GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
     {
-        GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTURifleWeapon::MakeShot, TimeBetweenShots, true);
+        if (isClipEmpty())
+        {
+            StopFire();
+            if (NoAmmoSound)
+            {
+                UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
+            }
+
+            return;
+        }
+        MakeShot();
+        GetWorldTimerManager().SetTimer(ShotTimerHandle, this,  &ASTURifleWeapon::MakeShot, TimeBetweenShots, true);
     }
 }
 void ASTURifleWeapon::StopFire()
@@ -51,68 +150,15 @@ void ASTURifleWeapon::Zoom(bool Enable)
 
 
 
-void ASTURifleWeapon::MakeShot()
+
+
+FVector ASTURifleWeapon::GetTraceData(FVector ViewLocation, FRotator ViewRotation) const
 {
-    if (!GetWorld())
-    {
-        StopFire();
-        return;
-    }
-    if (IsAmmoEmpty())
-    {
-        StopFire();
-        if (NoAmmoSound)
-        {
-            UGameplayStatics::PlaySoundAtLocation(GetWorld(), NoAmmoSound, GetActorLocation());
-        }
-        
-        return;
-    }
-    Controller = GetController();
-    FVector TraceStart, TraceEnd;
-    if (!GetTraceData(TraceStart, TraceEnd))
-    {
-        StopFire();
-        return;
-    }
-    const FVector SocketLocation = GetMuzzleWorldLocation();
-
-    FHitResult HitResult;
-    MakeHit(HitResult, TraceStart, TraceEnd);
-    FVector TraceFXEnd = TraceEnd;
-    if (HitResult.bBlockingHit)
-    {
-        TraceFXEnd = HitResult.ImpactPoint;
-        //*DrawDebugLine(GetWorld(), SocketLocation, HitResult.ImpactPoint, FColor::Red, false, 3.0f, 0, 3.0f);
-        //DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24, FColor::Red, false, 5.0f);*/
-        WeaponFXComponent->PlayImpactFX(HitResult);
-        if (HitResult.GetActor())
-        {
-            MakeDamage(HitResult);
-        }
-    }
-    SpawnTraceFX(GetMuzzleWorldLocation(), TraceFXEnd);
-    if (FireSound)
-    {
-        UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, MuzzleSocketName);
-    }
-   
-    DecreaseAmmo();
-}
-
-bool ASTURifleWeapon::GetTraceData(FVector &TraceStart, FVector &TraceEnd) const
-{
-    FVector ViewLocation;
-    FRotator ViewRotation;
-    if (!GetPlayerViewPoint(ViewLocation, ViewRotation))
-        return false;
-
-    TraceStart = ViewLocation;
     const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
     const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
-    TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
+    FVector TraceEnd = ViewLocation + ShootDirection * TraceMaxDistance;
 
-    return true;
+    return TraceEnd;
 }
 void ASTURifleWeapon::MakeDamage(const FHitResult &HitResult)
 {

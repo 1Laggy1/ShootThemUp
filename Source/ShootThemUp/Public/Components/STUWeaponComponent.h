@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 #pragma once
 
@@ -25,7 +25,19 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     bool GetCurrentAmmoData(FAmmoData &Data) const;
     bool TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount);
     void Zoom(bool Enabled);
+    bool bWeaponsSpawned;
+    
   protected:
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+    UFUNCTION()
+    void OnRep_Weapons()
+    {
+        GetWeapons();
+        EquipWeapon(CurrentWeaponIndex);
+    }
+
+    UPROPERTY(ReplicatedUsing = OnRep_Weapons)
+    TArray<ASTUBaseWeapon *> Weapons = {};
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     TArray<FWeaponData> WeaponData = {};
     virtual void BeginPlay() override;
@@ -35,16 +47,24 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     FName WeaponArmorySocketName = "ArmorySocket";
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     UAnimMontage *EquipAnimMontage;
+    
     void AttachWeaponToSocket(ASTUBaseWeapon *Weapon, USkeletalMeshComponent *Mesh, FName SocketName);
     bool CanFire() const;
     bool CanEquip() const;
     ASTUBaseWeapon *CurrentWeapon = nullptr;
     int32 CurrentWeaponIndex = 0;
-    UPROPERTY()
-    TArray<ASTUBaseWeapon *> Weapons = {};
+    
+    UFUNCTION(Server, Reliable)
+    void EquipWeaponServer(int32 WeaponIndex, int32 InstigatedBy);
+    UFUNCTION(Server, Reliable)
+    void ReloadServer(int32 InstigatedBy);
+    UFUNCTION(NetMulticast, Reliable)
+    void ReloadMulticast(int32 InstigatedBy);
+    UFUNCTION(NetMulticast, Reliable)
+    void EquipWeaponMulticast(int32 WeaponIndex, int32 InstigatedBy);
     void EquipWeapon(int32 WeaponIndex);
+    
   private:
-    UPROPERTY()
     
     
     bool EquipAnimInProgress;
@@ -52,8 +72,10 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     
     UPROPERTY()
     UAnimMontage *CurrentReloadAnimMontage = nullptr;
+    UFUNCTION(Server, Reliable)
     void SpawnWeapons();
-   
+    UFUNCTION(NetMulticast, Reliable)
+    void GetWeapons();
     
 
     void PlayAnimMontage(UAnimMontage *Animation);

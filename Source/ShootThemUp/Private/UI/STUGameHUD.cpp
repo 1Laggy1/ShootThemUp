@@ -5,6 +5,7 @@
 #include "Engine/Canvas.h"
 #include "UI/STUBaseWidget.h"
 #include "STUGameModeBase.h"
+#include "STUUtils.h"
 DEFINE_LOG_CATEGORY_STATIC(LogSTUGameHUD, All, All);
 void ASTUGameHUD::DrawHUD()
 {
@@ -15,7 +16,8 @@ void ASTUGameHUD::DrawHUD()
 void ASTUGameHUD::BeginPlay()
 {
     Super::BeginPlay();
-
+    if (!GetOwningPlayerController() || !GetOwningPlayerController()->IsLocalPlayerController())
+        return;
     GameWidgets.Add(ESTUMatchState::InProgress, CreateWidget<USTUBaseWidget>(GetWorld(), PlayerHUDWidgetClass));
     GameWidgets.Add(ESTUMatchState::Pause, CreateWidget<USTUBaseWidget>(GetWorld(), PauseWidgetClass));
     GameWidgets.Add(ESTUMatchState::GameOver, CreateWidget<USTUBaseWidget>(GetWorld(), GameOverWidgetClass));
@@ -32,11 +34,16 @@ void ASTUGameHUD::BeginPlay()
 
     if (GetWorld())
     {
-        const auto Gamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
+        OnMatchStateChanged(ESTUMatchState::InProgress);
+        /*if (auto GS = GetWorld()->GetGameState<ASTUGameModeBase>())
+        {
+            GS->OnMatchStateChanged.AddUObject(this, &ASTUGameHUD::OnMatchStateChanged);
+        }*/
+        /*const auto Gamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
         if (Gamemode)
         {
             Gamemode->OnMatchStateChanged.AddUObject(this, &ASTUGameHUD::OnMatchStateChanged);
-        }
+        }*/
     }
 
 }

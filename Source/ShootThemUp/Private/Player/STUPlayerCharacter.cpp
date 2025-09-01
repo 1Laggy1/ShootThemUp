@@ -66,14 +66,14 @@ void ASTUPlayerCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInput
 void ASTUPlayerCharacter::MoveForward(float Amount)
 {
 
-     if (Amount > 0 && GetCharacterMovement()->Velocity.Length() > 5)
+     /*if (Amount > 0 && GetCharacterMovement()->Velocity.Length() > 5)
     {
          isWalking = true;
      }
      else
     {
          isWalking = false;
-     }
+     }*/
     AddMovementInput(GetActorForwardVector(), Amount);
 }
 
@@ -112,10 +112,9 @@ void ASTUPlayerCharacter::CheckCameraOverlap()
     }
 }
 
-void ASTUPlayerCharacter::OnDamaged(AActor *DamagedActor, float Damage, const UDamageType *DamageType,
-                                    AController *InstigatedBy, AActor *DamageCauser)
+void ASTUPlayerCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser)
 {
-    Super::OnDamaged(DamagedActor,Damage, DamageType,InstigatedBy,DamageCauser);
+    Super::OnDamaged(DamagedActor, Damage, DamageCauser);
     STUPlayerCameraShake->PlayCameraShake(Cast<APlayerController>(GetController()));
 }
 

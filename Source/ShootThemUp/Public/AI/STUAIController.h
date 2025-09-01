@@ -18,8 +18,7 @@ class SHOOTTHEMUP_API ASTUAIController : public AAIController
     FName FocusOnKeyName = "EnemyActor";
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
     FName LastEnemyPositionKey = "LastEnemyPosition";
-    void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                   class AController *InstigatedBy, AActor *DamageCauser);
+    void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
     virtual void BeginPlay() override;
   protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")

@@ -63,17 +63,29 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     virtual void BeginPlay() override;
 
   private:
+    UPROPERTY(Replicated)//Using = "Rep_HealthChanged")
     float Health = 0.0f;
+    UFUNCTION()
+    void Rep_HealthChanged()
+    {
+        OnHealthChanged.Broadcast(Health);
+    }
     bool IsVaunded = false;
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
     UFUNCTION()
     void OnTakePointDamage(AActor *DamagedActor, float Damage, class AController *InstigatedBy, FVector HitLocation,
                            class UPrimitiveComponent *FHitComponent, FName BoneName, FVector ShotFromDirection,
                            const class UDamageType *DamageType, AActor *DamageCauser);
+    UFUNCTION(Server, Reliable)
+    void ApplyDamageServer(AActor *DamagedActor, float Damage,
+                           AActor* DamageCauser);
+    UFUNCTION(NetMulticast, Reliable)
+    void ApplyDamageMulticast(AActor *DamagedActor, float Damage, AActor *DamageCauser);
     UFUNCTION()
     void OnTakeRadialDamage(AActor *DamagedActor, float Damage, const class UDamageType *DamageType, FVector Origin,
                             const FHitResult &HitInfo, class AController *InstigatedBy, AActor *DamageCauser);
     void AutoHealHandle(float DeltaTime);
-    void Killed(AController *KillerController);
+    void Killed(AActor *KillerActor, AActor *DiedActor);
     void ApplyDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy, const UDamageType *DamageType,
                      AActor *DamageCauser);
     float GetPointDamageModifier(AActor *DamagedActor, const FName &BoneName);

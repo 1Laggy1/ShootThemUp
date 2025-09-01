@@ -24,7 +24,7 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
     // it.
 
     PrimaryActorTick.bCanEverTick = true;
-
+    bReplicates = true; 
     HealthComponent = CreateDefaultSubobject<USTUHealthActorComponent>("HealthComponent");
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
 
@@ -36,12 +36,10 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    
-    DOREPLIFETIME(ASTUBaseCharacter, AimRotation);
+    //DOREPLIFETIME(USTUWeaponComponent, WeaponComponent->bWeaponsSpawned);
 }
 
-void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                                  class AController* InstigatedBy, AActor* DamageCauser)
+void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor* DamageCauser)
 {
     if (HealthComponent->isDead() || !GetController())
         return;
@@ -80,27 +78,51 @@ void ASTUBaseCharacter::SetPlayerColor(const FLinearColor &Color)
 void ASTUBaseCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    
+    if (GetCharacterMovement()->Velocity.Length() > 5)
+    {
+        isWalking = true;
+    }
+    else
+    {
+        isWalking = false;
+    }
 }
 
 // aCalled to bind functionality to input
 
 void ASTUBaseCharacter::StartSprint()
 {
-    if (!isSprintingPressed)
-    {
-        isSprintingPressed = true;
-        GetCharacterMovement()->MaxWalkSpeed *= SprintSpeedMultiplier; // Double the speed when sprinting
-    }
+    RequestSprintServer(true);
 }
 
 void ASTUBaseCharacter::StopSprint()
 {
-    if (isSprintingPressed)
+    RequestSprintServer(false);
+}
+
+void ASTUBaseCharacter::MulticastStartSprint_Implementation(bool Start)
+{
+    if (Start)
     {
-        isSprintingPressed = false;
-        GetCharacterMovement()->MaxWalkSpeed /= SprintSpeedMultiplier; // Reset the speed when stopping sprint
+        if (!isSprintingPressed)
+        {
+            isSprintingPressed = true;
+            GetCharacterMovement()->MaxWalkSpeed *= SprintSpeedMultiplier; // Double the speed when sprinting
+        }
     }
+    else
+    {
+        if (isSprintingPressed)
+        {
+            isSprintingPressed = false;
+            GetCharacterMovement()->MaxWalkSpeed /= SprintSpeedMultiplier; // Reset the speed when stopping sprint
+        }
+    }
+}
+
+void ASTUBaseCharacter::RequestSprintServer_Implementation(bool Start)
+{
+    MulticastStartSprint(Start);
 }
 
 

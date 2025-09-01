@@ -42,8 +42,7 @@ void USTUPlayerHUDWidget::UpdateHealthBar()
         return;
     HealthProgressBar->SetFillColorAndOpacity(GetHealthPercent() > PercentColorThreshold ? GoodColor : BadColor);
 }
-void USTUPlayerHUDWidget::OnDamaged(AActor * DamagedActor, float Damage, const class UDamageType *DamageType,
-                                    class AController *InstigatedBy, AActor *DamageCauser)
+void USTUPlayerHUDWidget::OnDamaged(AActor * DamagedActor, float Damage, AActor *DamageCauser)
 {
     if (!IsAnimationPlaying(DamageAnimation))
     {
@@ -78,9 +77,11 @@ bool USTUPlayerHUDWidget::GetWeaponUIData(FWeaponUIData& UIData) const
     const auto WeaponComponent = STUUtils::GetSTUPlayerComponent<USTUWeaponComponent>(GetOwningPlayerPawn());
     if (!WeaponComponent)
         return false;
-
     WeaponComponent->GetWeaponUIData(UIData);
-    return true;
+    if (UIData.MainIcon && UIData.CrosshairIcon)
+        return true;
+    else
+        return false;
 
 }
 

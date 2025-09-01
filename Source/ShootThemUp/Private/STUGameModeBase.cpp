@@ -22,6 +22,7 @@ ASTUGameModeBase::ASTUGameModeBase()
 
 void ASTUGameModeBase::StartPlay()
 {
+
     Super::StartPlay();
     SpawnBots();
     CreateTeamsInfo();
@@ -125,6 +126,7 @@ void ASTUGameModeBase::CreateTeamsInfo()
 
         PlayerState->SetTeamID(TeamID);
         PlayerState->SetTeamColor(DetermineColorByTeamID(TeamID));
+        
         if (!Controller->IsPlayerController())
         {
             FString Bot;

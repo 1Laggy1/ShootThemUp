@@ -49,11 +49,11 @@ AActor *ASTUAIController::GetFocusOnActor() const
 
     return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
 }
-void ASTUAIController::OnDamaged(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
-                                 class AController* InstigatedBy, AActor* DamageCauser)
+void ASTUAIController::OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser)
 {
-    if (InstigatedBy)
+    if (DamageCauser)
     {
-        GetBlackboardComponent()->SetValueAsVector(LastEnemyPositionKey, InstigatedBy->GetPawn()->GetActorLocation());
+        GetBlackboardComponent()->SetValueAsVector(LastEnemyPositionKey, DamageCauser->GetActorLocation());
     }
+    
 }
