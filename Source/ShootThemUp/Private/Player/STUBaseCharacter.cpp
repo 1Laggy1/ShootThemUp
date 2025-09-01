@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 #include "Player/STUBaseCharacter.h"
 #include "Components/CapsuleComponent.h"
@@ -12,6 +12,7 @@
 #include "Weapon/STUBaseWeapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Net/UnrealNetwork.h"
 
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
@@ -32,7 +33,14 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 
 }
 
-void ASTUBaseCharacter::OnDamaged(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    
+    DOREPLIFETIME(ASTUBaseCharacter, AimRotation);
+}
+
+void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
                                   class AController* InstigatedBy, AActor* DamageCauser)
 {
     if (HealthComponent->isDead() || !GetController())
@@ -72,6 +80,7 @@ void ASTUBaseCharacter::SetPlayerColor(const FLinearColor &Color)
 void ASTUBaseCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    
 }
 
 // aCalled to bind functionality to input
@@ -98,6 +107,21 @@ void ASTUBaseCharacter::StopSprint()
 bool ASTUBaseCharacter::IsSprinting()
 {
     return isSprintingPressed && isWalking; // Check if the character is both sprinting and walking
+}
+
+FRotator ASTUBaseCharacter::CalculateAimRotation()
+{
+    
+    float Pitch = GetBaseAimRotation().Pitch;
+    if (Pitch > 180)
+    {
+        Pitch -= 360;
+    }
+    
+    AimRotation = GetBaseAimRotation();
+    AimRotation.Pitch = Pitch;
+    return AimRotation;
+    //UE_LOG(BaseCharacterLog, Warning, TEXT("Player: %s. Tick AimRotation: %s"), *GetActorNameOrLabel(),
 }
 
 float ASTUBaseCharacter::GetMovementDirection() const
