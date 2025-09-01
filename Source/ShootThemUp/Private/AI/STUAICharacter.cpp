@@ -59,11 +59,10 @@ void ASTUAICharacter::OnDeath()
     UE_LOG(STUAICharacter, Display, TEXT("Bot %s is dead"), *GetName());
 }
 
-void ASTUAICharacter::OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                                class AController *InstigatedBy, AActor *DamageCauser)
+void ASTUAICharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser)
 {
-    Super::OnDamaged(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
-    if (InstigatedBy)
+    Super::OnDamaged(DamagedActor, Damage, DamageCauser);
+    if (DamageCauser)
     {
         UAISense_Damage::ReportDamageEvent(GetWorld(), Cast<AActor>(GetOwner()), DamageCauser, Damage,
                                            DamageCauser->GetActorLocation(),
@@ -77,14 +76,7 @@ void ASTUAICharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (GetCharacterMovement()->Velocity.Length() > 5)
-    {
-        isWalking = true;
-    }
-    else
-    {
-        isWalking = false;
-    }
+    
 }
 
 void ASTUAICharacter::OnHealthChanged(float Health)

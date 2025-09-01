@@ -41,7 +41,7 @@ struct FWeaponUIData
 // health
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float) 
-DECLARE_MULTICAST_DELEGATE_FiveParams(FOnDamaged, AActor*, float, const UDamageType*, AController*, AActor*);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnDamaged, AActor*, float, AActor* )
 
 
 /// VFX

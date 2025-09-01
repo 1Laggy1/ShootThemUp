@@ -15,13 +15,14 @@
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
 ASTUBaseWeapon::ASTUBaseWeapon()
 {
     PrimaryActorTick.bCanEverTick = false;
-
+    bReplicates = true;
     WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
     SetRootComponent(WeaponMesh);
 }
@@ -34,16 +35,25 @@ void ASTUBaseWeapon::BeginPlay()
     CurrentAmmo = DefaultAmmo;
 }
 
+void ASTUBaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    //DOREPLIFETIME(ASTUBaseWeapon, CurrentAmmo);
+}
+
 void ASTUBaseWeapon::StartFire()
 {
 }
 void ASTUBaseWeapon::StopFire()
 {
 }
-
-void ASTUBaseWeapon::MakeShot()
+void ASTUBaseWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)
 {
-   
+    MakeShotMulticast(ViewLocation, ViewRotation, InstigatorID);
+}
+
+void ASTUBaseWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)
+{
 }
 
 AController *ASTUBaseWeapon::GetController() const
@@ -59,12 +69,13 @@ bool ASTUBaseWeapon::GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRot
 {
 
     const auto STUCharacter = Cast<ACharacter>(GetOwner());
-    if (!STUCharacter)
+    if (!STUCharacter || !STUCharacter->Controller)
         return false;
 
     if (STUCharacter->IsPlayerControlled())
     {
-        Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+        STUCharacter->Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+        ViewLocation = GetMuzzleWorldLocation();
     }
     else
     {
@@ -80,18 +91,12 @@ FVector ASTUBaseWeapon::GetMuzzleWorldLocation() const
     return WeaponMesh->GetSocketLocation(MuzzleSocketName);
 }
 
-bool ASTUBaseWeapon::GetTraceData(FVector &TraceStart, FVector &TraceEnd) const
+FVector ASTUBaseWeapon::GetTraceData(FVector ViewLocation, FRotator ViewRotation) const
 {
-    FVector ViewLocation;
-    FRotator ViewRotation;
-    if (!GetPlayerViewPoint(ViewLocation, ViewRotation))
-        return false;
-
-    TraceStart = ViewLocation;
     const FVector ShootDirection = ViewRotation.Vector();
-    TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
+    FVector TraceEnd = ViewLocation + ShootDirection * TraceMaxDistance;
 
-    return true;
+    return TraceEnd;
 }
 
 void ASTUBaseWeapon::DecreaseAmmo()

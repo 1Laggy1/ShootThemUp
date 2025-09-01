@@ -71,9 +71,21 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     void MakeHit(FHitResult &HitResult, const FVector &TraceStart, const FVector &TraceEnd);
 
     virtual void BeginPlay() override;
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+    virtual void MakeShot() {};
 
-    virtual void MakeShot();
-    virtual bool GetTraceData(FVector &TraceStart, FVector &TraceEnd) const;
+    UFUNCTION(Server, Reliable)
+    virtual void MakeShotServer(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
+    virtual void MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
+
+    virtual void MakeShotFX(FVector ViewLocation, FRotator ViewRotation) {};
+
+
+
+    UFUNCTION(NetMulticast, Reliable)
+    virtual void MakeShotMulticast(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
+    virtual void MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
+    virtual FVector GetTraceData(FVector ViewLocation, FRotator ViewRotation) const;
 
     void DecreaseAmmo();
     

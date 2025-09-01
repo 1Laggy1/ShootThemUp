@@ -25,8 +25,7 @@ class SHOOTTHEMUP_API ASTUAICharacter : public ASTUBaseCharacter
     float HealthVisibilityDistance = 1000.0f;
     virtual void BeginPlay() override;
     virtual void OnDeath() override;
-    virtual void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                           class AController *InstigatedBy, AActor *DamageCauser) override;
+    virtual void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser) override;
     virtual void Tick(float DeltaTime) override;
     void OnHealthChanged(float Health) override;
     void UpdateHealthWidgetVisibility();

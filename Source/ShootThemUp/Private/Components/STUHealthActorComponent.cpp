@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "STUGameModeBase.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
 
@@ -11,6 +12,7 @@ USTUHealthActorComponent::USTUHealthActorComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
     Health = MaxHealth;
+    SetIsReplicatedByDefault(true);
 }
 
 void USTUHealthActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -19,6 +21,12 @@ void USTUHealthActorComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     AutoHealHandle(DeltaTime);
     
+}
+
+void USTUHealthActorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    DOREPLIFETIME(USTUHealthActorComponent, Health);
 }
 
 float USTUHealthActorComponent::TakeHeal(float amount)
@@ -61,6 +69,34 @@ void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Dam
     ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, DamageCauser);
 }
 
+void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor* DamagedActor, float Damage, AActor* DamageCauser)
+{
+    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+    ApplyDamageMulticast(DamagedActor, Damage, DamageCauser);
+    if (isDead())
+    {
+        Killed(DamagedActor, DamageCauser);
+    }
+}
+
+void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *DamagedActor, float Damage,
+                                                                   AActor *DamageCauser)
+{
+    //Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+    if (Damage <= 0 || isDead())
+    {
+        return;
+    }
+    HealDelayCurrent = 0;
+    OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
+    IsVaunded = true;
+
+    if (isDead())
+    {
+        OnDeath.Broadcast();
+    }
+}
+
 void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Damage, const UDamageType *DamageType,
                                                   FVector Origin, const FHitResult &HitInfo, AController *InstigatedBy,
                                                   AActor *DamageCauser)
@@ -73,23 +109,9 @@ void USTUHealthActorComponent::ApplyDamage(AActor *DamagedActor, float Damage, A
                                            const UDamageType *DamageType,
                                            AActor *DamageCauser)
 {
-    if (Damage <= 0 || isDead())
-    {
-        return;
-    }
-    HealDelayCurrent = 0;
-    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    OnHealthChanged.Broadcast(Health);
-    OnDamaged.Broadcast(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
-    IsVaunded = true;
-
-    if (isDead())
-    {
-        Killed(InstigatedBy);
-        OnDeath.Broadcast();
-    }
+    ApplyDamageServer(DamagedActor, Damage, DamageCauser);
+   
 }
-
 float USTUHealthActorComponent::GetPointDamageModifier(AActor *DamagedActor, const FName &BoneName)
 {
     const auto Character = Cast<ACharacter>(DamagedActor);
@@ -123,16 +145,14 @@ void USTUHealthActorComponent::AutoHealHandle(float DeltaTime)
     }
 }
 
-void USTUHealthActorComponent::Killed(AController *KillerController)
+void USTUHealthActorComponent::Killed(AActor *KillerActor, AActor *DiedActor)
 {
     if (!GetWorld())
         return;
     const auto GameMode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!GameMode)
         return;
-    const auto Player = Cast<APawn>(GetOwner());
-    const auto VictimController = Player ? Player->Controller : nullptr;
-    GameMode->Killed(KillerController, VictimController);
+    //GameMode->Killed(KillerActor, DiedActor);
 }
 
 

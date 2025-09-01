@@ -55,8 +55,7 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
 
     
     void OnHealthChanged(float Health);
-    void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                   class AController *InstigatedBy, AActor *DamageCauser);
+    void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
     ASTUGameModeBase *CurrentGamemode;
     void OnNewPawn(APawn *NewPawn);
     void UpdateHealthBar();

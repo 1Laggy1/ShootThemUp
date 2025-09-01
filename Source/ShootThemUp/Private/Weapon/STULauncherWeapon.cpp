@@ -5,6 +5,7 @@
 #include "Weapon/STUProjectile.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Player/STUPlayerState.h"
 
 void ASTULauncherWeapon::StartFire()
 {
@@ -16,7 +17,8 @@ void ASTULauncherWeapon::StartFire()
 
 
 
-void ASTULauncherWeapon::MakeShot()
+void ASTULauncherWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation,
+                                                          int32 InstigatorID)
 {
     
 
@@ -37,26 +39,18 @@ void ASTULauncherWeapon::MakeShot()
             return;
     }
 
-    FVector TraceStart, TraceEnd;
-    if (!GetTraceData(TraceStart, TraceEnd))
-        return;
+    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
 
     const FVector SocketLocation = GetMuzzleWorldLocation();
 
-    const FTransform SpawnTransform(FRotator::ZeroRotator, SocketLocation);
     FHitResult HitResult;
-    MakeHit(HitResult, TraceStart, TraceEnd);
+    MakeHit(HitResult, ViewLocation, TraceEnd);
 
     const FVector EndPoint = HitResult.bBlockingHit ? HitResult.ImpactPoint : TraceEnd;
     const FVector Direction = (EndPoint - SocketLocation).GetSafeNormal();
-
-    ASTUProjectile* Projectile = GetWorld()->SpawnActorDeferred<ASTUProjectile>(ProjectileClass, SpawnTransform);
-    if (Projectile)
-    {
-        Projectile->SetShotDirection(Direction);
-        Projectile->SetOwner(GetOwner());
-        Projectile->FinishSpawning(SpawnTransform);
-    }
+    
+    SpawnProjectileServer(Direction);
+    
     // set projectile params
     if (FireSound)
     {
@@ -64,6 +58,24 @@ void ASTULauncherWeapon::MakeShot()
     }
     DecreaseAmmo();
     SpawnMuzzleFX();
+}
+
+void ASTULauncherWeapon::SpawnProjectileServer_Implementation(FVector Direction)
+{
+
+     const FVector SocketLocation = GetMuzzleWorldLocation();
+
+    const FTransform SpawnTransform(FRotator::ZeroRotator, SocketLocation);
+
+     
+
+    ASTUProjectile *Projectile = GetWorld()->SpawnActorDeferred<ASTUProjectile>(ProjectileClass, SpawnTransform);
+    if (Projectile)
+    {
+        Projectile->SetShotDirection(Direction);
+        Projectile->SetOwner(GetOwner());
+        Projectile->FinishSpawning(SpawnTransform);
+    }
 }
 
 void ASTULauncherWeapon::MakeBurstShot()
@@ -74,8 +86,10 @@ void ASTULauncherWeapon::MakeBurstShot()
         GetWorldTimerManager().ClearTimer(BurstTimerHandle);
         return;
     }
-    
+        FVector ViewLocation;
+        FRotator ViewRotation;
+        GetPlayerViewPoint(ViewLocation, ViewRotation);
         ShotsFires++;
-        MakeShot();
+        MakeShotServer(ViewLocation, ViewRotation, Controller->PlayerState->GetPlayerId());
 
 }

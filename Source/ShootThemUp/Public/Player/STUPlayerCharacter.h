@@ -31,8 +31,7 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     virtual void OnDeath() override;
     virtual void BeginPlay() override;
     void SnapCamera();
-    virtual void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                           class AController *InstigatedBy, AActor *DamageCauser) override;
+    virtual void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser) override;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUPlayerCameraShake *STUPlayerCameraShake;
 

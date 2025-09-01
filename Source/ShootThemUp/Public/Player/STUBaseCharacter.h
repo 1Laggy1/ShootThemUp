@@ -38,11 +38,10 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UPROPERTY(EditDefaultsOnly, Category = "Sound")
     USoundCue *DamageSound;
 
-    UPROPERTY(Replicated)
+    //UPROPERTY(Replicated)
     FRotator AimRotation;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
-    virtual void OnDamaged(AActor *DamagedActor, float Damage, const class UDamageType *DamageType,
-                           class AController *InstigatedBy, AActor *DamageCauser);
+    virtual void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
     virtual void OnDeath();
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
@@ -58,6 +57,10 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     virtual void Tick(float DeltaTime) override;
     void StartSprint();
     void StopSprint();
+    UFUNCTION(Server, Reliable)
+    void RequestSprintServer(bool Start);
+    UFUNCTION(NetMulticast, Reliable)
+    void MulticastStartSprint(bool Start);
     // Called to bind functionality to input
     
 
@@ -65,10 +68,11 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     float SprintSpeedMultiplier = 2.0f;
 
     bool isWalking;
+
     bool isSprintingPressed;
+
     UFUNCTION(BlueprintCallable, Category = "Movement")
     FRotator CalculateAimRotation();
-
     UFUNCTION(BlueprintCallable, Category = "Movement")
     float GetMovementDirection() const;
     UFUNCTION(BlueprintCallable, Category = "Movement")

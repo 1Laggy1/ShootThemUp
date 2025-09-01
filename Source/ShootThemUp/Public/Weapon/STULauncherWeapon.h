@@ -21,7 +21,10 @@ class SHOOTTHEMUP_API ASTULauncherWeapon : public ASTUBaseWeapon
   protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     TSubclassOf<ASTUProjectile> ProjectileClass;
-    virtual void MakeShot() override;
+    virtual void MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation,
+                                                  int32 InstigatorID) override;
+    UFUNCTION(Server, Reliable)
+    void SpawnProjectileServer(FVector Direction);
     int ShotsFires = 0;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats")
     int ShotsToFire = 3;

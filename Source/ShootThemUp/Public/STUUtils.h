@@ -22,4 +22,8 @@ class STUUtils
 
         return PlayerState1 && PlayerState2 && PlayerState1->GetTeamID() != PlayerState2->GetTeamID();
     }
+    int32 static GetRandomIDRange()
+    {
+        return FMath::RandRange(0, 99999);
+    }
 };
