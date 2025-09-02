@@ -5,6 +5,7 @@
 #include "STUGameModeBase.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/STUPlayerState.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
 
@@ -75,6 +76,10 @@ void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor* DamagedA
     ApplyDamageMulticast(DamagedActor, Damage, DamageCauser);
     if (isDead())
     {
+        if (!Cast<ACharacter>(GetOwner()) || !Cast<ACharacter>(GetOwner())->GetPlayerState() ||
+            !Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID())
+            return;
+        DeathMulticast(Cast<ACharacter>(DamagedActor)->GetPlayerState()->GetUniqueID());
         Killed(DamagedActor, DamageCauser);
     }
 }
@@ -83,18 +88,14 @@ void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *Damag
                                                                    AActor *DamageCauser)
 {
     //Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    if (Damage <= 0 || isDead())
-    {
-        return;
-    }
     HealDelayCurrent = 0;
     OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
     IsVaunded = true;
+}
 
-    if (isDead())
-    {
-        OnDeath.Broadcast();
-    }
+void USTUHealthActorComponent::DeathMulticast_Implementation(int32 PlayerID)
+{
+    OnDeath.Broadcast();
 }
 
 void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Damage, const UDamageType *DamageType,

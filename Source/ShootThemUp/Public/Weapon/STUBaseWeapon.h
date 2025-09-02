@@ -46,7 +46,7 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     UPROPERTY(EditAnywhere, Category = "Stats")
     float Damage = 10.0f;
     UPROPERTY(EditAnywhere, Category = "Stats")
-    float TraceMaxDistance = 5000.0f;
+    float TraceMaxDistance = 20000.0f;
     UPROPERTY(EditAnywhere, Category = "Stats")
     FAmmoData DefaultAmmo{15, 10, false};
     UPROPERTY(EditAnywhere, Category = "UI")
@@ -65,7 +65,7 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     float ZoomFOV = 50.0f;
     AController *Controller;
     AController *GetController() const;
-    bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const;
+    bool GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation);
     FVector GetMuzzleWorldLocation() const;
 
     void MakeHit(FHitResult &HitResult, const FVector &TraceStart, const FVector &TraceEnd);

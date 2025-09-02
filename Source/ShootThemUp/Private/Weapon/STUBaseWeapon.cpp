@@ -65,7 +65,7 @@ AController *ASTUBaseWeapon::GetController() const
     return Player->GetController<AController>();
 }
 
-bool ASTUBaseWeapon::GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation) const
+bool ASTUBaseWeapon::GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRotation)
 {
 
     const auto STUCharacter = Cast<ACharacter>(GetOwner());
@@ -75,7 +75,12 @@ bool ASTUBaseWeapon::GetPlayerViewPoint(FVector &ViewLocation, FRotator &ViewRot
     if (STUCharacter->IsPlayerControlled())
     {
         STUCharacter->Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+        FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
+        FHitResult HitResult;
+        MakeHit(HitResult, ViewLocation, TraceEnd);
         ViewLocation = GetMuzzleWorldLocation();
+        if (HitResult.bBlockingHit)
+        ViewRotation = (HitResult.ImpactPoint - ViewLocation).Rotation();
     }
     else
     {
