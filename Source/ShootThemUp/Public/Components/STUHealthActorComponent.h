@@ -45,6 +45,8 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     FOnHealthChanged OnHealthChanged;
     FOnDamaged OnDamaged;
 
+
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     bool AutoHeal;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
@@ -81,6 +83,8 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
                            AActor* DamageCauser);
     UFUNCTION(NetMulticast, Reliable)
     void ApplyDamageMulticast(AActor *DamagedActor, float Damage, AActor *DamageCauser);
+    UFUNCTION(NetMulticast, Reliable)
+    void DeathMulticast(int32 PlayerID);
     UFUNCTION()
     void OnTakeRadialDamage(AActor *DamagedActor, float Damage, const class UDamageType *DamageType, FVector Origin,
                             const FHitResult &HitInfo, class AController *InstigatedBy, AActor *DamageCauser);

@@ -23,6 +23,20 @@ void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotat
 {
     MakeShotMulticast(ViewLocation, ViewRotation, InstigatorID);
 
+    const FVector SocketLocation = GetMuzzleWorldLocation();
+    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
+    FHitResult HitResult;
+    MakeHit(HitResult, ViewLocation, TraceEnd);
+    FVector TraceFXEnd = TraceEnd;
+    if (HitResult.bBlockingHit)
+    {
+        TraceFXEnd = HitResult.ImpactPoint;
+        WeaponFXComponent->PlayImpactFX(HitResult);
+        if (HitResult.GetActor())
+        {
+            MakeDamage(HitResult);
+        }
+    }
     //DecreaseAmmo();
 }
 
@@ -85,23 +99,8 @@ void ASTURifleWeapon::MakeShot()
        */ 
         DecreaseAmmo();
     //}
-    MakeShotFX(ViewLocation, ViewRotator);
-
-        const FVector SocketLocation = GetMuzzleWorldLocation();
-    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotator);
-    FHitResult HitResult;
-    MakeHit(HitResult, ViewLocation, TraceEnd);
-    FVector TraceFXEnd = TraceEnd;
-    if (HitResult.bBlockingHit)
-    {
-        TraceFXEnd = HitResult.ImpactPoint;
-        WeaponFXComponent->PlayImpactFX(HitResult);
-        if (HitResult.GetActor())
-        {
-            MakeDamage(HitResult);
-        }
-    }
     
+    MakeShotFX(ViewLocation, ViewRotator);
     MakeShotServer(ViewLocation, ViewRotator, Controller->PlayerState->GetUniqueID());
     
 }
