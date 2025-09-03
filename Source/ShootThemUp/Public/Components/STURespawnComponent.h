@@ -18,8 +18,10 @@ public:
 	{
         return RespawnCountDown;
     }
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
     bool isRespawnInProgress() const;
-
+    UPROPERTY(Replicated)
+    int32 RespawnCountDown = 0;
   protected:
 	virtual void BeginPlay() override;
 
@@ -28,7 +30,7 @@ public:
 
 private:
     FTimerHandle RespawnTimerHandle;
-  int32 RespawnCountDown = 0;
+
     void RespawnTimerUpdate();
 
 		

@@ -137,3 +137,13 @@ USTRUCT(BlueprintType)
     };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData&)
+
+extern const FName NAME_STUSpectating;
+
+UENUM(BlueprintType)
+enum class STUPlayerStateEnum : uint8
+{
+    None = 0,
+    Gaming,
+    Spectating
+};

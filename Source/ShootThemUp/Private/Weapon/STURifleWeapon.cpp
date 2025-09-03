@@ -1,19 +1,18 @@
 // Shoot THem Up Game. All Rights Reserved.
 
-
 #include "Weapon/STURifleWeapon.h"
 #include "DrawDebugHelpers.h"
-#include "Engine/World.h"
-#include "GameFramework/DamageType.h"
 #include "Engine/DamageEvents.h"
-#include "Weapon/Components/STUWeaponFXComponent.h"
+#include "Engine/World.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/DamageType.h"
+#include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Character.h"
-#include "Kismet/GameplayStatics.h"
-#include "Sound/SoundCue.h"
 #include "Player/STUPlayerState.h"
+#include "Sound/SoundCue.h"
+#include "Weapon/Components/STUWeaponFXComponent.h"
 ASTURifleWeapon::ASTURifleWeapon()
 {
     WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
@@ -37,12 +36,12 @@ void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotat
             MakeDamage(HitResult);
         }
     }
-    //DecreaseAmmo();
+    // DecreaseAmmo();
 }
 
 void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation)
 {
-    
+
     const FVector SocketLocation = GetMuzzleWorldLocation();
     FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
     FHitResult HitResult;
@@ -60,8 +59,7 @@ void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation)
     }
 }
 
-void ASTURifleWeapon::MakeShotMulticast_Implementation(FVector ViewLocation,
-                                                       FRotator ViewRotation, int32 InstigatorID)
+void ASTURifleWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)
 {
     if (!Cast<ACharacter>(GetOwner()) || !Cast<ACharacter>(GetOwner())->GetPlayerState() ||
         !Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID())
@@ -71,11 +69,16 @@ void ASTURifleWeapon::MakeShotMulticast_Implementation(FVector ViewLocation,
     if (InstigatorID == InstigatorIDLocal)
         return;
     MakeShotFX(ViewLocation, ViewRotation);
-    
 }
 
 void ASTURifleWeapon::MakeShot()
 {
+    if (!Controller)
+    {
+        Controller = GetController();
+        if (!Controller)
+            return;
+    }
     if (!GetWorld())
     {
         StopFire();
@@ -96,20 +99,19 @@ void ASTURifleWeapon::MakeShot()
     GetPlayerViewPoint(ViewLocation, ViewRotator);
     /*if (!GetOwner()->HasAuthority())
     {
-       */ 
-        DecreaseAmmo();
+       */
+    DecreaseAmmo();
     //}
-    
+
     MakeShotFX(ViewLocation, ViewRotator);
+
     MakeShotServer(ViewLocation, ViewRotator, Controller->PlayerState->GetUniqueID());
-    
 }
 
 void ASTURifleWeapon::BeginPlay()
 {
     Super::BeginPlay();
     SetReplicates(true);
-    
 }
 
 void ASTURifleWeapon::StartFire()
@@ -128,7 +130,7 @@ void ASTURifleWeapon::StartFire()
             return;
         }
         MakeShot();
-        GetWorldTimerManager().SetTimer(ShotTimerHandle, this,  &ASTURifleWeapon::MakeShot, TimeBetweenShots, true);
+        GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTURifleWeapon::MakeShot, TimeBetweenShots, true);
     }
 }
 void ASTURifleWeapon::StopFire()
@@ -147,10 +149,6 @@ void ASTURifleWeapon::Zoom(bool Enable)
     Controllerr->PlayerCameraManager->SetFOV(Enable ? FOV.Min : FOV.Max);
 }
 
-
-
-
-
 FVector ASTURifleWeapon::GetTraceData(FVector ViewLocation, FRotator ViewRotation) const
 {
     const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
@@ -163,7 +161,7 @@ void ASTURifleWeapon::MakeDamage(const FHitResult &HitResult)
 {
     FPointDamageEvent PointDamageEvent;
     PointDamageEvent.HitInfo = HitResult;
-    HitResult.GetActor()->TakeDamage(Damage, PointDamageEvent, Controller, this);
+    HitResult.GetActor()->TakeDamage(Damage, PointDamageEvent, Cast<ACharacter>(GetOwner())->Controller, this);
 }
 
 void ASTURifleWeapon::InitMuzzleFX()

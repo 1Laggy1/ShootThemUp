@@ -59,16 +59,7 @@ void USTUHealthActorComponent::BeginPlay()
     }
 }
 
-void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,
-                                                 FVector HitLocation, UPrimitiveComponent *FHitComponent,
-                                                 FName BoneName, FVector ShotFromDirection,
-                                                 const UDamageType *DamageType, AActor *DamageCauser)
-{
-    const auto FinalDamage = Damage * GetPointDamageModifier(DamagedActor, BoneName);
-    UE_LOG(LogHealthComponent, Display, TEXT("On point damage: %f, final: %f, bone: %s"), Damage, FinalDamage,
-           *BoneName.ToString());
-    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, DamageCauser);
-}
+
 
 void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor* DamagedActor, float Damage, AActor* DamageCauser)
 {
@@ -79,8 +70,13 @@ void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor* DamagedA
         if (!Cast<ACharacter>(GetOwner()) || !Cast<ACharacter>(GetOwner())->GetPlayerState() ||
             !Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID())
             return;
+        const auto ControllerVictim = Cast<ACharacter>(GetOwner())->Controller;
+        const auto ControllerCauser = Cast<ACharacter>(DamageCauser)->Controller;
+        //OnDeath.Broadcast();
+        
         DeathMulticast(Cast<ACharacter>(DamagedActor)->GetPlayerState()->GetUniqueID());
-        Killed(DamagedActor, DamageCauser);
+
+        Killed(ControllerCauser, ControllerVictim);
     }
 }
 
@@ -98,12 +94,25 @@ void USTUHealthActorComponent::DeathMulticast_Implementation(int32 PlayerID)
     OnDeath.Broadcast();
 }
 
+void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,
+                                                 FVector HitLocation, UPrimitiveComponent *FHitComponent,
+                                                 FName BoneName, FVector ShotFromDirection,
+                                                 const UDamageType *DamageType, AActor *DamageCauser)
+{
+    const auto FinalDamage = Damage * GetPointDamageModifier(DamagedActor, BoneName);
+    UE_LOG(LogHealthComponent, Display, TEXT("On point damage: %f, final: %f, bone: %s"), Damage, FinalDamage,
+           *BoneName.ToString());
+    if (GetOwner()->GetLocalRole() == ROLE_Authority)
+    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, InstigatedBy->GetPawn());
+}
+
 void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Damage, const UDamageType *DamageType,
                                                   FVector Origin, const FHitResult &HitInfo, AController *InstigatedBy,
                                                   AActor *DamageCauser)
 {
     UE_LOG(LogHealthComponent, Display, TEXT("On radial damage: %f"), Damage);
-    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, DamageCauser);
+    if (GetOwner()->GetLocalRole() == ROLE_Authority)
+    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, InstigatedBy->GetPawn());
 }
 
 void USTUHealthActorComponent::ApplyDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,
@@ -146,14 +155,14 @@ void USTUHealthActorComponent::AutoHealHandle(float DeltaTime)
     }
 }
 
-void USTUHealthActorComponent::Killed(AActor *KillerActor, AActor *DiedActor)
+void USTUHealthActorComponent::Killed(AController *KillerActor, AController *DiedActor)
 {
     if (!GetWorld())
         return;
     const auto GameMode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!GameMode)
         return;
-    //GameMode->Killed(KillerActor, DiedActor);
+    GameMode->Killed(KillerActor, DiedActor);
 }
 
 

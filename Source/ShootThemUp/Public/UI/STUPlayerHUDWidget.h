@@ -12,8 +12,8 @@
  */
 class USTUWeaponComponent;
 class USTUHealthActorComponent;
-class ASTUGameModeBase;
 class UProgressBar;
+class ASTUGameStateBase;
 UCLASS()
 class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
 {
@@ -56,7 +56,7 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
     
     void OnHealthChanged(float Health);
     void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
-    ASTUGameModeBase *CurrentGamemode;
+    ASTUGameStateBase *CurrentGamemodeState;
     void OnNewPawn(APawn *NewPawn);
     void UpdateHealthBar();
 };

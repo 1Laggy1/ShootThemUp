@@ -10,13 +10,14 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "STUGameModeBase.h"
+#include "STUGameStateBase.h"
 
 void USTUGameOverWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
     if (GetWorld())
     {
-        const auto Gamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
+        const auto Gamemode = Cast<ASTUGameStateBase>(GetWorld()->GetGameState());
         if (Gamemode)
         {
             Gamemode->OnMatchStateChanged.AddUObject(this, &USTUGameOverWidget::OnMatchStateChanged);

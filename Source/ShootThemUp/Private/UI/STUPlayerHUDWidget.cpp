@@ -8,6 +8,10 @@
 #include "STUGameModeBase.h"
 #include "Player/STUPlayerState.h"
 #include "Components/ProgressBar.h"
+#include "STUGameStateBase.h"
+#include "STUCoreTypes.h"
+
+#include "Player/STUPlayerController.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 void USTUPlayerHUDWidget::NativeOnInitialized()
@@ -19,7 +23,7 @@ void USTUPlayerHUDWidget::NativeOnInitialized()
         OnNewPawn(GetOwningPlayerPawn());
     }
     
-    CurrentGamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
+    CurrentGamemodeState = Cast<ASTUGameStateBase>(GetWorld()->GetGameState());
     return;
 }
 void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
@@ -94,22 +98,25 @@ bool USTUPlayerHUDWidget::isPlayerAlive() const
 bool USTUPlayerHUDWidget::isPlayerSpectating() const
 {
     const auto Controller = GetOwningPlayer();
-    return Controller && Controller->GetStateName() == NAME_Spectating;
+    const auto PlayerController = Cast<ASTUPlayerController>(Controller);
+    const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
+    return PlayerState && PlayerState->GetSTUPlayerState() == STUPlayerStateEnum::Spectating;
 }
 
 FString USTUPlayerHUDWidget::GetRoundsInfo()
 {
-    if (!GetWorld() || !CurrentGamemode)
+    if (!GetWorld() || !CurrentGamemodeState)
         return "Rounds: 0/0";
     FString RoundsInfo = "Round: ";
-    FGameData GameData = CurrentGamemode->GetGameData();
-    RoundsInfo = RoundsInfo + FString::FromInt(CurrentGamemode->GetCurrentRound()) + "/" + FString::FromInt(GameData.RoundsNum);
+    FGameData GameData = CurrentGamemodeState->GetGameData();
+    RoundsInfo = RoundsInfo + FString::FromInt(CurrentGamemodeState->GetCurrentRound()) + "/" +
+                 FString::FromInt(GameData.RoundsNum);
     return RoundsInfo;
 }
 
 FString USTUPlayerHUDWidget::GetKills()
 {
-    if (!GetWorld() || !CurrentGamemode || !GetOwningPlayerPawn() || !GetOwningPlayerPawn()->Controller)
+    if (!GetWorld() || !CurrentGamemodeState || !GetOwningPlayerPawn() || !GetOwningPlayerPawn()->Controller)
         return "Kills: 0";
     const auto PlayerState = Cast<ASTUPlayerState>(GetOwningPlayerPawn()->Controller->PlayerState);
     if (!PlayerState)
@@ -121,11 +128,11 @@ FString USTUPlayerHUDWidget::GetKills()
 
 FString USTUPlayerHUDWidget::GetCurrentTime()
 {
-    if (!GetWorld() || !CurrentGamemode)
+    if (!GetWorld() || !CurrentGamemodeState)
         return "00:00";
     FString Time;
-    int32 Minutes = CurrentGamemode->GetRoundCountDown() / 60;
-    int32 Seconds = CurrentGamemode->GetRoundCountDown() % 60;  
+    int32 Minutes = CurrentGamemodeState->GetRoundCountDown() / 60;
+    int32 Seconds = CurrentGamemodeState->GetRoundCountDown() % 60;  
     Time = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
     return Time;
 }

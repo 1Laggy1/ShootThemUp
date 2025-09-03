@@ -89,7 +89,7 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     void OnTakeRadialDamage(AActor *DamagedActor, float Damage, const class UDamageType *DamageType, FVector Origin,
                             const FHitResult &HitInfo, class AController *InstigatedBy, AActor *DamageCauser);
     void AutoHealHandle(float DeltaTime);
-    void Killed(AActor *KillerActor, AActor *DiedActor);
+    void Killed(AController *KillerActor, AController *DiedActor);
     void ApplyDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy, const UDamageType *DamageType,
                      AActor *DamageCauser);
     float GetPointDamageModifier(AActor *DamagedActor, const FName &BoneName);
