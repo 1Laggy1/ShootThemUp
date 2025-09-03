@@ -49,7 +49,7 @@ void ASTUBaseWeapon::StopFire()
 }
 void ASTUBaseWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)
 {
-    MakeShotMulticast(ViewLocation, ViewRotation, InstigatorID);
+    //MakeShotMulticast(ViewLocation, ViewRotation, InstigatorID);
 }
 
 void ASTUBaseWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)

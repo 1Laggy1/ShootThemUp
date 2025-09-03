@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "STUCoreTypes.h"
 #include "STUPlayerState.generated.h"
 
 /**
@@ -14,6 +15,7 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
 {
 	GENERATED_BODY()
   public:
+    ASTUPlayerState();
     void SetTeamID(int32 ID)
     {
         TeamID = ID;
@@ -51,10 +53,22 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
         DeathsNum++;
     }
     void LogInfo();
+    STUPlayerStateEnum GetSTUPlayerState()
+    {
+        return PlayerStateNow;
+    }
+    void SetSTUPlayerState(STUPlayerStateEnum State)
+    {
+        PlayerStateNow = State;
+    }
+    UPROPERTY(Replicated)
+    STUPlayerStateEnum PlayerStateNow = STUPlayerStateEnum::None;
   private:
     int32 TeamID;
     FLinearColor TeamColor;
 
     int32 KillsNum = 0;
     int32 DeathsNum = 0;
+    
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 };

@@ -6,6 +6,7 @@
 #include "UI/STUBaseWidget.h"
 #include "STUGameModeBase.h"
 #include "STUUtils.h"
+#include "STUGameStateBase.h"
 DEFINE_LOG_CATEGORY_STATIC(LogSTUGameHUD, All, All);
 void ASTUGameHUD::DrawHUD()
 {
@@ -35,10 +36,10 @@ void ASTUGameHUD::BeginPlay()
     if (GetWorld())
     {
         OnMatchStateChanged(ESTUMatchState::InProgress);
-        /*if (auto GS = GetWorld()->GetGameState<ASTUGameModeBase>())
+        if (auto GS = GetWorld()->GetGameState<ASTUGameStateBase>())
         {
             GS->OnMatchStateChanged.AddUObject(this, &ASTUGameHUD::OnMatchStateChanged);
-        }*/
+        }
         /*const auto Gamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
         if (Gamemode)
         {
@@ -62,13 +63,14 @@ void ASTUGameHUD::DrawCrossHair()
 
 void ASTUGameHUD::OnMatchStateChanged(ESTUMatchState State)
 {
-    if (CurrentWidget)
-    {
-        CurrentWidget->SetVisibility(ESlateVisibility::Hidden);
-    }
+    
 
     if (GameWidgets.Contains(State))
     {
+        if (CurrentWidget)
+        {
+            CurrentWidget->SetVisibility(ESlateVisibility::Hidden);
+        }
         CurrentWidget = GameWidgets[State];
     }
 

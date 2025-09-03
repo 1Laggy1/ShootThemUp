@@ -10,6 +10,8 @@
 #include "Components/STUWeaponComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
+
+#include "Player/STUPlayerController.h"
 DEFINE_LOG_CATEGORY_STATIC(STUPlayerCharacter, All, All);
 ASTUPlayerCharacter::ASTUPlayerCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)
 {
@@ -120,15 +122,27 @@ void ASTUPlayerCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor *
 
 void ASTUPlayerCharacter::OnDeath()
 {
-    Super::OnDeath();
+    
     WeaponComponent->Zoom(false);
     if (Controller)
     {
-        Controller->ChangeState(NAME_Spectating);
+    //    Cast<ASTUPlayerController>(Controller)->SetPreviousPosition(GetActorLocation());
+
+    
+    if (Cast<ASTUPlayerController>(Controller))
+    {
+        Cast<ASTUPlayerController>(Controller)
+            ->SetPreviousCameraPosition(CameraComponent->GetComponentLocation(),
+                                        CameraComponent->GetComponentRotation());
     }
-    UE_LOG(STUPlayerCharacter, Display, TEXT("Player %s is dead"), *GetName());
+    //    
+    }
+    Super::OnDeath();
+    //UE_LOG(STUPlayerCharacter, Display, TEXT("Player %s is dead"), *GetName());
     
 }
+
+
 
 void ASTUPlayerCharacter::SnapCamera()
 {

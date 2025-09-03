@@ -9,6 +9,7 @@
 
 
 class AAIController;
+class ASTUGameStateBase;
 UCLASS()
 class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 {
@@ -16,29 +17,32 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
   public:
     ASTUGameModeBase();
 
-    FOnMatchStateChangeSignature OnMatchStateChanged;
 
     virtual void StartPlay() override;
+    AActor* GetRandomSpawnPoint(UWorld *World);
     virtual UClass *GetDefaultPawnClassForController_Implementation(AController *InController) override;
-    void Killed(AController *KillerController, AController *VictimController);
-    FGameData GetGameData()
-    {
-        return GameData;
-    }
-    int32 GetCurrentRound()
-    {
-        return CurrentRound;
-  }
-    int32 GetRoundCountDown()
-    {
-        return RoundCountDown;
-  }
-    void RespawnRequest(AController* Controller);
+    void Killed(AController *KillerActor, AController *DiedActor);
+  //  FGameData GetGameData()
+  //  {
+  //      return GameData;
+  //  }
+  //  int32 GetCurrentRound()
+  //  {
+  //      return CurrentRound;
+  //}
+  //  int32 GetRoundCountDown()
+  //  {
+  //      return RoundCountDown;
+  //}
+    void RespawnRequest(AController *Controller);
 
     virtual bool SetPause(APlayerController *PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
     virtual bool ClearPause() override;
     FLinearColor DetermineColorByTeamID(int32 TeamID) const;
   protected:
+    AActor *ChoosePlayerStart_Implementation(AController *Player) override;
+    bool IsGoodSpawnPoint(AActor *Spawn, AController *Player);
+    void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<AAIController> AIControllerClass;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
@@ -46,9 +50,11 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FGameData GameData;
   private:
-    ESTUMatchState MatchState = ESTUMatchState::WaitingToStart;
-    int32 CurrentRound = 1;
-    int32 RoundCountDown = 0;
+    
+    virtual void PostLogin(APlayerController *NewPlayer) override;
+    ASTUGameStateBase *STUGameStateBase;
+    //int32 CurrentRound = 1;
+    //int32 RoundCountDown = 0;
     FTimerHandle GameRoundTimerHandle;
     void SpawnBots();
     void StartRound();
@@ -57,10 +63,10 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void ResetOnePlayer(AController *Controller);
 
     void CreateTeamsInfo();
-    
-    void SetPlayerColor(AController *Controller);
+    int32 TeamIDNow = 1;
+    void SetPlayerColor(AActor *Character, FLinearColor TeamColor);
+    void SetPlayerInfo(APlayerController *Controller);
     void LogPlayerInfo();
-    void StartRespawn(AController *Controller);
+    void StartRespawn(AController *DiedActor);
     void GameOver();
-    void SetMatchState(ESTUMatchState State);
 };
