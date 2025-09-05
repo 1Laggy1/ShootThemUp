@@ -6,7 +6,12 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/STUPlayerState.h"
+#include "Components/STUHealthActorComponent.h"
+#include "Components/WidgetComponent.h"
+#include "STUUtils.h"
+#include "Player/STUPlayerController.h"
 
+#include "UI/STUHealthBarWidget.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
 
 USTUHealthActorComponent::USTUHealthActorComponent()
@@ -14,12 +19,15 @@ USTUHealthActorComponent::USTUHealthActorComponent()
     PrimaryComponentTick.bCanEverTick = true;
     Health = MaxHealth;
     SetIsReplicatedByDefault(true);
+    HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("HealthWidgetComponent");
+    HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 void USTUHealthActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                              FActorComponentTickFunction *ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    if (GetOwner() && GetOwner()->GetLocalRole() == ROLE_Authority)
     AutoHealHandle(DeltaTime);
     
 }
@@ -41,16 +49,50 @@ float USTUHealthActorComponent::TakeHeal(float amount)
     {
         IsVaunded = false;
     }
-    OnHealthChanged.Broadcast(Health);
+    //HealthChangedMulticast(Health);
+    //OnHealthChanged.Broadcast(Health);
     return Health;
+}
+
+void USTUHealthActorComponent::UpdateHealthWidget(AActor* DamageCauser)
+{
+    if (!GetOwner() || !HealthWidgetComponent)
+        return;
+
+    if (DamageCauser)
+    {
+        const auto ControllerCauser = STUUtils::GetInstigatorControllerFromDamageCauser(DamageCauser);
+        if (ControllerCauser)
+        {
+            const auto PlayerLocation = DamageCauser->GetActorLocation();
+            const auto Distance = FVector::Distance(PlayerLocation, GetOwner()->GetActorLocation());
+            HealthWidgetComponent->SetVisibility(Distance < HealthVisibilityDistance, true);
+        }
+    }
+    
+
+    if (!HealthBarWidget)
+    {
+        HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
+        if (!HealthBarWidget)
+            return;
+    }
+
+    HealthBarWidget->SetHealthPercent(GetHealthPercent());
+
+    FString yes = HealthBarWidget->IsVisible() ? FString("YES") : FString("HELNAAAH");
+    UE_LOG(LogTemp, Warning, TEXT("Visibility of HEALTH WIDGET COMPONENT = %s HEALTH PERCENT IS %s"), *yes,
+           *FString::Printf(TEXT("%.2f"), GetHealthPercent()));
 }
 
 void USTUHealthActorComponent::BeginPlay()
 {
     Super::BeginPlay();
-
-    Health = MaxHealth;
-    OnHealthChanged.Broadcast(Health);
+    
+    HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
+    //Health = MaxHealth;
+    //HealthChangedMulticast(Health);
+    //OnHealthChanged.Broadcast(Health);
     AActor *ComponentOwner = GetOwner();
     if (ComponentOwner)
     {
@@ -83,15 +125,26 @@ void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor* DamagedA
 void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *DamagedActor, float Damage,
                                                                    AActor *DamageCauser)
 {
+    UpdateHealthWidget(DamageCauser);
+    
     //Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
     HealDelayCurrent = 0;
     OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
+    OnHealthChanged.Broadcast(Health);
+    //OnHealthChanged.Broadcast(Health);
     IsVaunded = true;
 }
 
 void USTUHealthActorComponent::DeathMulticast_Implementation(int32 PlayerID)
 {
+    HealthWidgetComponent->SetVisibility(false, true);
     OnDeath.Broadcast();
+}
+
+void USTUHealthActorComponent::HealthChangedMulticast_Implementation(float NewHealth)
+{
+    UpdateHealthWidget(nullptr);
+    OnHealthChanged.Broadcast(NewHealth);
 }
 
 void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,

@@ -40,8 +40,6 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     virtual bool ClearPause() override;
     FLinearColor DetermineColorByTeamID(int32 TeamID) const;
   protected:
-    AActor *ChoosePlayerStart_Implementation(AController *Player) override;
-    bool IsGoodSpawnPoint(AActor *Spawn, AController *Player);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<AAIController> AIControllerClass;

@@ -75,16 +75,18 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     virtual void MakeShot() {};
 
     UFUNCTION(Server, Reliable)
-    virtual void MakeShotServer(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
-    virtual void MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
+    virtual void MakeShotServer(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd, int32 InstigatorID);
+    virtual void MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
+                                               int32 InstigatorID);
 
-    virtual void MakeShotFX(FVector ViewLocation, FRotator ViewRotation) {};
+    virtual void MakeShotFX(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd) {};
 
 
 
     UFUNCTION(NetMulticast, Reliable)
-    virtual void MakeShotMulticast(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
-    virtual void MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID);
+    virtual void MakeShotMulticast(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd, int32 InstigatorID);
+    virtual void MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
+                                                  int32 InstigatorID);
     virtual FVector GetTraceData(FVector ViewLocation, FRotator ViewRotation) const;
 
     void DecreaseAmmo();

@@ -26,4 +26,30 @@ class STUUtils
     {
         return FMath::RandRange(0, 99999);
     }
+    AController static *GetInstigatorControllerFromDamageCauser(AActor *DamageCauser)
+    {
+        if (!DamageCauser)
+            return nullptr;
+
+        if (APawn *Pawn = Cast<APawn>(DamageCauser))
+        {
+            return Pawn->GetController();
+        }
+
+        if (AController *InstCtrl = DamageCauser->GetInstigatorController())
+        {
+            return InstCtrl;
+        }
+
+        if (AActor *OwnerCauser = DamageCauser->GetOwner())
+        {
+            if (APawn *OwnerPawn = Cast<APawn>(OwnerCauser))
+                return OwnerPawn->GetController();
+
+            if (AController *OwnerCtrl = OwnerCauser->GetInstigatorController())
+                return OwnerCtrl;
+        }
+
+        return nullptr;
+    }
 };

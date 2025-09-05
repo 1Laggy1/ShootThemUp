@@ -18,4 +18,8 @@ void ASTUPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutL
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ASTUPlayerState, PlayerStateNow);
+    DOREPLIFETIME(ASTUPlayerState, TeamID);
+    DOREPLIFETIME(ASTUPlayerState, TeamColor);
+    DOREPLIFETIME(ASTUPlayerState, KillsNum);
+    DOREPLIFETIME(ASTUPlayerState, DeathsNum);
 }

@@ -14,6 +14,7 @@ class SHOOTTHEMUP_API USTUHealthBarWidget : public UUserWidget
   public:
     void SetHealthPercent(float Percent);
   protected:
+    virtual void NativeTick(const FGeometry &MyGeometry, float InDeltaTime) override;
     UPROPERTY(meta = (BindWidget))
     UProgressBar *HealthProgressBar;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
@@ -24,4 +25,7 @@ class SHOOTTHEMUP_API USTUHealthBarWidget : public UUserWidget
     FLinearColor GoodColor = FLinearColor::White;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     FLinearColor BadColor = FLinearColor::Red;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    float TimeToShowDefault = 5;
+    float TimeToShow = 0;
 };
