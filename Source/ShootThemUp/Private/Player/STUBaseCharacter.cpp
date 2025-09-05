@@ -13,7 +13,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Net/UnrealNetwork.h"
-
+#include "UI/STUHealthBarWidget.h"
+#include "Components/WidgetComponent.h"
+#include "Player/STUPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
@@ -27,7 +29,10 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
     bReplicates = true; 
     HealthComponent = CreateDefaultSubobject<USTUHealthActorComponent>("HealthComponent");
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
-
+    if (HealthComponent->GetHealthWidgetComponent())
+    {
+        HealthComponent->GetHealthWidgetComponent()->SetupAttachment(RootComponent);
+    }
     
 
 
@@ -43,6 +48,9 @@ void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor* Da
 {
     if (HealthComponent->isDead() || !GetController())
         return;
+
+     
+
     //UGameplayStatics::PlaySoundAtLocation(GetWorld(), DamageSound, GetActorLocation());
 }
 
@@ -99,6 +107,7 @@ void ASTUBaseCharacter::StopSprint()
 {
     RequestSprintServer(false);
 }
+
 
 void ASTUBaseCharacter::MulticastStartSprint_Implementation(bool Start)
 {
@@ -173,6 +182,13 @@ void ASTUBaseCharacter::OnDeath()
 void ASTUBaseCharacter::OnHealthChanged(float Health)
 {
     //HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+}
+
+void ASTUBaseCharacter::UpdateHealthWidgetVisibility(AActor *DamageCauser)
+{
+
+    
+    
 }
 
 void ASTUBaseCharacter::Landed(const FHitResult &Hit)

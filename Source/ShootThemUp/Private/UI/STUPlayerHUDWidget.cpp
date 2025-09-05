@@ -17,9 +17,10 @@ DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 void USTUPlayerHUDWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
-    if (GetOwningPlayer())
+    if (GetOwningPlayer() && Cast<ASTUPlayerController>(GetOwningPlayer()))
     {
-        GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &USTUPlayerHUDWidget::OnNewPawn);
+        Cast<ASTUPlayerController>(GetOwningPlayer())->OnNewPawnEvent.AddUObject(
+            this, &USTUPlayerHUDWidget::OnNewPawn);
         OnNewPawn(GetOwningPlayerPawn());
     }
     
@@ -29,6 +30,8 @@ void USTUPlayerHUDWidget::NativeOnInitialized()
 void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
 {
     const auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(NewPawn);
+    FString yes = HealthComponent ? FString("Yes") : FString("No");
+    UE_LOG(LogHudWidget, Warning, TEXT("NewPawn= %s, HealthComponent = %s"), *NewPawn->GetFullName(), *yes);
     if (HealthComponent)
     {
         HealthComponent->OnDamaged.AddUObject(this, &USTUPlayerHUDWidget::OnDamaged);

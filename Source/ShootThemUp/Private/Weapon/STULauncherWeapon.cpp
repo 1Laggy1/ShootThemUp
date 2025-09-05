@@ -17,7 +17,7 @@ void ASTULauncherWeapon::StartFire()
 
 
 
-void ASTULauncherWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation,
+void ASTULauncherWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
                                                           int32 InstigatorID)
 {
     
@@ -39,7 +39,6 @@ void ASTULauncherWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, 
             return;
     }
 
-    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
 
     const FVector SocketLocation = GetMuzzleWorldLocation();
 
@@ -90,6 +89,8 @@ void ASTULauncherWeapon::MakeBurstShot()
         FRotator ViewRotation;
         GetPlayerViewPoint(ViewLocation, ViewRotation);
         ShotsFires++;
-        MakeShotServer(ViewLocation, ViewRotation, Controller->PlayerState->GetPlayerId());
+
+        FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
+        MakeShotServer(ViewLocation, ViewRotation, TraceEnd, Controller->PlayerState->GetPlayerId());
 
 }

@@ -9,7 +9,6 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/STUHealthActorComponent.h"
-#include "UI/STUHealthBarWidget.h"
 DEFINE_LOG_CATEGORY_STATIC(STUAICharacter, All, All);
 
 ASTUAICharacter::ASTUAICharacter(const FObjectInitializer& ObjInit) : Super(ObjInit.SetDefaultSubobjectClass<USTUAIWeaponComponent>("Weapon Component"))
@@ -20,9 +19,7 @@ ASTUAICharacter::ASTUAICharacter(const FObjectInitializer& ObjInit) : Super(ObjI
         GetCharacterMovement()->bUseControllerDesiredRotation = true;
         GetCharacterMovement()->RotationRate = FRotator(0.0f, 200.0f, 0.0f);
     }
-    HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("HealthWidgetComponent");
-    HealthWidgetComponent->SetupAttachment(GetRootComponent());
-    HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+    
 }
 void ASTUAICharacter::BeginPlay()
 {
@@ -34,14 +31,6 @@ void ASTUAICharacter::BeginPlay()
         HealthComponent->OnHealthChanged.AddUObject(this, &ASTUAICharacter::OnHealthChanged);
         HealthComponent->OnDamaged.AddUObject(this, &ASTUAICharacter::OnDamaged);
     }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("No HealthComponent found in AICharacter instance!"));
-    }
-    UE_LOG(LogTemp, Warning, TEXT("AICharacter: %s, HealthComponent: %s, Owner: %s"), *GetNameSafe(this),
-           *GetNameSafe(HealthComponent), *GetNameSafe(HealthComponent ? HealthComponent->GetOwner() : nullptr));
-
-    check(HealthWidgetComponent);
 }
 void ASTUAICharacter::OnDeath()
 {
@@ -55,7 +44,6 @@ void ASTUAICharacter::OnDeath()
             Brain->Cleanup();
         }
     }
-    HealthWidgetComponent->SetVisibility(false, true);
     UE_LOG(STUAICharacter, Display, TEXT("Bot %s is dead"), *GetName());
 }
 
@@ -83,19 +71,5 @@ void ASTUAICharacter::OnHealthChanged(float Health)
 {
     Super::OnHealthChanged(Health);
 
-    const auto HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
-    if (!HealthBarWidget)
-        return;
-    UpdateHealthWidgetVisibility();
-    HealthBarWidget->SetHealthPercent(HealthComponent->GetHealthPercent());
 }
 
-void ASTUAICharacter::UpdateHealthWidgetVisibility()
-{
-    if (!GetWorld() || !GetWorld()->GetFirstPlayerController() || !GetWorld()->GetFirstPlayerController()->GetPawn() || !HealthWidgetComponent)
-        return;
-
-    const auto PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-    const auto Distance = FVector::Distance(PlayerLocation, GetActorLocation());
-    HealthWidgetComponent->SetVisibility(Distance < HealthVisibilityDistance, true);
-}

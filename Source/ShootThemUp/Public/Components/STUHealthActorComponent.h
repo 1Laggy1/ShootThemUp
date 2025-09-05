@@ -8,7 +8,8 @@
 #include "STUHealthActorComponent.generated.h"
 
 class UPhysicalMaterial;
-
+class UWidgetComponent;
+class USTUHealthBarWidget;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
 {
@@ -40,13 +41,21 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
         return IsVaunded;
     }
     float TakeHeal(float amount);
-
+    
     FOnDeath OnDeath;
     FOnHealthChanged OnHealthChanged;
     FOnDamaged OnDamaged;
-
-
-
+    UWidgetComponent* GetHealthWidgetComponent()
+    {
+        return HealthWidgetComponent;
+    }
+    UFUNCTION()
+    void Rep_HealthChanged()
+    {
+        UpdateHealthWidget(nullptr);
+        OnHealthChanged.Broadcast(Health);
+    }
+    void UpdateHealthWidget(AActor* DamageCauser);
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     bool AutoHeal;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
@@ -56,22 +65,22 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
               meta = (ClampMin = "0", EditCondition = "AutoHeal"))
     float HealAmount = 1.0f;
-
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+    float HealthVisibilityDistance = 10000.0f;
   protected:
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UWidgetComponent *HealthWidgetComponent;
       UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     TMap<UPhysicalMaterial *, float> DamageModifiers;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ClampMin = "0"))
     float MaxHealth = 100.0f;
     virtual void BeginPlay() override;
-
+    USTUHealthBarWidget *HealthBarWidget;
   private:
-    UPROPERTY(Replicated)//Using = "Rep_HealthChanged")
+
+    UPROPERTY(Replicated)//Using = Rep_HealthChanged)
     float Health = 0.0f;
-    UFUNCTION()
-    void Rep_HealthChanged()
-    {
-        OnHealthChanged.Broadcast(Health);
-    }
+    
     bool IsVaunded = false;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
     UFUNCTION()
@@ -85,6 +94,8 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     void ApplyDamageMulticast(AActor *DamagedActor, float Damage, AActor *DamageCauser);
     UFUNCTION(NetMulticast, Reliable)
     void DeathMulticast(int32 PlayerID);
+    UFUNCTION(NetMulticast, Reliable)
+    void HealthChangedMulticast(float NewHealth);
     UFUNCTION()
     void OnTakeRadialDamage(AActor *DamagedActor, float Damage, const class UDamageType *DamageType, FVector Origin,
                             const FHitResult &HitInfo, class AController *InstigatedBy, AActor *DamageCauser);

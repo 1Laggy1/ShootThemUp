@@ -33,13 +33,13 @@ class SHOOTTHEMUP_API ASTURifleWeapon : public ASTUBaseWeapon
     UNiagaraSystem* TraceFX;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
     FString TraceTargetName = "TraceTarget";
-    virtual void MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation,
+    virtual void MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
                                                int32 InstigatorID) override;
     virtual void MakeShot() override;
     virtual void BeginPlay() override;
-    virtual void MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation,
+    virtual void MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
                                                   int32 InstigatorID) override;
-    virtual void MakeShotFX(FVector ViewLocation, FRotator ViewRotation) override;
+    virtual void MakeShotFX(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd) override;
     virtual FVector GetTraceData(FVector ViewLocation, FRotator ViewRotation) const override;
     void MakeDamage(const FHitResult& HitResult);
   private:

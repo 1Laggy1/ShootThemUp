@@ -18,12 +18,12 @@ ASTURifleWeapon::ASTURifleWeapon()
     WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
 }
 
-void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)
+void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
+                                                    int32 InstigatorID)
 {
-    MakeShotMulticast(ViewLocation, ViewRotation, InstigatorID);
+    MakeShotMulticast(ViewLocation, ViewRotation, TraceEnd, InstigatorID);
 
     const FVector SocketLocation = GetMuzzleWorldLocation();
-    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
     FHitResult HitResult;
     MakeHit(HitResult, ViewLocation, TraceEnd);
     FVector TraceFXEnd = TraceEnd;
@@ -39,11 +39,10 @@ void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotat
     // DecreaseAmmo();
 }
 
-void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation)
+void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd)
 {
 
-    const FVector SocketLocation = GetMuzzleWorldLocation();
-    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotation);
+    
     FHitResult HitResult;
     MakeHit(HitResult, ViewLocation, TraceEnd);
     FVector TraceFXEnd = TraceEnd;
@@ -59,7 +58,8 @@ void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation)
     }
 }
 
-void ASTURifleWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, int32 InstigatorID)
+void ASTURifleWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation,
+                                                       FVector TraceEnd, int32 InstigatorID)
 {
     if (!Cast<ACharacter>(GetOwner()) || !Cast<ACharacter>(GetOwner())->GetPlayerState() ||
         !Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID())
@@ -68,7 +68,7 @@ void ASTURifleWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRo
     int32 InstigatorIDLocal = Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID();
     if (InstigatorID == InstigatorIDLocal)
         return;
-    MakeShotFX(ViewLocation, ViewRotation);
+    MakeShotFX(ViewLocation, ViewRotation, TraceEnd);
 }
 
 void ASTURifleWeapon::MakeShot()
@@ -100,12 +100,14 @@ void ASTURifleWeapon::MakeShot()
     /*if (!GetOwner()->HasAuthority())
     {
        */
+
     DecreaseAmmo();
     //}
+    const FVector SocketLocation = GetMuzzleWorldLocation();
+    FVector TraceEnd = GetTraceData(ViewLocation, ViewRotator);
+    MakeShotFX(ViewLocation, ViewRotator, TraceEnd);
 
-    MakeShotFX(ViewLocation, ViewRotator);
-
-    MakeShotServer(ViewLocation, ViewRotator, Controller->PlayerState->GetUniqueID());
+    MakeShotServer(ViewLocation, ViewRotator, TraceEnd, Controller->PlayerState->GetUniqueID());
 }
 
 void ASTURifleWeapon::BeginPlay()

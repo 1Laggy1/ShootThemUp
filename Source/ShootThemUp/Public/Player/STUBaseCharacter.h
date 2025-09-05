@@ -12,12 +12,15 @@ class USTUHealthActorComponent;
 class ASTUBaseWeapon;
 class USTUWeaponComponent;
 class USoundCue;
+class UWidgetComponent;
 
 UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 {
     GENERATED_BODY()
 
   protected:
+
+    
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUWeaponComponent* WeaponComponent;
     
@@ -47,6 +50,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     virtual void BeginPlay() override;
     virtual void OnHealthChanged(float Health);
     
+    
+    
   public:
     ASTUBaseCharacter(const FObjectInitializer &ObjInit);
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -61,6 +66,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     void RequestSprintServer(bool Start);
     UFUNCTION(NetMulticast, Reliable)
     void MulticastStartSprint(bool Start);
+    AController *GetInstigatorControllerFromDamageCauser(AActor *DamageCauser);
     // Called to bind functionality to input
     
 
@@ -77,6 +83,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     float GetMovementDirection() const;
     UFUNCTION(BlueprintCallable, Category = "Movement")
     virtual bool IsSprinting();
+    void UpdateHealthWidgetVisibility(AActor *DamageCauser);
 
   private:
     
