@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SphereComponent.h"
 #include "STUProjectile.generated.h"
-class USphereComponent;
 class UProjectileMovementComponent;
 class USTUWeaponFXComponent;
 class USoundCue;
@@ -16,7 +16,10 @@ class SHOOTTHEMUP_API ASTUProjectile : public AActor
 	
 public:	
 	ASTUProjectile();
-
+  USphereComponent *GetCollisionComponent() const
+  {
+      return CollisionComponent;
+  }
 	void SetShotDirection(const FVector &Direction)
     {
         ShotDirection = Direction;

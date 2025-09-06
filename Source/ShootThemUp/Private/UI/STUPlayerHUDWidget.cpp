@@ -32,10 +32,12 @@ void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
     const auto HealthComponent = STUUtils::GetSTUPlayerComponent<USTUHealthActorComponent>(NewPawn);
     FString yes = HealthComponent ? FString("Yes") : FString("No");
     UE_LOG(LogHudWidget, Warning, TEXT("NewPawn= %s, HealthComponent = %s"), *NewPawn->GetFullName(), *yes);
+    isPlayerDead = false;
     if (HealthComponent)
     {
         HealthComponent->OnDamaged.AddUObject(this, &USTUPlayerHUDWidget::OnDamaged);
         HealthComponent->OnHealthChanged.AddUObject(this, &USTUPlayerHUDWidget::OnHealthChanged);
+        HealthComponent->OnDeath.AddUObject(this, &USTUPlayerHUDWidget::OnPlayerDeath);
     }
     UpdateHealthBar();
 }
