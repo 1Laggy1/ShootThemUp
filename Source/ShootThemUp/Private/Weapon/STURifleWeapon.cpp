@@ -106,8 +106,8 @@ void ASTURifleWeapon::MakeShot()
     const FVector SocketLocation = GetMuzzleWorldLocation();
     FVector TraceEnd = GetTraceData(ViewLocation, ViewRotator);
     MakeShotFX(ViewLocation, ViewRotator, TraceEnd);
-
-    MakeShotServer(ViewLocation, ViewRotator, TraceEnd, Controller->PlayerState->GetUniqueID());
+    int32 ID = Cast<ACharacter>(GetOwner())->Controller->PlayerState->GetUniqueID();
+    MakeShotServer(ViewLocation, ViewRotator, TraceEnd, ID);
 }
 
 void ASTURifleWeapon::BeginPlay()

@@ -37,6 +37,16 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
     FString GetKills();
     UFUNCTION(BlueprintImplementableEvent, Category = "UI")
     void OnTakeDamage();
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    bool GetIsPlayerDead() const
+    {
+        return isPlayerDead;
+    }
+    UFUNCTION()
+    void OnPlayerDeath()
+    {
+        isPlayerDead = true;
+    }
     virtual void NativeOnInitialized() override;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     float PercentColorThreshold = 0.3f;
@@ -53,7 +63,7 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
     UPROPERTY(meta = (BindWidgetAnim), Transient)
     UWidgetAnimation *DamageAnimation;
 
-    
+    bool isPlayerDead = false;
     void OnHealthChanged(float Health);
     void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
     ASTUGameStateBase *CurrentGamemodeState;

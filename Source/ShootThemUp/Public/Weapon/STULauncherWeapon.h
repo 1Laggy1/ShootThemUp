@@ -21,6 +21,8 @@ class SHOOTTHEMUP_API ASTULauncherWeapon : public ASTUBaseWeapon
   protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     TSubclassOf<ASTUProjectile> ProjectileClass;
+    virtual void MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
+                                                  int32 InstigatorID) override;
     virtual void MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
                                                   int32 InstigatorID) override;
     UFUNCTION(Server, Reliable)
@@ -32,4 +34,5 @@ class SHOOTTHEMUP_API ASTULauncherWeapon : public ASTUBaseWeapon
     float ShotInterval = 0.2f;
     FTimerHandle BurstTimerHandle;
     void MakeBurstShot();
+    void FakeShot(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd);
 };

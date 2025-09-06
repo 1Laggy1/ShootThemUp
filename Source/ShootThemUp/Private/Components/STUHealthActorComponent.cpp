@@ -49,7 +49,7 @@ float USTUHealthActorComponent::TakeHeal(float amount)
     {
         IsVaunded = false;
     }
-    //HealthChangedMulticast(Health);
+    HealthChangedMulticast(Health);
     //OnHealthChanged.Broadcast(Health);
     return Health;
 }
@@ -80,9 +80,9 @@ void USTUHealthActorComponent::UpdateHealthWidget(AActor* DamageCauser)
 
     HealthBarWidget->SetHealthPercent(GetHealthPercent());
 
-    FString yes = HealthBarWidget->IsVisible() ? FString("YES") : FString("HELNAAAH");
+    /*FString yes = HealthBarWidget->IsVisible() ? FString("YES") : FString("NO");
     UE_LOG(LogTemp, Warning, TEXT("Visibility of HEALTH WIDGET COMPONENT = %s HEALTH PERCENT IS %s"), *yes,
-           *FString::Printf(TEXT("%.2f"), GetHealthPercent()));
+           *FString::Printf(TEXT("%.2f"), GetHealthPercent()));*/
 }
 
 void USTUHealthActorComponent::BeginPlay()

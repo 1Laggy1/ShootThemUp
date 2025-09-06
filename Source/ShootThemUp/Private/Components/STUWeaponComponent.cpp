@@ -123,6 +123,7 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
         CurrentWeapon->StopFire();
         AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponArmorySocketName);
     }
+    CurrentWeaponIndex = WeaponIndex;
     if (!Weapons[CurrentWeaponIndex])
     {
         return;
@@ -138,6 +139,7 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
         [&](const FWeaponData &Data) { return Data.WeaponClass == CurrentWeapon->GetClass(); });
     CurrentReloadAnimMontage = CurrentWeaponData ? CurrentWeaponData->ReloadAnimMontage : nullptr;
     AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponEquipSocketName);
+    UE_LOG(LogWeaponComponent, Warning, TEXT("CURRENT WEAPON: %s"), *CurrentWeapon->GetFullName());
     EquipAnimInProgress = true;
     PlayAnimMontage(EquipAnimMontage);
 }

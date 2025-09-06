@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 
 #include "Weapon/STUProjectile.h"
@@ -11,18 +11,21 @@
 
 ASTUProjectile::ASTUProjectile()
 {
-	PrimaryActorTick.bCanEverTick = false;
+    SetReplicates(false);
+    SetReplicateMovement(false);
+    bReplicates = false;
+    PrimaryActorTick.bCanEverTick = false;
     CollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
     CollisionComponent->InitSphereRadius(5.0f);
-    CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+    CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    CollisionComponent->SetCollisionResponseToChannel(
+        ECC_Pawn, ECR_Block);
     CollisionComponent->bReturnMaterialOnMove = true;
     SetRootComponent(CollisionComponent);
 
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("UProjectileMovementComponent");
     MovementComponent->InitialSpeed = 2000.0f;
     MovementComponent->ProjectileGravityScale = 0.3f;
-
     WeaponFXComponent = CreateDefaultSubobject<USTUWeaponFXComponent>("WeaponFXComponent");
 }
 
@@ -33,6 +36,8 @@ void ASTUProjectile::BeginPlay()
     check(CollisionComponent);
     MovementComponent->Velocity = ShotDirection * MovementComponent->InitialSpeed;
     CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
+    CollisionComponent->IgnoreActorWhenMoving(GetOwner()->GetOwner(), true);
+    CollisionComponent->IgnoreActorWhenMoving(this, true);
     CollisionComponent->OnComponentHit.AddDynamic(this, &ASTUProjectile::OnProjectileHit);
     SetLifeSpan(LifeSeconds);
 }
@@ -40,17 +45,21 @@ void ASTUProjectile::BeginPlay()
 void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *OtherActor,
                                      UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
-    if (!GetWorld())
+    if (!GetWorld() || OtherActor == GetOwner())
         return;
-
+    UE_LOG(LogTemp, Warning, TEXT("Projectile hitted, name of actor: %s"), *OtherActor->GetFullName());
     MovementComponent->StopMovementImmediately();
 
 
-    UGameplayStatics::ApplyRadialDamage(GetWorld(), DamageAmount, GetActorLocation(), DamageRadius,
-                                        UDamageType::StaticClass(), {}, this, GetController(), DoFullDamage);
+    
     DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 24, FColor::Red, false, 5.0f);
     WeaponFXComponent->PlayImpactFX(Hit);
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
+    if (GetLocalRole() == ROLE_Authority)
+    {
+        UGameplayStatics::ApplyRadialDamage(GetWorld(), DamageAmount, GetActorLocation(), DamageRadius,
+                                            UDamageType::StaticClass(), {}, this, GetController(), DoFullDamage);
+    }
     Destroy();
 }
 AController *ASTUProjectile::GetController() const
