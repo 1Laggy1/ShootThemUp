@@ -26,6 +26,26 @@ ASTUGameModeBase::ASTUGameModeBase()
     // SpectatorClass = ASpectatorPawn::StaticClass();
 }
 
+//FMatchStatistics ASTUGameModeBase::GetMatchStatistics()
+//{
+//    if (!GetWorld())
+//        return FMatchStatistics();
+//    FMatchStatistics MatchStatistics;
+//    for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
+//    {
+//        const auto Controller = It->Get();
+//        if (!Controller)
+//            continue;
+//        const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
+//        if (!PlayerState)
+//            continue;
+//        
+//        
+//        MatchStatistics.Stats.Add(RowInfo);
+//    }
+//    return MatchStatistics;
+//}
+
 void ASTUGameModeBase::StartPlay()
 {
 
@@ -39,7 +59,7 @@ void ASTUGameModeBase::StartPlay()
     // CreateTeamsInfo();
     STUGameStateBase->CurrentRound = 1;
     StartRound();
-    STUGameStateBase->SetMatchState(ESTUMatchState::InProgress);
+    ChangeState(ESTUMatchState::InProgress);
 }
 
 UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AController *InController)
@@ -189,13 +209,33 @@ void ASTUGameModeBase::SetPlayerInfo(APlayerController *Controller)
     const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
     if (!PlayerState)
         return;
+    
     PlayerState->SetTeamID(TeamIDNow);
+    
     PlayerState->SetTeamColor(
         DetermineColorByTeamID(TeamIDNow)); /*if (!Controller->IsPlayerController()) { FString Bot; Bot = "Bot " +
                                             FString::FromInt(BotNum); PlayerState->SetPlayerName(Bot); BotNum++; }*/
     PlayerState->SetSTUPlayerState(STUPlayerStateEnum::Gaming);
     SetPlayerColor(Controller, DetermineColorByTeamID(TeamIDNow));
     TeamIDNow = TeamIDNow == 1 ? 2 : 1;
+    if (!STUGameStateBase)
+        return;
+
+    /*FPlayerStats newPlayerStats;
+    newPlayerStats.PlayerName = PlayerState->GetPlayerName();
+    newPlayerStats.Kills = PlayerState->GetKillsNum();
+    newPlayerStats.Deaths = PlayerState->GetDeathsNum();
+    newPlayerStats.TeamID = PlayerState->GetTeamID();*/
+    STUGameStateBase->MatchStatistics.Stats.Add(STUUtils::GetPlayerStatsFromPlayerState(PlayerState));
+}
+
+void ASTUGameModeBase::ChangeState(ESTUMatchState NewState)
+{
+    if (STUGameStateBase)
+    {
+        STUGameStateBase->SetMatchState(NewState);
+        STUGameStateBase->OnMatchStateChanged.Broadcast(NewState);
+    }
 }
 
 void ASTUGameModeBase::RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation)
@@ -286,7 +326,7 @@ void ASTUGameModeBase::GameOver()
             Pawn->DisableInput(nullptr);
         }
     }
-    STUGameStateBase->SetMatchState(ESTUMatchState::GameOver);
+    ChangeState(ESTUMatchState::GameOver);
 }
 
 void ASTUGameModeBase::RespawnRequest(AController *Controller)
@@ -308,11 +348,30 @@ void ASTUGameModeBase::Killed(AController *KillerActor, AController *DiedActor)
         }
         else
             KillerPlayerState->AddKill();
+
+        if (STUGameStateBase)
+        {
+            FPlayerStats *KillerStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
+                [&](const FPlayerStats &E) { return E.PlayerName == KillerPlayerState->GetPlayerName(); });
+            if (KillerStats)
+            {
+                KillerStats->Kills = KillerPlayerState->GetKillsNum();
+            }
+        }
     }
 
     if (VictimPlayerState)
     {
         VictimPlayerState->AddDeath();
+        if (STUGameStateBase)
+        {
+            FPlayerStats *VictimStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
+                [&](const FPlayerStats &E) { return E.PlayerName == VictimPlayerState->GetPlayerName(); });
+            if (VictimStats)
+            {
+                VictimStats->Deaths = VictimPlayerState->GetDeathsNum();
+            }
+        }
     }
     StartRespawn(DiedActor);
 }
@@ -322,7 +381,7 @@ bool ASTUGameModeBase::SetPause(APlayerController *PC, FCanUnpause CanUnpauseDel
     const auto PauseSet = Super::SetPause(PC, CanUnpauseDelegate);
     if (PauseSet)
     {
-        STUGameStateBase->SetMatchState(ESTUMatchState::Pause);
+        ChangeState(ESTUMatchState::Pause);
     }
     return PauseSet;
 }
@@ -332,7 +391,7 @@ bool ASTUGameModeBase::ClearPause()
     const auto PauseSet = Super::ClearPause();
     if (PauseSet)
     {
-        STUGameStateBase->SetMatchState(ESTUMatchState::InProgress);
+        ChangeState(ESTUMatchState::InProgress);
     }
     return PauseSet;
 }
