@@ -7,6 +7,7 @@
 #include "STUCoreTypes.h"
 #include "STUGameStateBase.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStatistics, FMatchStatistics *);
 
 /**
  * 
@@ -16,6 +17,7 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
   public:
+    void BeginPlay() override;
     FOnMatchStateChangeSignature OnMatchStateChanged;
     UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
     FGameData GameData;
@@ -25,8 +27,22 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     int32 RoundCountDown = 0;
     UPROPERTY(ReplicatedUsing = OnRep_MatchStateChanged, EditAnywhere, BlueprintReadWrite)
     ESTUMatchState MatchState = ESTUMatchState::WaitingToStart;
+    UPROPERTY(Replicated)
+    FMatchStatistics Statistics;
     UFUNCTION()
     void OnRep_MatchStateChanged();
+    FMatchStatistics GetMatchStatistics() {
+        return Statistics;
+    };
+
+    UPROPERTY(ReplicatedUsing = MatchStatisticsBroadcast)
+    FMatchStatistics MatchStatistics;
+    UFUNCTION()
+    void MatchStatisticsBroadcast()
+    {
+        OnMatchStatistics.Broadcast(&MatchStatistics);
+    }
+    FOnMatchStatistics OnMatchStatistics;
 
   public:
     UFUNCTION(NetMulticast, Reliable)

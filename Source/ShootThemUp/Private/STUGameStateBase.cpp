@@ -6,7 +6,7 @@
 #include "Player/STUBaseCharacter.h"
 #include "Player/STUPlayerState.h"
 #include "Net/UnrealNetwork.h"
-
+#include "STUGameModeBase.h"
 void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -16,7 +16,14 @@ void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUGameStateBase, CurrentRound);
     DOREPLIFETIME(ASTUGameStateBase, RoundCountDown);
     DOREPLIFETIME(ASTUGameStateBase, MatchState);
+    DOREPLIFETIME(ASTUGameStateBase, MatchStatistics);
+}
 
+void ASTUGameStateBase::BeginPlay()
+{
+    Super::BeginPlay();
+    SetReplicates(true);
+    bReplicates = true;
 }
 
 void ASTUGameStateBase::OnRep_MatchStateChanged()

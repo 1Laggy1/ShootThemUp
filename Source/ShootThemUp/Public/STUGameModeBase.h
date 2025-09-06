@@ -8,6 +8,7 @@
 #include "STUGameModeBase.generated.h"
 
 
+
 class AAIController;
 class ASTUGameStateBase;
 UCLASS()
@@ -16,8 +17,6 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     GENERATED_BODY()
   public:
     ASTUGameModeBase();
-
-
     virtual void StartPlay() override;
     AActor* GetRandomSpawnPoint(UWorld *World);
     virtual UClass *GetDefaultPawnClassForController_Implementation(AController *InController) override;
@@ -40,6 +39,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     virtual bool ClearPause() override;
     FLinearColor DetermineColorByTeamID(int32 TeamID) const;
   protected:
+    void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<AAIController> AIControllerClass;

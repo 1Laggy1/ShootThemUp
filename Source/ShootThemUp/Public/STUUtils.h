@@ -1,5 +1,6 @@
 #pragma once
 #include "Player/STUPlayerState.h"
+#include "STUCoreTypes.h"
 
 class STUUtils
 {
@@ -51,5 +52,27 @@ class STUUtils
         }
 
         return nullptr;
+    }
+    FPlayerStats static GetPlayerStatsFromPlayerState(ASTUPlayerState* PlayerState)
+    {
+        FPlayerStats NewPlayerStats;
+        if (!PlayerState)
+            return NewPlayerStats;
+        NewPlayerStats.PlayerName = PlayerState->GetPlayerName();
+        NewPlayerStats.Kills = PlayerState->GetKillsNum();
+        NewPlayerStats.Deaths = PlayerState->GetDeathsNum();
+        NewPlayerStats.TeamID = PlayerState->GetTeamID();
+        NewPlayerStats.TeamColor = PlayerState->GetTeamColor();
+        return NewPlayerStats;
+    }
+    FStatRowInfo static GetStatRowInfoFromFPlayerStats(FPlayerStats &PlayerStats)
+    {
+        FStatRowInfo RowInfo;
+        RowInfo.PlayerNameText = PlayerStats.PlayerName;
+        RowInfo.KillsText = FString::FromInt(PlayerStats.Kills);
+        RowInfo.DeathsText = FString::FromInt(PlayerStats.Deaths);
+        RowInfo.TeamText = FString::FromInt(PlayerStats.TeamID);
+        RowInfo.TeamColor = PlayerStats.TeamColor;
+        return RowInfo;
     }
 };
