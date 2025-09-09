@@ -1,10 +1,19 @@
 # ShootThemUp
-Multiplayer is coming up in 1.1 stay tuned!
+There is a UE 5.6 bug from OnlineSubsytemSteam side, I trying to implement steam invites but I can't because of this.
+Steam multiplayer will be ready when I will find a way to somehow avoid this bug in OnlineSubsystemSteam, so stay tuned for 1.1 version!
 
 A third person shooter built in Unreal Engine 5.6. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
 ## Summary
 ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 years of Unity developing. In this project I have implemented a full gameplay loop (movement, weapons, health, AI, pickups, UI, VFX, sound, and game flow) and is designed to show practical engineering decisions and reusable systems.
 ## Highlights
+- Fully working multiplayer (`Replicated`, `RPC`, `Lobby`)
+
+<img width="1978" height="1237" alt="{C8F44DBB-BF43-42FE-AC2C-A6A3E115541D}" src="https://github.com/user-attachments/assets/48c0b6e3-e41d-4501-9a7c-9cd781da7731" />
+
+<img width="1987" height="1383" alt="{358D833F-60B1-4DDD-84C7-EADB4BCBB9BE}" src="https://github.com/user-attachments/assets/12ed6305-34e2-4cdc-a417-913dbfe50fb4" />
+
+![Multiplayer](https://github.com/user-attachments/assets/15a20c3f-78b4-4851-a782-56db97237731)
+
 - Complete third-person character with animations (`blendspaces`, `montages`, `notifies`, `ragdoll`, `aim offsets`, `F.A.B.R.I.K`).
 
 ![Animations](https://github.com/user-attachments/assets/cd30227c-395b-4a5e-8e58-e2052bb77982)
