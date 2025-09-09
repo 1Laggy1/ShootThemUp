@@ -10,7 +10,7 @@ ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 y
 
 <img width="1978" height="1237" alt="{C8F44DBB-BF43-42FE-AC2C-A6A3E115541D}" src="https://github.com/user-attachments/assets/48c0b6e3-e41d-4501-9a7c-9cd781da7731" />
 
-<img width="1987" height="1383" alt="{358D833F-60B1-4DDD-84C7-EADB4BCBB9BE}" src="https://github.com/user-attachments/assets/12ed6305-34e2-4cdc-a417-913dbfe50fb4" />
+- Full movement, animations, weapons shooting, equiping, replication between clients, and host.
 
 ![Multiplayer](https://github.com/user-attachments/assets/15a20c3f-78b4-4851-a782-56db97237731)
 
