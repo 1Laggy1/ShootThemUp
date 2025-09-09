@@ -19,30 +19,26 @@ class SHOOTTHEMUP_API USTUMenuWidget : public USTUBaseWidget
 	GENERATED_BODY()
 	
   protected:
-    UPROPERTY(meta = (BindWidget))
-    UButton *StartGameButton;
+    /*UPROPERTY(meta = (BindWidget))
+    UButton *StartGameButton;*/
     UPROPERTY(meta = (BindWidget))
     UButton *QuitGameButton;
-    UPROPERTY(meta = (BindWidget))
-    UHorizontalBox *LevelItemsBox;
-    UPROPERTY(meta = (BindWidgetAnim), Transient)
+    
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidgetAnim), Transient)
     UWidgetAnimation *LoadAnim;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
-    TSubclassOf<UUserWidget> LevelItemWidgetClass;
+    
 
     virtual void NativeOnInitialized() override;
-    virtual void OnAnimationFinished_Implementation(const UWidgetAnimation *Animation) override;
-
+    //virtual void OnAnimationFinished_Implementation(const UWidgetAnimation *Animation) override;
+    //virtual void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
   private:
-    UPROPERTY()
-    TArray<USTULevelItemWidget *> LevelItemWidgets;
-    UFUNCTION()
-    void OnStartGame();
+    
+    /*UFUNCTION()
+    void OnStartGame();*/
     UFUNCTION()
     void OnQuitGame();
 
-    void InitLevelItems();
-    void OnLevelSelected(const FLevelData& Data);
+   
     USTUGameInstance *GetSTUGameInstance() const;
 };

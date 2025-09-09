@@ -14,6 +14,8 @@
 #include "STUUtils.h"
 #include "UI/STUGameHUD.h"
 #include "Algo/RandomShuffle.h"
+#include "STUGameInstance.h"
+#include "OnlineSubsystem.h"
 DEFINE_LOG_CATEGORY_STATIC(LogSTUGameModeBase, All, All)
 
 ASTUGameModeBase::ASTUGameModeBase()
@@ -60,6 +62,12 @@ void ASTUGameModeBase::StartPlay()
     STUGameStateBase->CurrentRound = 1;
     StartRound();
     ChangeState(ESTUMatchState::InProgress);
+
+    if (USTUGameInstance* GI = GetWorld()->GetGameInstance<USTUGameInstance>())
+    {
+        GI->CreateSession();
+    }
+
 }
 
 UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AController *InController)
