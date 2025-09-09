@@ -5,15 +5,27 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "STUCoreTypes.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
+#include "AdvancedSessions/Classes/AdvancedFriendsGameInstance.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "STUGameInstance.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSTUOnCreateSessionComplete, bool, Success);
 class USoundClass;
 
 UCLASS()
-class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
+class SHOOTTHEMUP_API USTUGameInstance : public UAdvancedFriendsGameInstance
 {
 	GENERATED_BODY()
   public:
+    UPROPERTY(BlueprintAssignable, Category = "Multiplayer")
+    FSTUOnCreateSessionComplete OnCreateSessionCompleteDelegate;
+    virtual void Init() override;
+    IOnlineSubsystem* GetOnlineSubsystem()
+    {
+        return Subsystem;
+    }
     FLevelData GetStartupLevel()
     {
         return StartupLevel;
@@ -30,16 +42,42 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
     {
         return MainMenuLevelName;
     }
+    FName GetLobbyLevelName()
+    {
+        return LobbyLevelName;
+    }
     void ToggleVolume();
+    void CloseSession();
+    void CreateSession();
+    
+    void OnSessionUserInviteAccepted(const bool bWasSuccessful, int32 ControllerId,
+                                     TSharedPtr<const FUniqueNetId> UserId,
+                                     const FOnlineSessionSearchResult &InviteResult);
   protected:
+    IOnlineSessionPtr SessionInterface;
+    IOnlineSubsystem *Subsystem;
+
+    UFUNCTION(BlueprintCallable, Category = "Game")
+    void OnCreateSession(bool Success);
+
+    void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+    void OnFindSessionsComplete(bool bWasSuccessful);
+    void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+    void OnEndSessionComplete(FName Name, bool bWasSuccessful);
+
+    
+
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TArray<FLevelData> LevelsData;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName StartupLevelName = NAME_None;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName MainMenuLevelName = NAME_None;
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
+    FName LobbyLevelName = NAME_None;
+    FLevelData StartupLevel ;
     private:
-    FLevelData StartupLevel;
+   
       UPROPERTY(EditDefaultsOnly, Category = "Sound")
     USoundClass *MasterSoundClass;
 };

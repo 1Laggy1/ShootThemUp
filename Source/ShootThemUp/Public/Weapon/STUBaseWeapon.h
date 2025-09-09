@@ -12,6 +12,7 @@ class USkeletalMeshComponents;
 class UNiagaraSystem;
 class UNiagaraComponent;
 class USoundCue;
+class UAnimMontage;
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 {
@@ -38,6 +39,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     {
 
     }
+    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    UAnimMontage *ReloadAnimMontage;
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent *WeaponMesh;

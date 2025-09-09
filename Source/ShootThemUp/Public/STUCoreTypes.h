@@ -17,16 +17,16 @@ struct FAmmoData
     bool Infinite;
 };
 
-USTRUCT(BlueprintType)
-struct FWeaponData
-{
-    GENERATED_USTRUCT_BODY()
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    TSubclassOf<ASTUBaseWeapon> WeaponClass;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    UAnimMontage *ReloadAnimMontage;
-};
+//USTRUCT(BlueprintType)
+//struct FWeaponData
+//{
+//    GENERATED_USTRUCT_BODY()
+//    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+//    TSubclassOf<ASTUBaseWeapon> WeaponClass;
+//
+//    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+//    UAnimMontage *ReloadAnimMontage;
+//};
 
 USTRUCT(BlueprintType)
 struct FWeaponUIData
@@ -158,7 +158,15 @@ struct FPlayerStats
     UPROPERTY()
     FLinearColor TeamColor;
 };
-
+USTRUCT(BlueprintType)
+struct FPlayerSpawnInfo
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
+    FLinearColor Color = FLinearColor::White;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
+    TSubclassOf<ASTUBaseWeapon> WeaponClass;
+};
 USTRUCT(BlueprintType)
 struct FMatchStatistics
 {

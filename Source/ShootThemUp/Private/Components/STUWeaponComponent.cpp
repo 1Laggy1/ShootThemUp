@@ -7,8 +7,11 @@
 #include "Animations/STUReloadFinishedAnimNotify.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
-#include "Weapon/STUBaseWeapon.h"
+#include "Player/STUBaseCharacter.h"
 #include "Player/STUPlayerState.h"
+#include "Weapon/STUBaseWeapon.h"
+
+#include "STUCoreTypes.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All, All)
 
@@ -29,14 +32,16 @@ USTUWeaponComponent::USTUWeaponComponent()
 void USTUWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
-    checkf(WeaponData.Num() == WeaponNum,
-           TEXT("Only exactly %i weapons on 1 character is allowed: Change Weapon data in WeaponComponent"), WeaponNum);
-    CurrentWeaponIndex = 0;
-    InitAnimations();
-    if (GetOwner()->HasAuthority())
-    {
-        SpawnWeapons();
-    }
+    // checkf(WeaponData.Num() == WeaponNum,
+           //TEXT("Only exactly %i weapons on 1 character is allowed: Change Weapon data in WeaponComponent"), WeaponNum);
+           CurrentWeaponIndex = 0;
+           
+           if (GetOwner()->HasAuthority())
+           {
+               SpawnWeapons();
+               InitAnimations();
+           }
+           
 }
 
 void USTUWeaponComponent::SpawnWeapons_Implementation()
@@ -44,29 +49,28 @@ void USTUWeaponComponent::SpawnWeapons_Implementation()
     if (bWeaponsSpawned)
         return;
     bWeaponsSpawned = true;
-    ACharacter *Character = Cast<ACharacter>(GetOwner());
+    ASTUBaseCharacter *Character = Cast<ASTUBaseCharacter>(GetOwner());
     if (!Character || !GetWorld())
         return;
-    for (auto OneWeaponData : WeaponData)
-    {
-        FActorSpawnParameters Params;
-        Params.Owner = Character;
-        Params.Instigator = Character;
-        Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    /*for (auto OneWeaponData : Character->SpawnInfo.WeaponClass)
+    {*/
+    FActorSpawnParameters Params;
+    Params.Owner = Character;
+    Params.Instigator = Character;
+    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-        ASTUBaseWeapon *Weapon = GetWorld()->SpawnActor<ASTUBaseWeapon>(OneWeaponData.WeaponClass, FVector::ZeroVector,
-                                                                        FRotator::ZeroRotator, Params);
-        if (!Weapon)
-            continue;
+    ASTUBaseWeapon *Weapon = GetWorld()->SpawnActor<ASTUBaseWeapon>(Character->SpawnInfo.WeaponClass,
+                                                                    FVector::ZeroVector, FRotator::ZeroRotator, Params);
+    if (!Weapon)
+        return;
 
-        //Weapon->OnClipEmpty.AddUObject(this, &USTUWeaponComponent::OnEmptyClip);
-        Weapon->SetOwner(Character);
-        Weapons.Add(Weapon);
-        AttachWeaponToSocket(Weapon, Character->GetMesh(), WeaponArmorySocketName);
-        
-    }
-    GetWeapons();
-    
+    // Weapon->OnClipEmpty.AddUObject(this, &USTUWeaponComponent::OnEmptyClip);
+    Weapon->SetOwner(Character);
+    Weapons.Add(Weapon);
+    AttachWeaponToSocket(Weapon, Character->GetMesh(), WeaponArmorySocketName);
+
+    //}
+    GetWeapons(0);
 }
 void USTUWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
@@ -128,16 +132,16 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
     {
         return;
     }
-    //FString WeaponIndexIs = Weapons[CurrentWeaponIndex] ? Weapons[CurrentWeaponIndex]->GetName() : "nullptr"; 
-    //UE_LOG(LogTemp, Warning, TEXT("Weapons[CurrentWeaponIndex] is %s"), *WeaponIndexIs);
+    // FString WeaponIndexIs = Weapons[CurrentWeaponIndex] ? Weapons[CurrentWeaponIndex]->GetName() : "nullptr";
+    // UE_LOG(LogTemp, Warning, TEXT("Weapons[CurrentWeaponIndex] is %s"), *WeaponIndexIs);
     CurrentWeapon = Weapons[CurrentWeaponIndex];
-    //FString CurrentWeaponIndexIs = CurrentWeapon ? CurrentWeapon->GetName() : "nullptr"; 
-    //UE_LOG(LogTemp, Warning, TEXT("CurrentWeapon set to %s"), *CurrentWeaponIndexIs);
-    // CurrentReloadAnimMontage = WeaponData[WeaponIndex].ReloadAnimMontage;
+    // FString CurrentWeaponIndexIs = CurrentWeapon ? CurrentWeapon->GetName() : "nullptr";
+    // UE_LOG(LogTemp, Warning, TEXT("CurrentWeapon set to %s"), *CurrentWeaponIndexIs);
+    //  CurrentReloadAnimMontage = WeaponData[WeaponIndex].ReloadAnimMontage;
 
-    const auto CurrentWeaponData = WeaponData.FindByPredicate(
-        [&](const FWeaponData &Data) { return Data.WeaponClass == CurrentWeapon->GetClass(); });
-    CurrentReloadAnimMontage = CurrentWeaponData ? CurrentWeaponData->ReloadAnimMontage : nullptr;
+    /*const auto CurrentWeaponData = WeaponData.FindByPredicate(
+        [&](const FWeaponData &Data) { return Data.WeaponClass == CurrentWeapon->GetClass(); });*/
+    CurrentReloadAnimMontage = CurrentWeapon->ReloadAnimMontage;
     AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), WeaponEquipSocketName);
     UE_LOG(LogWeaponComponent, Warning, TEXT("CURRENT WEAPON: %s"), *CurrentWeapon->GetFullName());
     EquipAnimInProgress = true;
@@ -224,14 +228,40 @@ bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, i
     return false;
 }
 
-void USTUWeaponComponent::GetWeapons_Implementation()
+void USTUWeaponComponent::GetWeapons(int32 MaxRetries)
 {
+    bool bAllWeaponsValid = true;
     for (auto Weapon : Weapons)
     {
-        if (!Weapon) continue;
+        if (!Weapon || !IsValid(Weapon))
+        {
+            bAllWeaponsValid = false;
+            break;
+        }
+    }
+    if (!bAllWeaponsValid && MaxRetries > 0)
+    {
+        UE_LOG(LogWeaponComponent, Warning, TEXT("Weapons not ready, retrying... (%d retries left)"), MaxRetries);
+
+        FTimerHandle RetryTimer;
+        GetWorld()->GetTimerManager().SetTimer(
+            RetryTimer, [this, MaxRetries]() { GetWeapons(MaxRetries - 1); }, 0.1f, false);
+        return;
+    }
+
+    if (!bAllWeaponsValid)
+    {
+        UE_LOG(LogWeaponComponent, Error, TEXT("Failed to get valid weapons after all retries"));
+        return;
+    }
+
+    // All weapons are valid, proceed
+    for (auto Weapon : Weapons)
+    {
         Weapon->OnClipEmpty.AddUObject(this, &USTUWeaponComponent::OnEmptyClip);
     }
     EquipWeapon(CurrentWeaponIndex);
+    InitAnimations();
 }
 
 void USTUWeaponComponent::PlayAnimMontage(UAnimMontage *Animation)
@@ -255,15 +285,15 @@ void USTUWeaponComponent::InitAnimations()
     {
         UE_LOG(LogWeaponComponent, Error, TEXT("Equip anim notify on weapon is not set"));
     }
-    for (auto OneWeaponData : WeaponData)
-    {
+    //for (auto OneWeaponData : WeaponData)
+    //{
         auto ReloadFinishedNotify =
-            AnimUtils::FindNotifyByClass<USTUReloadFinishedAnimNotify>(OneWeaponData.ReloadAnimMontage);
+            AnimUtils::FindNotifyByClass<USTUReloadFinishedAnimNotify>(CurrentWeapon->ReloadAnimMontage);
         if (!ReloadFinishedNotify)
-            continue;
+            return;
 
         ReloadFinishedNotify->OnNotified.AddUObject(this, &USTUWeaponComponent::OnReloadFinished);
-    }
+    //}
 }
 
 void USTUWeaponComponent::OnEquipFinished(USkeletalMeshComponent *Mesh)

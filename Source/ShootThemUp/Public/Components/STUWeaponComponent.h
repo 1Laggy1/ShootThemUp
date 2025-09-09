@@ -32,14 +32,14 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     UFUNCTION()
     void OnRep_Weapons()
     {
-        GetWeapons();
+        GetWeapons(MaxRetriesForLoops);
         EquipWeapon(CurrentWeaponIndex);
     }
 
     UPROPERTY(ReplicatedUsing = OnRep_Weapons)
     TArray<ASTUBaseWeapon *> Weapons = {};
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    TArray<FWeaponData> WeaponData = {};
+    /*UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    TArray<FWeaponData> WeaponData = {};*/
     virtual void BeginPlay() override;
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     FName WeaponEquipSocketName = "WeaponPoint";
@@ -47,13 +47,12 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     FName WeaponArmorySocketName = "ArmorySocket";
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     UAnimMontage *EquipAnimMontage;
-    
+    int32 MaxRetriesForLoops = 10;
     void AttachWeaponToSocket(ASTUBaseWeapon *Weapon, USkeletalMeshComponent *Mesh, FName SocketName);
     bool CanFire() const;
     bool CanEquip() const;
     ASTUBaseWeapon *CurrentWeapon = nullptr;
     int32 CurrentWeaponIndex = 0;
-    
     UFUNCTION(Server, Reliable)
     void EquipWeaponServer(int32 WeaponIndex, int32 InstigatedBy);
     UFUNCTION(Server, Reliable)
@@ -74,8 +73,7 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     UAnimMontage *CurrentReloadAnimMontage = nullptr;
     UFUNCTION(Server, Reliable)
     void SpawnWeapons();
-    UFUNCTION(NetMulticast, Reliable)
-    void GetWeapons();
+    void GetWeapons(int32 MaxRetries);
     
 
     void PlayAnimMontage(UAnimMontage *Animation);

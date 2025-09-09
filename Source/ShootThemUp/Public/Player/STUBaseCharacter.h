@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Player/STUPlayerCameraShake.h"
+#include "STUCoreTypes.h"
 #include "STUBaseCharacter.generated.h"
 
 
@@ -19,7 +20,6 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     GENERATED_BODY()
 
   protected:
-
     
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUWeaponComponent* WeaponComponent;
@@ -47,13 +47,16 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     virtual void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
     virtual void OnDeath();
     // Called when the game starts or when spawned
-    virtual void BeginPlay() override;
+    
     virtual void OnHealthChanged(float Health);
     
     
     
   public:
     ASTUBaseCharacter(const FObjectInitializer &ObjInit);
+    virtual void BeginPlay() override;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+    FPlayerSpawnInfo SpawnInfo;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUHealthActorComponent *HealthComponent;
     

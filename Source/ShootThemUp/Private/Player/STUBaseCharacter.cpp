@@ -71,7 +71,7 @@ void ASTUBaseCharacter::BeginPlay()
     }
     
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), RespawnSound, GetActorLocation());
-}
+} 
 
 void ASTUBaseCharacter::SetPlayerColor(const FLinearColor &Color)
 {
