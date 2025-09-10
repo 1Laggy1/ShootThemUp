@@ -19,8 +19,8 @@ class SHOOTTHEMUP_API USTUMenuWidget : public USTUBaseWidget
 	GENERATED_BODY()
 	
   protected:
-    /*UPROPERTY(meta = (BindWidget))
-    UButton *StartGameButton;*/
+    UPROPERTY(meta = (BindWidget))
+    UButton *StartGameButton;
     UPROPERTY(meta = (BindWidget))
     UButton *QuitGameButton;
     
@@ -34,8 +34,8 @@ class SHOOTTHEMUP_API USTUMenuWidget : public USTUBaseWidget
     //virtual void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
   private:
     
-    /*UFUNCTION()
-    void OnStartGame();*/
+    UFUNCTION()
+    void OnStartGame();
     UFUNCTION()
     void OnQuitGame();
 

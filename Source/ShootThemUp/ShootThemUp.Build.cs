@@ -8,8 +8,9 @@ public class ShootThemUp : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Niagara", "PhysicsCore", "GameplayTasks", "NavigationSystem", "AdvancedSessions"});
-        PrivateDependencyModuleNames.AddRange(new string[] { "OnlineSubsystem", "OnlineSubsystemNull", "OnlineSubsystemSteam" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Niagara", "PhysicsCore", "GameplayTasks", "NavigationSystem", "AdvancedSessions", "SocketSubsystemSteamIP",
+    "SteamSockets", "OnlineSubsystem", "OnlineSubsystemNull", "OnlineSubsystemSteam"});
+        PrivateDependencyModuleNames.AddRange(new string[] {  });
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
