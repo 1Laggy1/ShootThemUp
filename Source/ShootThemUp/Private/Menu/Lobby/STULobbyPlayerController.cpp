@@ -23,5 +23,11 @@ void ASTULobbyPlayerController::SetCamera()
 void ASTULobbyPlayerController::OnPossess(APawn *aPawn)
 {
     Super::OnPossess(aPawn);
+    
     SetCamera();
+}
+
+void ASTULobbyPlayerController::BeginPlay()
+{
+    bShowMouseCursor = true;
 }

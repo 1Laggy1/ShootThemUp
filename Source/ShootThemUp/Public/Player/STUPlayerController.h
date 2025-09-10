@@ -18,6 +18,7 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
 {
 	GENERATED_BODY()
   public:
+    
     FOnNewPawnEvent OnNewPawnEvent;
     ASTUPlayerController();
     void SetPreviousCameraPosition(FVector PreviousLocation, FRotator PreviousRotation)

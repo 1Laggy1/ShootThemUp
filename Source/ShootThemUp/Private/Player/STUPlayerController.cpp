@@ -50,6 +50,7 @@ void ASTUPlayerController::BeginPlay()
     Super::BeginPlay();
     if (GetWorld())
     {
+        bShowMouseCursor = false;
         const auto Gamemode = Cast<ASTUGameStateBase>(GetWorld()->GetGameState());
         if (Gamemode)
         {

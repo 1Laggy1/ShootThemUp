@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "SteamSocketsNetDriver.h"
 #include "SteamSockets/Public/SteamSocketsNetDriver.h"
+#include "OnlineSubsystemSteam.h"
+#include "OnlineSubsystemUtils.h"
 
 #include <Online/OnlineSessionNames.h>
 
@@ -44,37 +46,30 @@ void USTUGameInstance::InitSteamSocketsNetDriver()
     if (!World)
         return;
 
-    // Check if the world already has a NetDriver
+    // Already created? Skip
     if (World->GetNetDriver())
-    {
-        UE_LOG(LogTemp, Log, TEXT("World already has NetDriver: %s"), *World->GetNetDriver()->GetName());
         return;
-    }
 
-    // Create a SteamSocketsNetDriver manually
     USteamSocketsNetDriver *NetDriver =
         NewObject<USteamSocketsNetDriver>(GetTransientPackage(), USteamSocketsNetDriver::StaticClass());
-
     NetDriver->SetWorld(World);
 
-    // Optional: tweak recently disconnected tracking
+    // Optional: avoid MappedClientConnections assertion
     NetDriver->RecentlyDisconnectedTrackingTime = 10.0f;
 
-    // Init listening immediately
     FURL ListenURL;
     ListenURL.Map = TEXT("LobbyLevel");
     ListenURL.AddOption(TEXT("listen"));
 
-    FString ErrorString;
-    if (NetDriver->InitListen(World, ListenURL, false, ErrorString))
+    FString Error;
+    if (NetDriver->InitListen(World, ListenURL, false, Error))
     {
-        // Force the world to use this driver
         World->SetNetDriver(NetDriver);
-        UE_LOG(LogTemp, Log, TEXT("SteamSocketsNetDriver initialized and forced as world's NetDriver"));
+        UE_LOG(LogTemp, Log, TEXT("SteamSockets NetDriver initialized"));
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to initialize SteamSocketsNetDriver: %s"), *ErrorString);
+        UE_LOG(LogTemp, Error, TEXT("Failed to init NetDriver: %s"), *Error);
     }
 }
 
@@ -189,7 +184,7 @@ void USTUGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCo
         APlayerController *PC = GetFirstLocalPlayerController();
         if (PC)
         {
-            //PC->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
+            PC->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
         }
         else
         {

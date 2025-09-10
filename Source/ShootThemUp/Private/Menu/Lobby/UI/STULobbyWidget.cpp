@@ -92,18 +92,18 @@ void USTULobbyWidget::OnStartGame()
     if (!GM)
         return;
 
-    for (FConstPlayerControllerIterator Iterator = World->GetPlayerControllerIterator(); Iterator; ++Iterator)
-    {
-        APlayerController *PC = Iterator->Get();
-        if (PC && !PC->IsLocalController())
-        {
-            PC->Destroy();
-        }
-    }
+    //for (FConstPlayerControllerIterator Iterator = World->GetPlayerControllerIterator(); Iterator; ++Iterator)
+    //{
+    //    APlayerController *PC = Iterator->Get();
+    //    if (PC && !PC->IsLocalController())
+    //    {
+    //        PC->Destroy();
+    //    }
+    //}
 
     // ServerTravel
     FString Level = "/Game/Levels/" + GetSTUGameInstance()->GetStartupLevel().LevelName.ToString();
-    World->ServerTravel(Level, true);
+    World->ServerTravel(Level, false, false);
 }
 void USTULobbyWidget::OnQuitGame()
 {
