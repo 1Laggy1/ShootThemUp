@@ -20,4 +20,5 @@ class SHOOTTHEMUP_API ASTULobbyPlayerController : public APlayerController
 
   protected:
     virtual void OnPossess(APawn *aPawn) override;
+    void BeginPlay() override;
 };

@@ -7,7 +7,6 @@
 #include "STUCoreTypes.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
-#include "AdvancedSessions/Classes/AdvancedFriendsGameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include <ThirdParty/Steamworks/Steamv157/sdk/public/steam/steamclientpublic.h>
 #include "STUGameInstance.generated.h"
@@ -17,7 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSTUOnCreateSessionComplete, bool, S
 class USoundClass;
 
 UCLASS()
-class SHOOTTHEMUP_API USTUGameInstance : public UAdvancedFriendsGameInstance
+class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
   public:

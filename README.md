@@ -1,6 +1,5 @@
 # ShootThemUp
-There is a UE 5.6 bug from OnlineSubsytemSteam side, I trying to implement steam invites but I can't because of this.
-Steam multiplayer will be ready when I will find a way to somehow avoid this bug in OnlineSubsystemSteam, so stay tuned for 1.1 version!
+First Steam multiplayer build here! Check it out with you friends, download 1.1 release!
 
 A third person shooter built in Unreal Engine 5.6. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
 ## Summary
