@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 
 #include "Menu/Lobby/UI/STULobbyWidget.h"
@@ -83,12 +83,30 @@ USTUGameInstance *USTULobbyWidget::GetSTUGameInstance() const
 
 void USTULobbyWidget::OnStartGame()
 {
-    PlayAnimation(LoadAnim);
+
+    UWorld *World = GetWorld();
+    if (!World)
+        return;
+
+    AGameModeBase *GM = World->GetAuthGameMode();
+    if (!GM)
+        return;
+
+    for (FConstPlayerControllerIterator Iterator = World->GetPlayerControllerIterator(); Iterator; ++Iterator)
+    {
+        APlayerController *PC = Iterator->Get();
+        if (PC && !PC->IsLocalController())
+        {
+            PC->Destroy();
+        }
+    }
+
+    // ServerTravel
     FString Level = "/Game/Levels/" + GetSTUGameInstance()->GetStartupLevel().LevelName.ToString();
-    GetWorld()->ServerTravel(Level);
+    World->ServerTravel(Level, true);
 }
 void USTULobbyWidget::OnQuitGame()
 {
-    GetSTUGameInstance()->CloseSession();
+   // GetSTUGameInstance()->CloseSession();
     UGameplayStatics::OpenLevel(this, GetSTUGameInstance()->GetMainMenuLevelName());
 }

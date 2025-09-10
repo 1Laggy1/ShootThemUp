@@ -15,10 +15,10 @@ void USTUMenuWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    /*if (StartGameButton)
+    if (StartGameButton)
     {
         StartGameButton->OnClicked.AddDynamic(this, &USTUMenuWidget::OnStartGame);
-    }*/
+    }
 
     if (QuitGameButton)
     {
@@ -54,12 +54,13 @@ void USTUMenuWidget::NativeOnInitialized()
 //    else
 //        StopAnimation(LoadAnim);
 //}
-//void USTUMenuWidget::OnStartGame()
-//{
-//    PlayAnimation(LoadAnim);
-//    
-//    Cast<USTUGameInstance>(GetGameInstance())->CreateSession();
-//}
+void USTUMenuWidget::OnStartGame()
+{
+    PlayAnimation(LoadAnim);
+    
+    
+    Cast<USTUGameInstance>(GetGameInstance())->CreateLobby();
+}
 
 void USTUMenuWidget::OnQuitGame()
 {

@@ -5,7 +5,8 @@
 #include "STUSoundFunctionLibrary.h"
 #include "OnlineSessionSettings.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "SteamSocketsNetDriver.h"
+#include "SteamSockets/Public/SteamSocketsNetDriver.h"
 
 #include <Online/OnlineSessionNames.h>
 
@@ -13,26 +14,213 @@
 void USTUGameInstance::Init()
 {
     Super::Init();
-    Subsystem = IOnlineSubsystem::Get();
-    
-if (Subsystem)
+    InitSteamSocketsNetDriver();
+    Subsystem = IOnlineSubsystem::Get(TEXT("STEAM"));
+
+    if (Subsystem)
     {
+        UE_LOG(LogTemp, Log, TEXT("Steam subsystem initialized successfully"));
         SessionInterface = Subsystem->GetSessionInterface();
+
         if (SessionInterface.IsValid())
         {
-            /*SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this,
+            SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this,
                                                                           &USTUGameInstance::OnCreateSessionComplete);
-            SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this,
-                                                                         &USTUGameInstance::OnFindSessionsComplete);
             SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &USTUGameInstance::OnJoinSessionComplete);
-            SessionInterface->OnEndSessionCompleteDelegates.AddUObject(
-                this, &USTUGameInstance::OnEndSessionComplete);
-            SessionInterface->OnSessionUserInviteAcceptedDelegates.AddUObject(
-                this, &USTUGameInstance::OnSessionUserInviteAccepted);*/
-
+            SessionInterface->OnSessionUserInviteAcceptedDelegates.AddUObject(this,
+                                                                              &USTUGameInstance::OnInviteAccepted);
         }
     }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to init Steam subsystem!"));
+    }
+
 }
+
+void USTUGameInstance::InitSteamSocketsNetDriver()
+{
+    UWorld *World = GetWorld();
+    if (!World)
+        return;
+
+    // Check if the world already has a NetDriver
+    if (World->GetNetDriver())
+    {
+        UE_LOG(LogTemp, Log, TEXT("World already has NetDriver: %s"), *World->GetNetDriver()->GetName());
+        return;
+    }
+
+    // Create a SteamSocketsNetDriver manually
+    USteamSocketsNetDriver *NetDriver =
+        NewObject<USteamSocketsNetDriver>(GetTransientPackage(), USteamSocketsNetDriver::StaticClass());
+
+    NetDriver->SetWorld(World);
+
+    // Optional: tweak recently disconnected tracking
+    NetDriver->RecentlyDisconnectedTrackingTime = 10.0f;
+
+    // Init listening immediately
+    FURL ListenURL;
+    ListenURL.Map = TEXT("LobbyLevel");
+    ListenURL.AddOption(TEXT("listen"));
+
+    FString ErrorString;
+    if (NetDriver->InitListen(World, ListenURL, false, ErrorString))
+    {
+        // Force the world to use this driver
+        World->SetNetDriver(NetDriver);
+        UE_LOG(LogTemp, Log, TEXT("SteamSocketsNetDriver initialized and forced as world's NetDriver"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to initialize SteamSocketsNetDriver: %s"), *ErrorString);
+    }
+}
+
+
+void USTUGameInstance::CreateLobby()
+{
+    UNetDriver *NetDriver = GetWorld()->GetNetDriver();
+    if (NetDriver)
+    {
+        NetDriver->RecentlyDisconnectedTrackingTime = 10.0f;
+        UE_LOG(LogTemp, Log, TEXT("Set RecentlyDisconnectedTrackingTime to 10.0"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("NetDriver not found!"));
+    }
+    if (!Subsystem || !SessionInterface.IsValid())
+    {
+        UE_LOG(LogTemp, Error, TEXT("Steam subsystem or session interface not valid"));
+        return;
+    }
+
+    // Destroy existing session first
+    if (SessionInterface->GetNamedSession(FName(NAME_GameSession)))
+    {
+        SessionInterface->DestroySession(FName(NAME_GameSession));
+    }
+
+    // Create session settings for Steam lobby
+    FOnlineSessionSettings SessionSettings;
+
+    // CRITICAL: These settings are required for Steam invites
+    SessionSettings.bIsLANMatch = false;
+    SessionSettings.bUsesPresence = true;
+    SessionSettings.bUseLobbiesIfAvailable = true; // This is key for Steam lobbies
+    SessionSettings.bUseLobbiesVoiceChatIfAvailable = false;
+    SessionSettings.NumPublicConnections = 4;
+    SessionSettings.bAllowJoinInProgress = true;
+    SessionSettings.bAllowInvites = true; // Enable invites
+    SessionSettings.bShouldAdvertise = true;
+    SessionSettings.bAllowJoinViaPresence = true;
+    SessionSettings.bAllowJoinViaPresenceFriendsOnly = false;
+
+    // Set up for Steam networking
+    SessionSettings.Set(SETTING_GAMEMODE, FString("Lobby"), EOnlineDataAdvertisementType::ViaOnlineService);
+    SessionSettings.Set(SETTING_MAPNAME, FString("LobbyLevel"), EOnlineDataAdvertisementType::ViaOnlineService);
+
+    // Create the session
+    bool bSuccess = SessionInterface->CreateSession(0, NAME_GameSession, SessionSettings);
+
+    if (!bSuccess)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to start creating session"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("Started creating Steam lobby session"));
+    }
+} 
+
+void USTUGameInstance::OnInviteAccepted(const bool bWasSuccessful, int32 ControllerId,
+                                        TSharedPtr<const FUniqueNetId> UserId,
+                                        const FOnlineSessionSearchResult &InviteResult)
+{
+    if (!bWasSuccessful)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Invite acceptance failed"));
+        return;
+    }
+
+    if (!SessionInterface.IsValid())
+    {
+        UE_LOG(LogTemp, Error, TEXT("Session interface invalid when accepting invite"));
+        return;
+    }
+    if (SessionInterface->GetNamedSession(NAME_GameSession) != nullptr)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Already in a session, skipping JoinSession"));
+        return;
+    }
+    UE_LOG(LogTemp, Log, TEXT("Invite accepted, attempting to join session..."));
+
+    // Join the session from the invite
+    bool bJoinSuccess = SessionInterface->JoinSession(ControllerId, NAME_GameSession, InviteResult);
+
+    if (!bJoinSuccess)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to start joining session from invite"));
+    }
+}
+void USTUGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+    if (!SessionInterface.IsValid())
+    {
+        UE_LOG(LogTemp, Error, TEXT("Session interface invalid during join"));
+        return;
+    }
+
+    if (Result != EOnJoinSessionCompleteResult::Success)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to join session. Result: %d"), (int32)Result);
+        return;
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("Successfully joined session: %s"), *SessionName.ToString());
+
+    FString ConnectString;
+    if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
+    {
+        UE_LOG(LogTemp, Log, TEXT("Connect string: %s"), *ConnectString);
+
+        APlayerController *PC = GetFirstLocalPlayerController();
+        if (PC)
+        {
+            //PC->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("No player controller found for travel"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Could not resolve connect string for session: %s"), *SessionName.ToString());
+    }
+}
+
+void USTUGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
+{
+    
+        if (!bWasSuccessful)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create session!"));
+            return;
+        }
+
+        UWorld *World = GetWorld();
+        if (!World)
+            return;
+
+        UE_LOG(LogTemp, Log, TEXT("Session created"));
+
+        UGameplayStatics::OpenLevel(this, TEXT("/Game/Levels/LobbyLevel?listen"), true);
+}
+
+
 void USTUGameInstance::OnEndSessionComplete(FName Name, bool bWasSuccessful)
 {
 }
@@ -40,109 +228,13 @@ void USTUGameInstance::OnCreateSession(bool Success)
 {
     OnCreateSessionCompleteDelegate.Broadcast(Success);
 }
-void USTUGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
-{
-    //if (bWasSuccessful && SessionInterface.IsValid())
-    //{
-    //    // Register the local player with the session
-    //    SessionInterface->RegisterPlayer(SessionName, *GetFirstGamePlayer()->GetPreferredUniqueNetId(), false);
-    //}
-}
+
 void USTUGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 {
 
-}
-void USTUGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
-{
-    //UE_LOG(LogTemp, Log, TEXT("Join session result: %d"), (int32)Result);
-
-    //if (!SessionInterface.IsValid())
-    //{
-    //    UE_LOG(LogTemp, Error, TEXT("Session interface invalid"));
-    //    return;
-    //}
-
-    //if (Result != EOnJoinSessionCompleteResult::Success)
-    //{
-    //    UE_LOG(LogTemp, Error, TEXT("Failed to join session"));
-    //    return;
-    //}
-
-    //FString ConnectString;
-    //if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
-    //{
-    //    UE_LOG(LogTemp, Log, TEXT("Original connect string: %s"), *ConnectString);
-
-    //    // Clean up the connect string (remove port if present)
-    //    if (ConnectString.Contains(":"))
-    //    {
-    //        ConnectString = ConnectString.Left(ConnectString.Find(":"));
-    //    }
-
-    //    // Add the lobby level to the connect string
-    //    FString LobbyLevelNameCurrent = GetLobbyLevelName().ToString();
-    //    ConnectString = FString::Printf(TEXT("%s/Game/Levels/%s"), *ConnectString, *LobbyLevelNameCurrent);
-
-    //    UE_LOG(LogTemp, Log, TEXT("Final connect string: %s"), *ConnectString);
-
-    //    APlayerController *PC = GetFirstLocalPlayerController();
-    //    if (PC)
-    //    {
-    //        PC->ClientTravel(ConnectString, ETravelType::TRAVEL_Absolute);
-    //    }
-    //    else
-    //    {
-    //        UE_LOG(LogTemp, Error, TEXT("No player controller found"));
-    //    }
-    //}
-    //else
-    //{
-    //    UE_LOG(LogTemp, Error, TEXT("Failed to get connect string"));
-    //}
 }
 
 void USTUGameInstance::ToggleVolume()
     {
     USTUSoundFunctionLibrary::ToggleSoundClassVolume(MasterSoundClass);
-}
-
-
-void USTUGameInstance::CreateSession()
-{
-    
-}
-
-
-void USTUGameInstance::CloseSession()
-
-{
-    if (!SessionInterface.IsValid())
-        return;
-
-    auto ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
-    if (ExistingSession != nullptr)
-    {
-        SessionInterface->DestroySession(NAME_GameSession);
-    }
-}
-
-void USTUGameInstance::OnSessionUserInviteAccepted(
-    const bool bWasSuccessful, int32 ControllerId, TSharedPtr<const FUniqueNetId> UserId,
-    const FOnlineSessionSearchResult &InviteResult)
-{
-    /*if (bWasSuccessful && SessionInterface.IsValid())
-    {
-        UE_LOG(LogTemp, Log, TEXT("Accepting invite to session"));
-
-        
-        CloseSession();
-
-        
-        SessionInterface->JoinSession(ControllerId, NAME_GameSession, InviteResult);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Failed to accept invite: bWasSuccessful=%s"),
-               bWasSuccessful ? TEXT("true") : TEXT("false"));
-    }*/
 }

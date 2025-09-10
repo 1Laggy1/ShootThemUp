@@ -9,7 +9,9 @@
 #include "OnlineSessionSettings.h"
 #include "AdvancedSessions/Classes/AdvancedFriendsGameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include <ThirdParty/Steamworks/Steamv157/sdk/public/steam/steamclientpublic.h>
 #include "STUGameInstance.generated.h"
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSTUOnCreateSessionComplete, bool, Success);
 class USoundClass;
@@ -47,9 +49,16 @@ class SHOOTTHEMUP_API USTUGameInstance : public UAdvancedFriendsGameInstance
         return LobbyLevelName;
     }
     void ToggleVolume();
-    void CloseSession();
-    void CreateSession();
-    
+    /// <summary>
+    /// //////
+    /// </summary>
+    void CreateLobby();
+    void InitSteamSocketsNetDriver();
+    void OnInviteAccepted(const bool bWasSuccessful, int32 ControllerId, TSharedPtr<const FUniqueNetId> UserId,
+                          const FOnlineSessionSearchResult &InviteResult);
+    /// <summary>
+    /// ///////
+    /// </summary>
     void OnSessionUserInviteAccepted(const bool bWasSuccessful, int32 ControllerId,
                                      TSharedPtr<const FUniqueNetId> UserId,
                                      const FOnlineSessionSearchResult &InviteResult);

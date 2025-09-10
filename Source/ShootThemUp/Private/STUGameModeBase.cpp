@@ -63,11 +63,6 @@ void ASTUGameModeBase::StartPlay()
     StartRound();
     ChangeState(ESTUMatchState::InProgress);
 
-    if (USTUGameInstance* GI = GetWorld()->GetGameInstance<USTUGameInstance>())
-    {
-        GI->CreateSession();
-    }
-
 }
 
 UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AController *InController)
