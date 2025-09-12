@@ -15,6 +15,9 @@
 #include "Net/UnrealNetwork.h"
 #include "UI/STUHealthBarWidget.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "STUUtils.h"
 #include "Player/STUPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
@@ -37,6 +40,7 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 
 
 }
+
 
 void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {

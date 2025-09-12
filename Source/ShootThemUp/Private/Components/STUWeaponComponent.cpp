@@ -18,6 +18,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All, All)
 constexpr static int32 WeaponNum = 2;
 void USTUWeaponComponent::Zoom(bool Enabled)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("Zoom"));
     if (CurrentWeapon)
     {
         CurrentWeapon->Zoom(Enabled);
@@ -25,27 +26,29 @@ void USTUWeaponComponent::Zoom(bool Enabled)
 }
 USTUWeaponComponent::USTUWeaponComponent()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("USTUWeaponComponent"));
     SetIsReplicatedByDefault(true);
     PrimaryComponentTick.bCanEverTick = false;
 }
 
 void USTUWeaponComponent::BeginPlay()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("BeginPlay"));
     Super::BeginPlay();
     // checkf(WeaponData.Num() == WeaponNum,
-           //TEXT("Only exactly %i weapons on 1 character is allowed: Change Weapon data in WeaponComponent"), WeaponNum);
-           CurrentWeaponIndex = 0;
-           
-           if (GetOwner()->HasAuthority())
-           {
-               SpawnWeapons();
-               InitAnimations();
-           }
-           
+    // TEXT("Only exactly %i weapons on 1 character is allowed: Change Weapon data in WeaponComponent"), WeaponNum);
+    CurrentWeaponIndex = 0;
+
+    if (GetOwner()->HasAuthority())
+    {
+        SpawnWeapons();
+        InitAnimations();
+    }
 }
 
 void USTUWeaponComponent::SpawnWeapons_Implementation()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("SpawnWeapons_Implementation"));
     if (bWeaponsSpawned)
         return;
     bWeaponsSpawned = true;
@@ -58,7 +61,8 @@ void USTUWeaponComponent::SpawnWeapons_Implementation()
     Params.Owner = Character;
     Params.Instigator = Character;
     Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
+    UE_LOG(LogWeaponComponent, Display, TEXT("SpawnInfo: %s"), *Character->SpawnInfo.PlayerID);
+    FPlayerInfo PlayerInfo = Character->SpawnInfo;
     ASTUBaseWeapon *Weapon = GetWorld()->SpawnActor<ASTUBaseWeapon>(Character->SpawnInfo.WeaponClass,
                                                                     FVector::ZeroVector, FRotator::ZeroRotator, Params);
     if (!Weapon)
@@ -74,17 +78,20 @@ void USTUWeaponComponent::SpawnWeapons_Implementation()
 }
 void USTUWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("GetLifetimeReplicatedProps"));
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(USTUWeaponComponent, Weapons);
 }
 
 void USTUWeaponComponent::EquipWeaponServer_Implementation(int32 WeaponIndex, int32 InstigatedBy)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("EquipWeaponServer_Implementation"));
     EquipWeaponMulticast(WeaponIndex, InstigatedBy);
 }
 
 void USTUWeaponComponent::EquipWeaponMulticast_Implementation(int32 WeaponIndex, int32 InstigatedBy)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("EquipWeaponMulticast_Implementation"));
     if (InstigatedBy == Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID())
         return;
 
@@ -93,11 +100,13 @@ void USTUWeaponComponent::EquipWeaponMulticast_Implementation(int32 WeaponIndex,
 
 void USTUWeaponComponent::ReloadServer_Implementation(int32 InstigatedBy)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("ReloadServer_Implementation"));
     ReloadMulticast(InstigatedBy);
 }
 
 void USTUWeaponComponent::ReloadMulticast_Implementation(int32 InstigatedBy)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("ReloadMulticast_Implementation"));
     /*FString From = FString::FromInt(InstigatedBy);
     FString To = FString::FromInt(Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID());
     UE_LOG(LogWeaponComponent, Warning, TEXT("Requested reload anim: From %s to: %s"), *From, *To);*/
@@ -111,6 +120,7 @@ void USTUWeaponComponent::ReloadMulticast_Implementation(int32 InstigatedBy)
 
 void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("EquipWeapon"));
     if (Weapons.IsEmpty() || WeaponIndex < 0 || WeaponIndex >= Weapons.Num())
     {
         UE_LOG(LogWeaponComponent, Error, TEXT("Invalid weapon index, requested %d, length of weapons %d"), WeaponIndex,
@@ -150,6 +160,7 @@ void USTUWeaponComponent::EquipWeapon(int32 WeaponIndex)
 
 void USTUWeaponComponent::AttachWeaponToSocket(ASTUBaseWeapon *Weapon, USkeletalMeshComponent *Mesh, FName SocketName)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("AttachWeaponToSocket"));
     if (!Weapon || !Mesh)
         return;
     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
@@ -158,6 +169,7 @@ void USTUWeaponComponent::AttachWeaponToSocket(ASTUBaseWeapon *Weapon, USkeletal
 
 void USTUWeaponComponent::StartFire()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("StartFire"));
     FString Result = CanFire() ? "Yes" : "No";
     UE_LOG(LogWeaponComponent, Display, TEXT("Start fire %s"), *Result);
     if (!CanFire())
@@ -168,6 +180,7 @@ void USTUWeaponComponent::StartFire()
 
 void USTUWeaponComponent::StopFire()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("StopFire"));
     if (!CurrentWeapon)
         return;
     CurrentWeapon->StopFire();
@@ -175,6 +188,7 @@ void USTUWeaponComponent::StopFire()
 
 void USTUWeaponComponent::NextWeapon()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("NextWeapon"));
     if (!CanEquip())
         return;
 
@@ -185,6 +199,7 @@ void USTUWeaponComponent::NextWeapon()
 
 void USTUWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("EndPlay"));
     CurrentWeapon = nullptr;
     for (auto Weapon : Weapons)
     {
@@ -197,6 +212,7 @@ void USTUWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 bool USTUWeaponComponent::GetWeaponUIData(FWeaponUIData &UIData) const
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("GetWeaponUIData"));
 
     if (CurrentWeapon)
     {
@@ -208,6 +224,7 @@ bool USTUWeaponComponent::GetWeaponUIData(FWeaponUIData &UIData) const
 
 bool USTUWeaponComponent::GetCurrentAmmoData(FAmmoData &Data) const
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("GetCurrentAmmoData"));
     if (CurrentWeapon)
     {
         Data = CurrentWeapon->GetCurrentAmmoData();
@@ -218,6 +235,7 @@ bool USTUWeaponComponent::GetCurrentAmmoData(FAmmoData &Data) const
 
 bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("TryToAddAmmo"));
     for (const auto Weapon : Weapons)
     {
         if (Weapon && Weapon->IsA(WeaponType))
@@ -230,6 +248,7 @@ bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, i
 
 void USTUWeaponComponent::GetWeapons(int32 MaxRetries)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("GetWeapons"));
     bool bAllWeaponsValid = true;
     for (auto Weapon : Weapons)
     {
@@ -266,6 +285,7 @@ void USTUWeaponComponent::GetWeapons(int32 MaxRetries)
 
 void USTUWeaponComponent::PlayAnimMontage(UAnimMontage *Animation)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("PlayAnimMontage"));
     ACharacter *Character = Cast<ACharacter>(GetOwner());
     if (!Character)
         return;
@@ -275,6 +295,7 @@ void USTUWeaponComponent::PlayAnimMontage(UAnimMontage *Animation)
 
 void USTUWeaponComponent::InitAnimations()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("InitAnimations"));
 
     auto EquipFinishedNotify = AnimUtils::FindNotifyByClass<USTUEquipFinishedAnimNotify>(EquipAnimMontage);
     if (EquipFinishedNotify)
@@ -285,19 +306,20 @@ void USTUWeaponComponent::InitAnimations()
     {
         UE_LOG(LogWeaponComponent, Error, TEXT("Equip anim notify on weapon is not set"));
     }
-    //for (auto OneWeaponData : WeaponData)
+    // for (auto OneWeaponData : WeaponData)
     //{
-        auto ReloadFinishedNotify =
-            AnimUtils::FindNotifyByClass<USTUReloadFinishedAnimNotify>(CurrentWeapon->ReloadAnimMontage);
-        if (!ReloadFinishedNotify)
-            return;
+    auto ReloadFinishedNotify =
+        AnimUtils::FindNotifyByClass<USTUReloadFinishedAnimNotify>(CurrentWeapon->ReloadAnimMontage);
+    if (!ReloadFinishedNotify)
+        return;
 
-        ReloadFinishedNotify->OnNotified.AddUObject(this, &USTUWeaponComponent::OnReloadFinished);
+    ReloadFinishedNotify->OnNotified.AddUObject(this, &USTUWeaponComponent::OnReloadFinished);
     //}
 }
 
 void USTUWeaponComponent::OnEquipFinished(USkeletalMeshComponent *Mesh)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("OnEquipFinished"));
     ACharacter *Character = Cast<ACharacter>(GetOwner());
     if (!Character || Character->GetMesh() != Mesh)
         return;
@@ -307,6 +329,7 @@ void USTUWeaponComponent::OnEquipFinished(USkeletalMeshComponent *Mesh)
 
 void USTUWeaponComponent::OnReloadFinished(USkeletalMeshComponent *Mesh)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("OnReloadFinished"));
     ACharacter *Character = Cast<ACharacter>(GetOwner());
     if (!Character || Character->GetMesh() != Mesh)
         return;
@@ -316,21 +339,25 @@ void USTUWeaponComponent::OnReloadFinished(USkeletalMeshComponent *Mesh)
 
 bool USTUWeaponComponent::CanFire() const
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("CanFire"));
 
     return CurrentWeapon && !EquipAnimInProgress && !ReloadAnimInProgress;
 }
 
 bool USTUWeaponComponent::CanEquip() const
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("CanEquip"));
     return !EquipAnimInProgress && !ReloadAnimInProgress;
 }
 bool USTUWeaponComponent::CanReload() const
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("CanReload"));
     return CurrentWeapon && !EquipAnimInProgress && !ReloadAnimInProgress && CurrentWeapon->CanReload();
 }
 
 void USTUWeaponComponent::OnEmptyClip(ASTUBaseWeapon *AmmoEmptyWeapon)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("OnEmptyClip"));
     if (!AmmoEmptyWeapon)
         return;
     if (CurrentWeapon == AmmoEmptyWeapon)
@@ -350,6 +377,7 @@ void USTUWeaponComponent::OnEmptyClip(ASTUBaseWeapon *AmmoEmptyWeapon)
 }
 void USTUWeaponComponent::ChangeClip()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("ChangeClip"));
     if (!CanReload())
         return;
     CurrentWeapon->StopFire();
@@ -362,5 +390,6 @@ void USTUWeaponComponent::ChangeClip()
 
 void USTUWeaponComponent::Reload()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("Reload"));
     ChangeClip();
 }

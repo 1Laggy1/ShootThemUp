@@ -17,7 +17,7 @@ ASTULobbyGameMode::ASTULobbyGameMode()
     SpectatorClass = nullptr;
 
     GameStateClass = ASTULobbyGameState::StaticClass();
-    bUseSeamlessTravel = true;
+    bUseSeamlessTravel = false;
 }
 
 void ASTULobbyGameMode::StartPlay()

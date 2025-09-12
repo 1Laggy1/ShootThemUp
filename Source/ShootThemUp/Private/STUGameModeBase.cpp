@@ -20,7 +20,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogSTUGameModeBase, All, All)
 
 ASTUGameModeBase::ASTUGameModeBase()
 {
-    DefaultPawnClass = ASTUBaseCharacter::StaticClass();
+    DefaultPawnClass = nullptr;
     PlayerControllerClass = ASTUPlayerController::StaticClass();
     HUDClass = ASTUGameHUD::StaticClass();
     PlayerStateClass = ASTUPlayerState::StaticClass();
@@ -81,9 +81,10 @@ void ASTUGameModeBase::PostLogin(APlayerController *NewPlayer)
 {
     Super::PostLogin(NewPlayer);
     UE_LOG(LogSTUGameModeBase, Display, TEXT("PostLogin: NewPlayer=%s"), *GetNameSafe(NewPlayer));
-    UE_LOG(LogSTUGameModeBase, Display, TEXT("DefaultPawnClass=%s"), *GetNameSafe(DefaultPawnClass));
+    UE_LOG(LogSTUGameModeBase, Display, TEXT("DefaultPawnClass=%s"), *GetNameSafe(DefaultCharacterClass));
     // RestartPlayer(NewPlayer);
     SetPlayerInfo(NewPlayer);
+    ResetOnePlayer(NewPlayer);
 }
 
 void ASTUGameModeBase::SpawnBots()
@@ -152,10 +153,31 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
            *FindPlayerStart(Controller)->GetFullName(), *FindPlayerStart(Controller)->GetActorLocation().ToString());
     
     RestartPlayer(Controller);*/
-    AActor* Spawn = GetRandomSpawnPoint(GetWorld());
-    APawn *NewDefaultPawn = SpawnDefaultPawnFor(Controller, Spawn);
-    Controller->Possess(NewDefaultPawn);
+    /*AActor* Spawn = GetRandomSpawnPoint(GetWorld());
+    APawn *NewDefaultPawn = SpawnDefaultPawnFor(Controller, Spawn);*/
+    
 
+    AActor *Spawn = GetRandomSpawnPoint(GetWorld());
+    FTransform SpawnTransform(Spawn->GetActorRotation(), Spawn->GetActorLocation());
+
+    ASTUBaseCharacter *NewCharacter = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
+        DefaultCharacterClass, SpawnTransform, Controller, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+    if (NewCharacter)
+    {
+
+        FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
+                               ? Controller->PlayerState->GetUniqueId()->ToString()
+                               : TEXT("UnknownID");
+        FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, Cast<USTUGameInstance>(GetGameInstance()));
+        if (PlayerInfo)
+        {
+            NewCharacter->SpawnInfo = *PlayerInfo;
+        }
+
+        UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
+    }
+    Controller->Possess(NewCharacter);
 }
 
 void ASTUGameModeBase::SetPlayerColor(AActor *Player, FLinearColor TeamColor)

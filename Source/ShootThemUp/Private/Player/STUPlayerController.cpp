@@ -32,6 +32,8 @@ void ASTUPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
 
 void ASTUPlayerController::OnPossess(APawn *InPawn)
 {
+    if (InPawn == nullptr)
+        return;
     ControlledPawn = InPawn;
     Super::OnPossess(InPawn);
     OnNewPawnEvent.Broadcast(InPawn);

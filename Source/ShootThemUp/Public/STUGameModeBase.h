@@ -21,6 +21,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     AActor* GetRandomSpawnPoint(UWorld *World);
     virtual UClass *GetDefaultPawnClassForController_Implementation(AController *InController) override;
     void Killed(AController *KillerActor, AController *DiedActor);
+
   //  FGameData GetGameData()
   //  {
   //      return GameData;
@@ -47,6 +48,8 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     TSubclassOf<APawn> AIPawnClass;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FGameData GameData;
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
+    TSubclassOf<APawn> DefaultCharacterClass;
   private:
     
     virtual void PostLogin(APlayerController *NewPlayer) override;

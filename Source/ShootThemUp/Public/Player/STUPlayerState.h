@@ -63,6 +63,7 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
     }
     UPROPERTY(Replicated)
     STUPlayerStateEnum PlayerStateNow = STUPlayerStateEnum::None;
+
   private:
     UPROPERTY(Replicated)
     int32 TeamID;

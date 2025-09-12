@@ -172,6 +172,7 @@ struct FPlayerInfo
     FString PlayerID;
     int32 TeamID;
     FPlayerStats Stats;
+    APlayerController *ThisPlayerController;
 
 };
 USTRUCT(BlueprintType)

@@ -27,10 +27,6 @@
 		{
 			"Name": "SteamSockets",
 			"Enabled": true
-		},
-		{
-			"Name": "OnlineSubsystemNull",
-			"Enabled": false
 		}
 	]
 }

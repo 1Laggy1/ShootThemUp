@@ -48,31 +48,32 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     UFUNCTION()
     void OnPostLogin(APlayerController *PlayerController);
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TSubclassOf<ASTUBaseCharacter> BaseCharacter;
-
     void AddTeamIndex()
     {
         TeamIndex = (TeamIndex + 1) % TeamNumbers;
     }
 
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     float XStart;
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     float YStart;
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     float XDifference;
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     float YDifference;
     float XNow = XStart;
     float YNow = YStart;
     int Row = 1;
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     int RowMax = 3;
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     FRotator StartRotation;
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     float Height;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CameraSpawn")
+    FVector RelatedCameraPosition;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CameraSpawn")
+    FRotator RelatedCameraRotation;
     bool FirstSpawnPosition = true;
     FVector GetNextPlayerStart();
     
@@ -84,12 +85,8 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     void SpawnTeam(FTeamInfo& TeamInfo);
     void SpawnPlayer(FPlayerInfo *PlayerInfo, FVector Position);
     void SpawnLobbyCharacter(APlayerController *Player);
-    FTeamInfo *FindTeamByTeamID(int32 TeamID);
-
-    FPlayerInfo *FindPlayerByPlayerID(const FString &PlayerID);
 
     AActor *LobbyCamera;
-    void SetCamera();
 
   private:
     int TeamIndex = 0;

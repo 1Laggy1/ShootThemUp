@@ -5,26 +5,27 @@
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraActor.h"
 
-void ASTULobbyPlayerController::SetCamera()
+void ASTULobbyPlayerController::SetCamera_Implementation(FVector Location, FRotator Rotation)
 {
+
+     FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    ACameraActor *TempCamera = GetWorld()->SpawnActor<ACameraActor>(Location, Rotation, SpawnParams);
+    SetViewTarget(TempCamera);
+
     TArray<AActor *> Cameras;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), Cameras);
-    auto LobbyCamera = Cast<ACameraActor>(Cameras[0]);
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    for (AActor* Camera : Cameras)
     {
-        APlayerController *PC = It->Get();
-        if (PC)
-        {
-            PC->SetViewTarget(LobbyCamera);
-        }
+        if (Camera != TempCamera)
+        Camera->Destroy();
     }
+
 }
 
 void ASTULobbyPlayerController::OnPossess(APawn *aPawn)
 {
     Super::OnPossess(aPawn);
-    
-    SetCamera();
 }
 
 void ASTULobbyPlayerController::BeginPlay()

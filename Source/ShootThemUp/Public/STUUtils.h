@@ -1,5 +1,6 @@
 #pragma once
 #include "Player/STUPlayerState.h"
+#include "STUGameInstance.h"
 #include "STUCoreTypes.h"
 
 class STUUtils
@@ -74,5 +75,23 @@ class STUUtils
         RowInfo.TeamText = FString::FromInt(PlayerStats.TeamID);
         RowInfo.TeamColor = PlayerStats.TeamColor;
         return RowInfo;
+    }
+    FTeamInfo static *FindTeamByTeamID(int32 TeamID, USTUGameInstance *GameInstance)
+    {
+        return GameInstance->Teams.FindByPredicate([TeamID](const FTeamInfo &Team) { return Team.TeamID == TeamID; });
+    }
+
+    FPlayerInfo static *FindPlayerByPlayerID(const FString &PlayerID, USTUGameInstance *GameInstance)
+    {
+        for (FTeamInfo &Team : GameInstance->Teams)
+        {
+            FPlayerInfo *Player =
+                Team.PlayersInfos.FindByPredicate([&](const FPlayerInfo &P) { return P.PlayerID == PlayerID; });
+            if (Player)
+            {
+                return Player;
+            }
+        }
+        return nullptr;
     }
 };
