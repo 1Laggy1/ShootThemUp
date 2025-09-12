@@ -16,7 +16,7 @@ void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUGameStateBase, CurrentRound);
     DOREPLIFETIME(ASTUGameStateBase, RoundCountDown);
     DOREPLIFETIME(ASTUGameStateBase, MatchState);
-    DOREPLIFETIME(ASTUGameStateBase, MatchStatistics);
+    //DOREPLIFETIME(ASTUGameStateBase, MatchStatistics);
 }
 
 void ASTUGameStateBase::BeginPlay()
@@ -26,10 +26,10 @@ void ASTUGameStateBase::BeginPlay()
     bReplicates = true;
 }
 
-void ASTUGameStateBase::OnRep_MatchStateChanged()
-{
-    OnMatchStateChanged.Broadcast(MatchState);
-}
+//void ASTUGameStateBase::OnRep_MatchStateChanged()
+//{
+//    OnMatchStateChanged.Broadcast(MatchState);
+//}
 void ASTUGameStateBase::ResetOnePlayerMulticast_Implementation(AActor *DiedActor, AActor *Spawn)
 {
     /*if (DiedActor && Cast<ACharacter>(DiedActor) && Cast<ACharacter>(DiedActor)->Controller)

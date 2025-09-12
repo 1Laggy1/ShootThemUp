@@ -15,7 +15,7 @@ class SHOOTTHEMUP_API ASTULobbyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
   public:
-    FPlayerSpawnInfo SpawnInfo;
+    FPlayerInfo SpawnInfo;
     void SetCamera();
 
   protected:

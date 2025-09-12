@@ -56,7 +56,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     ASTUBaseCharacter(const FObjectInitializer &ObjInit);
     virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
-    FPlayerSpawnInfo SpawnInfo;
+    FPlayerInfo SpawnInfo;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUHealthActorComponent *HealthComponent;
     

@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "STUCoreTypes.h"
-#include "OnlineSubsystem.h"
-#include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "OnlineSessionSettings.h"
+#include "OnlineSubsystem.h"
+#include "STUCoreTypes.h"
 #include <ThirdParty/Steamworks/Steamv157/sdk/public/steam/steamclientpublic.h>
 #include "STUGameInstance.generated.h"
 
@@ -18,12 +18,12 @@ class USoundClass;
 UCLASS()
 class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
   public:
     UPROPERTY(BlueprintAssignable, Category = "Multiplayer")
     FSTUOnCreateSessionComplete OnCreateSessionCompleteDelegate;
     virtual void Init() override;
-    IOnlineSubsystem* GetOnlineSubsystem()
+    IOnlineSubsystem *GetOnlineSubsystem()
     {
         return Subsystem;
     }
@@ -48,19 +48,12 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
         return LobbyLevelName;
     }
     void ToggleVolume();
-    /// <summary>
-    /// //////
-    /// </summary>
     void CreateLobby();
     void InitSteamSocketsNetDriver();
     void OnInviteAccepted(const bool bWasSuccessful, int32 ControllerId, TSharedPtr<const FUniqueNetId> UserId,
                           const FOnlineSessionSearchResult &InviteResult);
-    /// <summary>
-    /// ///////
-    /// </summary>
-    void OnSessionUserInviteAccepted(const bool bWasSuccessful, int32 ControllerId,
-                                     TSharedPtr<const FUniqueNetId> UserId,
-                                     const FOnlineSessionSearchResult &InviteResult);
+    
+    TArray<FTeamInfo> Teams;
   protected:
     IOnlineSessionPtr SessionInterface;
     IOnlineSubsystem *Subsystem;
@@ -73,8 +66,6 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
     void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
     void OnEndSessionComplete(FName Name, bool bWasSuccessful);
 
-    
-
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TArray<FLevelData> LevelsData;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
@@ -83,9 +74,11 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
     FName MainMenuLevelName = NAME_None;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName LobbyLevelName = NAME_None;
-    FLevelData StartupLevel ;
-    private:
-   
-      UPROPERTY(EditDefaultsOnly, Category = "Sound")
+    FLevelData StartupLevel;
+
+    
+
+  private:
+    UPROPERTY(EditDefaultsOnly, Category = "Sound")
     USoundClass *MasterSoundClass;
 };

@@ -229,7 +229,7 @@ void ASTUGameModeBase::SetPlayerInfo(APlayerController *Controller)
     newPlayerStats.Kills = PlayerState->GetKillsNum();
     newPlayerStats.Deaths = PlayerState->GetDeathsNum();
     newPlayerStats.TeamID = PlayerState->GetTeamID();*/
-    STUGameStateBase->MatchStatistics.Stats.Add(STUUtils::GetPlayerStatsFromPlayerState(PlayerState));
+    //STUGameStateBase->MatchStatistics.Stats.Add(STUUtils::GetPlayerStatsFromPlayerState(PlayerState));
 }
 
 void ASTUGameModeBase::ChangeState(ESTUMatchState NewState)
@@ -354,12 +354,12 @@ void ASTUGameModeBase::Killed(AController *KillerActor, AController *DiedActor)
 
         if (STUGameStateBase)
         {
-            FPlayerStats *KillerStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
-                [&](const FPlayerStats &E) { return E.PlayerName == KillerPlayerState->GetPlayerName(); });
-            if (KillerStats)
+            //FPlayerStats *KillerStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
+                //[&](const FPlayerStats &E) { return E.PlayerName == KillerPlayerState->GetPlayerName(); });
+            /*if (KillerStats)
             {
                 KillerStats->Kills = KillerPlayerState->GetKillsNum();
-            }
+            }*/
         }
     }
 
@@ -368,12 +368,12 @@ void ASTUGameModeBase::Killed(AController *KillerActor, AController *DiedActor)
         VictimPlayerState->AddDeath();
         if (STUGameStateBase)
         {
-            FPlayerStats *VictimStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
-                [&](const FPlayerStats &E) { return E.PlayerName == VictimPlayerState->GetPlayerName(); });
-            if (VictimStats)
+            //FPlayerStats *VictimStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
+                //[&](const FPlayerStats &E) { return E.PlayerName == VictimPlayerState->GetPlayerName(); });
+            /*if (VictimStats)
             {
                 VictimStats->Deaths = VictimPlayerState->GetDeathsNum();
-            }
+            }*/
         }
     }
     StartRespawn(DiedActor);
