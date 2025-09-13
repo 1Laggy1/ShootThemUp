@@ -9,6 +9,9 @@
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
 #include "Player/STUBaseCharacter.h"
+#include "Camera/CameraActor.h"
+
+#include "Kismet/GameplayStatics.h"
 
 ASTUPlayerController::ASTUPlayerController()
 {
@@ -52,7 +55,7 @@ void ASTUPlayerController::BeginPlay()
     Super::BeginPlay();
     if (GetWorld())
     {
-        bShowMouseCursor = false;
+        bShowMouseCursor = true;
         const auto Gamemode = Cast<ASTUGameStateBase>(GetWorld()->GetGameState());
         if (Gamemode)
         {
@@ -89,5 +92,22 @@ void ASTUPlayerController::OnMatchStateChanged(ESTUMatchState State)
     {
         SetInputMode(FInputModeUIOnly());
         bShowMouseCursor = true;
+    }
+}
+
+void ASTUPlayerController::SetCamera_Implementation(FVector Location, FRotator Rotation)
+{
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    ACameraActor *TempCamera = GetWorld()->SpawnActor<ACameraActor>(Location, Rotation, SpawnParams);
+    SetViewTarget(TempCamera);
+
+    TArray<AActor *> Cameras;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), Cameras);
+    for (AActor *Camera : Cameras)
+    {
+        if (Camera != TempCamera)
+            Camera->Destroy();
     }
 }

@@ -169,11 +169,7 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
         FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
                                ? Controller->PlayerState->GetUniqueId()->ToString()
                                : TEXT("UnknownID");
-        FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, Cast<USTUGameInstance>(GetGameInstance()));
-        if (PlayerInfo)
-        {
-            NewCharacter->SpawnInfo = *PlayerInfo;
-        }
+        NewCharacter->PlayerID = PlayerID;
 
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
     }

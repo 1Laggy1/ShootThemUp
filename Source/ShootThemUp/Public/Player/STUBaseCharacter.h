@@ -40,7 +40,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     USoundCue *RespawnSound;
     UPROPERTY(EditDefaultsOnly, Category = "Sound")
     USoundCue *DamageSound;
-
+    
+    FPlayerInfo* PlayerInfo;
     //UPROPERTY(Replicated)
     FRotator AimRotation;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
@@ -71,8 +72,10 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     void MulticastStartSprint(bool Start);
     AController *GetInstigatorControllerFromDamageCauser(AActor *DamageCauser);
     // Called to bind functionality to input
-    
-
+    UPROPERTY(ReplicatedUsing = OnRep_PlayerID)
+    FString PlayerID = "UnknownID";
+    void OnRep_PlayerID();
+    void InitAfterSpawnSync();
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement", meta = (ClampMin = "1.1", ClampMax = "10.0"))
     float SprintSpeedMultiplier = 2.0f;
 

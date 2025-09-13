@@ -45,7 +45,7 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    //DOREPLIFETIME(USTUWeaponComponent, WeaponComponent->bWeaponsSpawned);
+    DOREPLIFETIME(ASTUBaseCharacter, PlayerID);
 }
 
 void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor* DamageCauser)
@@ -57,11 +57,32 @@ void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor* Da
 
     //UGameplayStatics::PlaySoundAtLocation(GetWorld(), DamageSound, GetActorLocation());
 }
+void ASTUBaseCharacter::OnRep_PlayerID()
+{
+    InitAfterSpawnSync();
+}
+void ASTUBaseCharacter::InitAfterSpawnSync()
+{
 
+}
 // Called when the game starts or when spawned
 void ASTUBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
+    if (Controller && Controller->PlayerState)
+    {
+        ASTUPlayerState* STUPlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
+        if (STUPlayerState)
+        {
+            if (!STUPlayerState->PlayerID.IsEmpty() && STUPlayerState->PlayerID != "UnknownID")
+            {
+                PlayerInfo =
+                    STUUtils::FindPlayerByPlayerID(STUPlayerState->PlayerID, Cast<USTUGameInstance>(GetGameInstance()));
+                InitAfterSpawnSync();
+            }
+        }
+    }
+    
     if (HealthComponent)
     {
         OnHealthChanged(HealthComponent->GetHealth());

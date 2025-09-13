@@ -165,7 +165,7 @@ struct FPlayerInfo
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     FLinearColor Color = FLinearColor::White;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
-    TSubclassOf<ASTUBaseWeapon> WeaponClass;
+    TSoftClassPtr<ASTUBaseWeapon> WeaponClass;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     FString PlayerName;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")

@@ -62,6 +62,8 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
         PlayerStateNow = State;
     }
     UPROPERTY(Replicated)
+    FString PlayerID = "UnknownID";
+    UPROPERTY(Replicated)
     STUPlayerStateEnum PlayerStateNow = STUPlayerStateEnum::None;
 
   private:

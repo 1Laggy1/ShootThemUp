@@ -44,6 +44,9 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     void StartSpectatingMulticast(APawn* PawnSpectator);
     UPROPERTY(ReplicatedUsing = OnRep_Possesed)
     APawn *ControlledPawn;
+    FPlayerInfo SpawnInfo;
+    UFUNCTION(Client, Reliable)
+    void SetCamera(FVector Location, FRotator Rotation);
   protected:
     
     virtual void OnPossess(APawn *InPawn) override;
