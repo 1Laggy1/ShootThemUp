@@ -13,6 +13,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnNewPawnEvent, APawn*);
  */
 class USTURespawnComponent;
 class ASTUBaseCharacter;
+class UCameraComponent;
 UCLASS()
 class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
 {
@@ -21,6 +22,8 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     
     FOnNewPawnEvent OnNewPawnEvent;
     ASTUPlayerController();
+    UFUNCTION(Client, Reliable)
+    void Possess_Client(APawn *InPawn);
     void SetPreviousCameraPosition(FVector PreviousLocation, FRotator PreviousRotation)
     {
         PreviousCameraPosition = PreviousLocation;
@@ -36,19 +39,17 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     };
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
     UFUNCTION()
-    void OnRep_Possesed()
-    {
-        OnNewPawnEvent.Broadcast(ControlledPawn);
-    }
+    void OnRep_Possesed();
     UFUNCTION(NetMulticast, Reliable)
     void StartSpectatingMulticast(APawn* PawnSpectator);
     UPROPERTY(ReplicatedUsing = OnRep_Possesed)
     APawn *ControlledPawn;
     FPlayerInfo SpawnInfo;
-    UFUNCTION(Client, Reliable)
-    void SetCamera(FVector Location, FRotator Rotation);
+    UPROPERTY(ReplicatedUsing = OnRep_SetCamera)
+    ACameraActor *LobbyCamera;
+    UFUNCTION()
+    void OnRep_SetCamera();
   protected:
-    
     virtual void OnPossess(APawn *InPawn) override;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     USTURespawnComponent *STURespawnComponent;

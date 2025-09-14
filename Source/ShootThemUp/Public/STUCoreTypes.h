@@ -170,18 +170,20 @@ struct FPlayerInfo
     FString PlayerName;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     FString PlayerID;
+    UPROPERTY()
     int32 TeamID;
+    UPROPERTY()
     FPlayerStats Stats;
     APlayerController *ThisPlayerController;
 
 };
-USTRUCT(BlueprintType)
-struct FMatchStatistics
-{
-    GENERATED_USTRUCT_BODY()
-    UPROPERTY()
-    TArray<FPlayerStats> Stats;
-};
+//USTRUCT(BlueprintType)
+//struct FMatchStatistics
+//{
+//    GENERATED_USTRUCT_BODY()
+//    UPROPERTY()
+//    TArray<FPlayerStats> Stats;
+//};
 
 USTRUCT(BlueprintType)
 struct FLevelData

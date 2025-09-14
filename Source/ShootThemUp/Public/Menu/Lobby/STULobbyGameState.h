@@ -70,10 +70,7 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     FRotator StartRotation;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     float Height;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CameraSpawn")
-    FVector RelatedCameraPosition;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CameraSpawn")
-    FRotator RelatedCameraRotation;
+    
     bool FirstSpawnPosition = true;
     FVector GetNextPlayerStart();
     
@@ -84,7 +81,7 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     void RespawnPlayer(FPlayerInfo *PlayerInfo);
     void SpawnTeam(FTeamInfo& TeamInfo);
     void SpawnPlayer(FPlayerInfo *PlayerInfo, FVector Position);
-    void SpawnLobbyCharacter(APlayerController *Player);
+    //void SpawnLobbyCharacter(APlayerController *Player);
 
     AActor *LobbyCamera;
 

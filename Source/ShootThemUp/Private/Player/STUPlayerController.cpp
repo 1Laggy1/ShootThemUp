@@ -13,13 +13,26 @@
 
 #include "Kismet/GameplayStatics.h"
 
+DECLARE_LOG_CATEGORY_CLASS(LogSTUPlayerController, All, All);
+
 ASTUPlayerController::ASTUPlayerController()
 {
     STURespawnComponent = CreateDefaultSubobject<USTURespawnComponent>("RespawnComponent");
 }
 
+void ASTUPlayerController::Possess_Client_Implementation(APawn *InPawn)
+{
+    if (InPawn == nullptr)
+    {
+        UE_LOG(LogSTUPlayerController, Warning, TEXT("Possess_Client: InPawn was nullptr"));
+        return;
+    }
+    Possess(InPawn);
+}
+
 void ASTUPlayerController::StartSpectatingMulticast_Implementation(APawn *PawnSpectator)
 {
+    
     UnPossess();
     Possess(PawnSpectator);
     SetViewTargetWithBlend(PawnSpectator, 0.0f);
@@ -31,10 +44,31 @@ void ASTUPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
 
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(ASTUPlayerController, ControlledPawn);
+    DOREPLIFETIME(ASTUPlayerController, LobbyCamera);
+}
+
+void ASTUPlayerController::OnRep_Possesed()
+{
+    
+    
+    FTimerHandle TempHandle;
+    GetWorld()->GetTimerManager().SetTimer(
+        TempHandle,
+        [this]() {
+            if (ControlledPawn)
+            {
+                Possess(ControlledPawn);
+                OnNewPawnEvent.Broadcast(ControlledPawn);
+                return;
+            }
+            OnRep_Possesed();
+        },
+        0.5f, false);
 }
 
 void ASTUPlayerController::OnPossess(APawn *InPawn)
 {
+    bShowMouseCursor = false;
     if (InPawn == nullptr)
         return;
     ControlledPawn = InPawn;
@@ -95,19 +129,23 @@ void ASTUPlayerController::OnMatchStateChanged(ESTUMatchState State)
     }
 }
 
-void ASTUPlayerController::SetCamera_Implementation(FVector Location, FRotator Rotation)
+void ASTUPlayerController::OnRep_SetCamera()
 {
+    /*FTimerHandle TempHandle;
+    GetWorld()->GetTimerManager().SetTimer(
+        TempHandle,
+        [this]() {
+            if (LobbyCamera)
+            {
+                SetViewTarget(LobbyCamera); 
+                return;
+            }
+            OnRep_SetCamera();
+        },
+        0.5f, false);*/
+    if (!LobbyCamera)
+        return;
 
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-    ACameraActor *TempCamera = GetWorld()->SpawnActor<ACameraActor>(Location, Rotation, SpawnParams);
-    SetViewTarget(TempCamera);
-
-    TArray<AActor *> Cameras;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), Cameras);
-    for (AActor *Camera : Cameras)
-    {
-        if (Camera != TempCamera)
-            Camera->Destroy();
-    }
+    UE_LOG(LogTemp, Warning, TEXT("Switching view to camera: %s"), *GetNameSafe(LobbyCamera));
+    SetViewTarget(LobbyCamera);
 }

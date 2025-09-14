@@ -7,7 +7,7 @@
 #include "STUCoreTypes.h"
 #include "STUGameStateBase.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStatistics, FMatchStatistics *);
+//DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStatistics, FMatchStatistics *);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStateChanged, ESTUMatchState);
 
 /**
@@ -27,6 +27,12 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     int32 RoundCountDown = 0;
     UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
     ESTUMatchState MatchState = ESTUMatchState::WaitingToStart;
+    UPROPERTY(Replicated)
+    TArray<FTeamInfo> TeamsStats;
+    UFUNCTION(Server, Reliable)
+    void PlayerConnected(APlayerController *PC);
+
+    
     /*UPROPERTY(Replicated)
     FMatchStatistics Statistics;
     UFUNCTION()
@@ -42,7 +48,7 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     {
         OnMatchStatistics.Broadcast(&MatchStatistics);
     }*/
-    FOnMatchStatistics OnMatchStatistics;
+    //FOnMatchStatistics OnMatchStatistics;
     FOnMatchStateChanged OnMatchStateChanged;
 
   public:
@@ -54,9 +60,10 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     {
         return GameData;
     }
-    void SetGameData(FGameData GameDataServer)
+    void SetGameData(FGameData GameDataServer, TArray<FTeamInfo> TeamsInfo)
     {
         GameData = GameDataServer;
+        TeamsStats = TeamsInfo;
     }
     int32 GetCurrentRound()
     {

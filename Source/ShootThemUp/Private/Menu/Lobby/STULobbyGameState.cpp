@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Menu/Lobby/STULobbyGameMode.h"
 #include "Menu/Lobby/STULobbyPlayerController.h"
+#include "Player/STUPlayerController.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/STUPlayerState.h"
 #include "STUCoreTypes.h"
@@ -16,6 +17,7 @@
 #include "STUGameInstance.h"
 #include "Weapon/STUBaseWeapon.h"
 #include "Player/STUBaseCharacter.h"
+#include "Player/STULobbyCharacter.h"
 DECLARE_LOG_CATEGORY_CLASS(LogSTULobbyGameState, All, All);
 // ----- BeginPlay / Init -----
 
@@ -65,7 +67,7 @@ void ASTULobbyGameState::InitTeams()
     TArray<FTeamInfo> LocalTeams;
     for (int32 i = 1; i <= TeamNumbers; ++i)
     {
-        FTeamInfo TeamInfo(i, (i == 1) ? FLinearColor::White : FLinearColor::Red);
+        FTeamInfo TeamInfo(i, (i == 1) ? FLinearColor::Green : FLinearColor::Red);
         LocalTeams.Add(TeamInfo);
     }
     UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::InitTeams - Teams initialized"));
@@ -114,6 +116,7 @@ void ASTULobbyGameState::SpawnAllTeams_Multicast_Implementation(const TArray<FTe
 {
     UE_LOG(LogSTULobbyGameState, Display,
            TEXT("ASTULobbyGameState::SpawnAllTeams_Multicast_Implementation - Spawning all teams"));
+    
     if (!Characters.IsEmpty())
     {
         for (auto &Pair : Characters)
@@ -125,37 +128,14 @@ void ASTULobbyGameState::SpawnAllTeams_Multicast_Implementation(const TArray<FTe
         }
         Characters.Empty();
     }
-
     if (STUGameInstance)
     {
         STUGameInstance->Teams = TeamsInfo;
     }
 
-
-    APlayerController *LocalPC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
-    FString MyID;
-    if (LocalPC && LocalPC->PlayerState)
-    {
-        MyID = LocalPC->PlayerState->GetUniqueId()->ToString();
-    }
-
-
-
-    //FPlayerInfo *MyPlayer = nullptr;
-    //if (!MyID.IsEmpty())
-    //{
-    //    MyPlayer = FindPlayerByPlayerID(MyID);
-    //}
-
-    //int32 MyTeamID = MyPlayer ? MyPlayer->TeamID : INDEX_NONE;
-
-    //FTeamInfo *MyTeam = (MyTeamID != INDEX_NONE) ? FindTeamByTeamID(MyTeamID) : nullptr;
-    //if (MyTeam)
-    //{
-    //    SpawnTeam(*MyTeam);
-    //}
     if (HasAuthority())
     {
+        
         for (FTeamInfo &Team : STUGameInstance->Teams)
         {
             SpawnTeam(Team);
@@ -193,17 +173,18 @@ void ASTULobbyGameState::SpawnPlayer(FPlayerInfo *PlayerInfo, FVector Position)
         UE_LOG(LogSTULobbyGameState, Error, TEXT("ASTULobbyGameState::SpawnPlayer CharacterClass is NULL! Cannot spawn actor"));
         return;
     }
-    ASTUBaseCharacter *Character = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
+    ASTULobbyCharacter *Character = GetWorld()->SpawnActorDeferred<ASTULobbyCharacter>(
         CharacterClass, SpawnTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
     if (!Character)
         return;
 
     Character->SpawnInfo = *PlayerInfo;
     UGameplayStatics::FinishSpawningActor(Character, SpawnTransform);
-    const auto STUPlayerController = Cast<ASTULobbyPlayerController>(PlayerInfo->ThisPlayerController);
+    const auto STUPlayerController = Cast<ASTUPlayerController>(PlayerInfo->ThisPlayerController);
     if (STUPlayerController)
     {
-        STUPlayerController->SetCamera(Position + RelatedCameraPosition, RelatedCameraRotation);
+        STUPlayerController->LobbyCamera = Character->SpawnLobbyCamera();
+        STUPlayerController->OnRep_SetCamera();
     }
     Characters.Add(PlayerInfo->PlayerID, Character);
 }
@@ -259,7 +240,7 @@ void ASTULobbyGameState::OnPlayerChanged_Multicast_Implementation(FPlayerInfo Pl
     UE_LOG(LogSTULobbyGameState, Display,
            TEXT("ASTULobbyGameState::OnPlayerChanged_Multicast_Implementation - Player %s changed"),
            *PlayerChanged.PlayerName);
-    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerChanged.PlayerID, STUGameInstance);
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerChanged.PlayerID, STUGameInstance->Teams);
     if (Player)
     {
         *Player = PlayerChanged;
@@ -291,7 +272,7 @@ void ASTULobbyGameState::ChangeTeamColor_Server_Implementation(const FString &Te
 void ASTULobbyGameState::ChangeWeapons_Server_Implementation(TSubclassOf<ASTUBaseWeapon> WeaponToChoose,
                                                              const FString &PlayerID)
 {
-    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance);
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
     if (Player && WeaponToChoose)
     {
         if (WeaponsToChoose.Contains(WeaponToChoose))
@@ -334,7 +315,8 @@ void ASTULobbyGameState::RespawnPlayer(FPlayerInfo *PlayerInfo)
     Character->Destroy();
 
     FVector StartPosition = PreviousPosition;
-    FTransform NewTransform(StartRotation, StartPosition);
+    SpawnPlayer(PlayerInfo, StartPosition);
+    /*FTransform NewTransform(StartRotation, StartPosition);
     if (!CharacterClass)
     {
         UE_LOG(LogSTULobbyGameState, Error,
@@ -347,45 +329,45 @@ void ASTULobbyGameState::RespawnPlayer(FPlayerInfo *PlayerInfo)
     {
         PlayerCharacter->SpawnInfo = DefaultPlayerInfo;
         UGameplayStatics::FinishSpawningActor(PlayerCharacter, NewTransform);
-    }
+    }*/
 }
 // ----- Spawn lobby character -----
-
-void ASTULobbyGameState::SpawnLobbyCharacter(APlayerController *Player)
-{
-    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Spawning lobby character"));
-    if (!Player)
-        return;
-
-    FVector StartPosition = GetNextPlayerStart();
-    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Start position: %s"),
-           *StartPosition.ToString());
-    FTransform NewTransform(StartRotation, StartPosition);
-    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Rotation: %s"),
-           *StartRotation.ToString());
-    if (!CharacterClass)
-    {
-        UE_LOG(LogSTULobbyGameState, Error,
-               TEXT(" ASTULobbyGameState::SpawnLobbyCharacter CharacterClass is NULL! Cannot spawn actor"));
-        return;
-    }
-    ASTUBaseCharacter *PlayerCharacter = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
-        CharacterClass, NewTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-    if (PlayerCharacter)
-    {
-        PlayerCharacter->SpawnInfo = DefaultPlayerInfo;
-        UGameplayStatics::FinishSpawningActor(PlayerCharacter, NewTransform);
-
-        const auto STUPlayerController =
-            Cast<ASTULobbyPlayerController>(PlayerCharacter->SpawnInfo.ThisPlayerController);
-        if (STUPlayerController)
-        {
-            STUPlayerController->SetCamera(StartPosition + RelatedCameraPosition, RelatedCameraRotation);
-        }
-
-        
-    }
-}
+//
+//void ASTULobbyGameState::SpawnLobbyCharacter(APlayerController *Player)
+//{
+//    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Spawning lobby character"));
+//    if (!Player)
+//        return;
+//
+//    FVector StartPosition = GetNextPlayerStart();
+//    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Start position: %s"),
+//           *StartPosition.ToString());
+//    FTransform NewTransform(StartRotation, StartPosition);
+//    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Rotation: %s"),
+//           *StartRotation.ToString());
+//    if (!CharacterClass)
+//    {
+//        UE_LOG(LogSTULobbyGameState, Error,
+//               TEXT(" ASTULobbyGameState::SpawnLobbyCharacter CharacterClass is NULL! Cannot spawn actor"));
+//        return;
+//    }
+//    ASTULobbyCharacter *PlayerCharacter = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
+//        CharacterClass, NewTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+//    if (PlayerCharacter)
+//    {
+//        PlayerCharacter->SpawnInfo = DefaultPlayerInfo;
+//        UGameplayStatics::FinishSpawningActor(PlayerCharacter, NewTransform);
+//
+//        const auto STUPlayerController =
+//            Cast<ASTULobbyPlayerController>(PlayerCharacter->SpawnInfo.ThisPlayerController);
+//        if (STUPlayerController)
+//        {
+//            STUPlayerController->SetCamera(StartPosition + RelatedCameraPosition, RelatedCameraRotation);
+//        }
+//
+//        
+//    }
+//}
 //void ASTULobbyGameState::SetCamera(FVector PlayerLocation)
 //{
 //    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SetCamera - Setting lobby camera"));

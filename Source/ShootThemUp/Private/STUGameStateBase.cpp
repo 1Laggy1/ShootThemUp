@@ -24,6 +24,12 @@ void ASTUGameStateBase::BeginPlay()
     Super::BeginPlay();
     SetReplicates(true);
     bReplicates = true;
+    PlayerConnected(GetWorld()->GetFirstPlayerController());
+}
+
+void ASTUGameStateBase::PlayerConnected_Implementation(APlayerController *PC)
+{
+    GetWorld()->GetAuthGameMode<ASTUGameModeBase>()->PlayerConnected(PC);
 }
 
 //void ASTUGameStateBase::OnRep_MatchStateChanged()

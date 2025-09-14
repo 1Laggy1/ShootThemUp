@@ -2,20 +2,21 @@
 
 #include "STUGameModeBase.h"
 #include "AIController.h"
+#include "Algo/RandomShuffle.h"
 #include "Components/STURespawnComponent.h"
 #include "EngineUtils.h"
+#include "GameFramework/GameState.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "OnlineSubsystem.h"
 #include "Player/STUBaseCharacter.h"
 #include "Player/STUPlayerController.h"
 #include "Player/STUPlayerState.h"
+#include "STUGameInstance.h"
 #include "STUGameStateBase.h"
 #include "STUUtils.h"
 #include "UI/STUGameHUD.h"
-#include "Algo/RandomShuffle.h"
-#include "STUGameInstance.h"
-#include "OnlineSubsystem.h"
 DEFINE_LOG_CATEGORY_STATIC(LogSTUGameModeBase, All, All)
 
 ASTUGameModeBase::ASTUGameModeBase()
@@ -28,41 +29,47 @@ ASTUGameModeBase::ASTUGameModeBase()
     // SpectatorClass = ASpectatorPawn::StaticClass();
 }
 
-//FMatchStatistics ASTUGameModeBase::GetMatchStatistics()
+// FMatchStatistics ASTUGameModeBase::GetMatchStatistics()
 //{
-//    if (!GetWorld())
-//        return FMatchStatistics();
-//    FMatchStatistics MatchStatistics;
-//    for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
-//    {
-//        const auto Controller = It->Get();
-//        if (!Controller)
-//            continue;
-//        const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
-//        if (!PlayerState)
-//            continue;
-//        
-//        
-//        MatchStatistics.Stats.Add(RowInfo);
-//    }
-//    return MatchStatistics;
-//}
+//     if (!GetWorld())
+//         return FMatchStatistics();
+//     FMatchStatistics MatchStatistics;
+//     for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
+//     {
+//         const auto Controller = It->Get();
+//         if (!Controller)
+//             continue;
+//         const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
+//         if (!PlayerState)
+//             continue;
+//
+//
+//         MatchStatistics.Stats.Add(RowInfo);
+//     }
+//     return MatchStatistics;
+// }
 
 void ASTUGameModeBase::StartPlay()
 {
 
     Super::StartPlay();
-    STUGameStateBase = GetGameState<ASTUGameStateBase>();
-    if (STUGameStateBase)
+    if (!GetWorld() || !GetWorld()->HasBegunPlay())
     {
-        STUGameStateBase->SetGameData(GameData);
+        UE_LOG(LogTemp, Warning, TEXT("World not ready in StartPlay"));
+        return;
+    }
+    auto GState = GetWorld()->GetGameState();
+    STUGameStateBase = Cast<ASTUGameStateBase>(GState);
+    USTUGameInstance *STUGameInstance = GetGameInstance<USTUGameInstance>();
+    if (STUGameInstance && STUGameStateBase->TeamsStats.IsEmpty())
+    {
+        STUGameStateBase->SetGameData(GameData, STUGameInstance->Teams);
     }
     // SpawnBots();
     // CreateTeamsInfo();
     STUGameStateBase->CurrentRound = 1;
     StartRound();
     ChangeState(ESTUMatchState::InProgress);
-
 }
 
 UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AController *InController)
@@ -80,10 +87,14 @@ UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AContr
 void ASTUGameModeBase::PostLogin(APlayerController *NewPlayer)
 {
     Super::PostLogin(NewPlayer);
-    UE_LOG(LogSTUGameModeBase, Display, TEXT("PostLogin: NewPlayer=%s"), *GetNameSafe(NewPlayer));
+    auto GState = GetWorld()->GetGameState();
+    STUGameStateBase = Cast<ASTUGameStateBase>(GState);
+    USTUGameInstance *STUGameInstance = GetGameInstance<USTUGameInstance>();
+    if (STUGameInstance && STUGameStateBase->TeamsStats.IsEmpty())
+    {
+        STUGameStateBase->SetGameData(GameData, STUGameInstance->Teams);
+    }
     UE_LOG(LogSTUGameModeBase, Display, TEXT("DefaultPawnClass=%s"), *GetNameSafe(DefaultCharacterClass));
-    // RestartPlayer(NewPlayer);
-    SetPlayerInfo(NewPlayer);
     ResetOnePlayer(NewPlayer);
 }
 
@@ -151,29 +162,38 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
     }
     /*UE_LOG(LogGameMode, Error, TEXT("----------------------PlayerState is %s, %s"),
            *FindPlayerStart(Controller)->GetFullName(), *FindPlayerStart(Controller)->GetActorLocation().ToString());
-    
+
     RestartPlayer(Controller);*/
     /*AActor* Spawn = GetRandomSpawnPoint(GetWorld());
     APawn *NewDefaultPawn = SpawnDefaultPawnFor(Controller, Spawn);*/
-    
 
     AActor *Spawn = GetRandomSpawnPoint(GetWorld());
     FTransform SpawnTransform(Spawn->GetActorRotation(), Spawn->GetActorLocation());
 
     ASTUBaseCharacter *NewCharacter = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
         DefaultCharacterClass, SpawnTransform, Controller, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
+    NewCharacter->SetReplicates(true);
     if (NewCharacter)
     {
 
         FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
                                ? Controller->PlayerState->GetUniqueId()->ToString()
                                : TEXT("UnknownID");
-        NewCharacter->PlayerID = PlayerID;
 
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
+        // NewCharacter->OnRep_PlayerID();
     }
-    Controller->Possess(NewCharacter);
+    auto STUPlayerController = Cast<ASTUPlayerController>(Controller);
+    if (!STUPlayerController)
+        return;
+    
+    STUPlayerController->ControlledPawn = NewCharacter;
+    STUPlayerController->OnRep_Possesed();
+    FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
+                           ? Controller->PlayerState->GetUniqueId()->ToString()
+                           : TEXT("UnknownID");
+    NewCharacter->InitPlayer_Multicast(PlayerID);
+    // Controller->Possess(NewCharacter);
 }
 
 void ASTUGameModeBase::SetPlayerColor(AActor *Player, FLinearColor TeamColor)
@@ -192,63 +212,32 @@ AActor *ASTUGameModeBase::GetRandomSpawnPoint(UWorld *World)
         return nullptr;
     return PlayerStarts[FMath::RandRange(0, PlayerStarts.Num() - 1)];
 }
-
-void ASTUGameModeBase::CreateTeamsInfo()
-{
-    if (!GetWorld())
-        return;
-    int32 TeamID = 1;
-    int32 BotNum = 1;
-    for (TActorIterator<ASTUBaseCharacter> It(GetWorld()); It; ++It)
-    {
-        const auto Character = *It;
-        if (!Character)
-            continue;
-
-        const auto PlayerState = Cast<ASTUPlayerState>(Character->GetPlayerState<ASTUPlayerState>());
-        if (!PlayerState)
-            return;
-
-        PlayerState->SetTeamID(TeamID);
-        PlayerState->SetTeamColor(DetermineColorByTeamID(TeamID));
-
-        /*if (!Controller->IsPlayerController())
-        {
-            FString Bot;
-            Bot = "Bot " + FString::FromInt(BotNum);
-            PlayerState->SetPlayerName(Bot);
-                BotNum++;
-        }*/
-        SetPlayerColor(Character, DetermineColorByTeamID(TeamID));
-        TeamID = TeamID == 1 ? 2 : 1;
-    }
-}
-void ASTUGameModeBase::SetPlayerInfo(APlayerController *Controller)
-{
-    if (!Controller)
-        return;
-    const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
-    if (!PlayerState)
-        return;
-    
-    PlayerState->SetTeamID(TeamIDNow);
-    
-    PlayerState->SetTeamColor(
-        DetermineColorByTeamID(TeamIDNow)); /*if (!Controller->IsPlayerController()) { FString Bot; Bot = "Bot " +
-                                            FString::FromInt(BotNum); PlayerState->SetPlayerName(Bot); BotNum++; }*/
-    PlayerState->SetSTUPlayerState(STUPlayerStateEnum::Gaming);
-    SetPlayerColor(Controller, DetermineColorByTeamID(TeamIDNow));
-    TeamIDNow = TeamIDNow == 1 ? 2 : 1;
-    if (!STUGameStateBase)
-        return;
-
-    /*FPlayerStats newPlayerStats;
-    newPlayerStats.PlayerName = PlayerState->GetPlayerName();
-    newPlayerStats.Kills = PlayerState->GetKillsNum();
-    newPlayerStats.Deaths = PlayerState->GetDeathsNum();
-    newPlayerStats.TeamID = PlayerState->GetTeamID();*/
-    //STUGameStateBase->MatchStatistics.Stats.Add(STUUtils::GetPlayerStatsFromPlayerState(PlayerState));
-}
+// void ASTUGameModeBase::SetPlayerInfo(APlayerController *Controller)
+//{
+//     if (!Controller)
+//         return;
+//     const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
+//     if (!PlayerState)
+//         return;
+//
+//     PlayerState->SetTeamID(TeamIDNow);
+//
+//     PlayerState->SetTeamColor(
+//         DetermineColorByTeamID(TeamIDNow)); /*if (!Controller->IsPlayerController()) { FString Bot; Bot = "Bot " +
+//                                             FString::FromInt(BotNum); PlayerState->SetPlayerName(Bot); BotNum++; }*/
+//     PlayerState->SetSTUPlayerState(STUPlayerStateEnum::Gaming);
+//     SetPlayerColor(Controller, DetermineColorByTeamID(TeamIDNow));
+//     TeamIDNow = TeamIDNow == 1 ? 2 : 1;
+//     if (!STUGameStateBase)
+//         return;
+//
+//     /*FPlayerStats newPlayerStats;
+//     newPlayerStats.PlayerName = PlayerState->GetPlayerName();
+//     newPlayerStats.Kills = PlayerState->GetKillsNum();
+//     newPlayerStats.Deaths = PlayerState->GetDeathsNum();
+//     newPlayerStats.TeamID = PlayerState->GetTeamID();*/
+//     //STUGameStateBase->MatchStatistics.Stats.Add(STUUtils::GetPlayerStatsFromPlayerState(PlayerState));
+// }
 
 void ASTUGameModeBase::ChangeState(ESTUMatchState NewState)
 {
@@ -282,16 +271,16 @@ void ASTUGameModeBase::RespawnAsSpectator(AController *Controller, FVector Death
     }
 }
 
-FLinearColor ASTUGameModeBase::DetermineColorByTeamID(int32 TeamID) const
-{
-    if (TeamID - 1 < GameData.TeamColors.Num())
-    {
-        return GameData.TeamColors[TeamID - 1];
-    }
-    UE_LOG(LogSTUGameModeBase, Warning, TEXT("No color for team id: %i, set to default: %s"), TeamID,
-           *GameData.DefaultTeamColor.ToString());
-    return GameData.DefaultTeamColor;
-}
+// FLinearColor ASTUGameModeBase::DetermineColorByTeamID(int32 TeamID) const
+//{
+//     if (TeamID - 1 < GameData.TeamColors.Num())
+//     {
+//         return GameData.TeamColors[TeamID - 1];
+//     }
+//     UE_LOG(LogSTUGameModeBase, Warning, TEXT("No color for team id: %i, set to default: %s"), TeamID,
+//            *GameData.DefaultTeamColor.ToString());
+//     return GameData.DefaultTeamColor;
+// }
 
 void ASTUGameModeBase::LogPlayerInfo()
 {
@@ -363,40 +352,46 @@ void ASTUGameModeBase::Killed(AController *KillerActor, AController *DiedActor)
 
     if (KillerPlayerState && VictimPlayerState)
     {
-        if (KillerPlayerState->GetTeamID() == VictimPlayerState->GetTeamID())
+        FPlayerInfo *KillerInfo = FindPlayerByPlayerID(KillerPlayerState->GetUniqueId().IsValid()
+                                                           ? KillerPlayerState->GetUniqueId()->ToString()
+                                                           : TEXT("UnknownID"));
+        FPlayerInfo *VictimInfo = FindPlayerByPlayerID(VictimPlayerState->GetUniqueId().IsValid()
+                                                           ? VictimPlayerState->GetUniqueId()->ToString()
+                                                           : TEXT("UnknownID"));
+        if (KillerInfo && VictimInfo)
         {
-            KillerPlayerState->RemoveKill();
-        }
-        else
-            KillerPlayerState->AddKill();
-
-        if (STUGameStateBase)
-        {
-            //FPlayerStats *KillerStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
-                //[&](const FPlayerStats &E) { return E.PlayerName == KillerPlayerState->GetPlayerName(); });
-            /*if (KillerStats)
+            if (KillerInfo->TeamID == VictimInfo->TeamID)
             {
-                KillerStats->Kills = KillerPlayerState->GetKillsNum();
-            }*/
-        }
-    }
-
-    if (VictimPlayerState)
-    {
-        VictimPlayerState->AddDeath();
-        if (STUGameStateBase)
-        {
-            //FPlayerStats *VictimStats = STUGameStateBase->MatchStatistics.Stats.FindByPredicate(
-                //[&](const FPlayerStats &E) { return E.PlayerName == VictimPlayerState->GetPlayerName(); });
-            /*if (VictimStats)
+                KillerInfo->Stats.Kills--;
+            }
+            else
             {
-                VictimStats->Deaths = VictimPlayerState->GetDeathsNum();
-            }*/
+                KillerInfo->Stats.Kills++;
+                VictimInfo->Stats.Deaths++;
+            }
         }
     }
     StartRespawn(DiedActor);
 }
+FPlayerInfo *ASTUGameModeBase::FindPlayerByPlayerID(const FString &PlayerID)
+{
+    for (FTeamInfo &Team : STUGameStateBase->TeamsStats)
+    {
+        FPlayerInfo *Player =
+            Team.PlayersInfos.FindByPredicate([&](const FPlayerInfo &P) { return P.PlayerID == PlayerID; });
+        if (Player)
+        {
+            return Player;
+        }
+    }
+    return nullptr;
+}
+void ASTUGameModeBase::PostSeamlessTravel()
+{
+    Super::PostSeamlessTravel();
 
+    UE_LOG(LogSTUGameModeBase, Display, TEXT("PostSeamlessTravel called"));
+}
 bool ASTUGameModeBase::SetPause(APlayerController *PC, FCanUnpause CanUnpauseDelegate)
 {
     const auto PauseSet = Super::SetPause(PC, CanUnpauseDelegate);
@@ -415,4 +410,20 @@ bool ASTUGameModeBase::ClearPause()
         ChangeState(ESTUMatchState::InProgress);
     }
     return PauseSet;
+}
+
+void ASTUGameModeBase::PlayerConnected(APlayerController *PC)
+{
+    if (PC)
+    {
+        auto GState = GetWorld()->GetGameState();
+        STUGameStateBase = Cast<ASTUGameStateBase>(GState);
+        USTUGameInstance *STUGameInstance = GetGameInstance<USTUGameInstance>();
+        if (STUGameInstance && STUGameStateBase->TeamsStats.IsEmpty())
+        {
+            STUGameStateBase->SetGameData(GameData, STUGameInstance->Teams);
+        }
+        UE_LOG(LogSTUGameModeBase, Display, TEXT("DefaultPawnClass=%s"), *GetNameSafe(DefaultCharacterClass));
+        ResetOnePlayer(PC);
+    }
 }

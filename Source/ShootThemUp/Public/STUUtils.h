@@ -81,9 +81,9 @@ class STUUtils
         return GameInstance->Teams.FindByPredicate([TeamID](const FTeamInfo &Team) { return Team.TeamID == TeamID; });
     }
 
-    FPlayerInfo static *FindPlayerByPlayerID(const FString &PlayerID, USTUGameInstance *GameInstance)
+    static FPlayerInfo *FindPlayerByPlayerID(const FString &PlayerID, TArray<FTeamInfo> &Teams)
     {
-        for (FTeamInfo &Team : GameInstance->Teams)
+        for (FTeamInfo &Team : Teams)
         {
             FPlayerInfo *Player =
                 Team.PlayersInfos.FindByPredicate([&](const FPlayerInfo &P) { return P.PlayerID == PlayerID; });

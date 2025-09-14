@@ -71,11 +71,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UFUNCTION(NetMulticast, Reliable)
     void MulticastStartSprint(bool Start);
     AController *GetInstigatorControllerFromDamageCauser(AActor *DamageCauser);
-    // Called to bind functionality to input
-    UPROPERTY(ReplicatedUsing = OnRep_PlayerID)
-    FString PlayerID = "UnknownID";
-    void OnRep_PlayerID();
-    void InitAfterSpawnSync();
+    UFUNCTION(NetMulticast, Reliable)
+    void InitPlayer_Multicast( const FString& PlayerID);
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement", meta = (ClampMin = "1.1", ClampMax = "10.0"))
     float SprintSpeedMultiplier = 2.0f;
 

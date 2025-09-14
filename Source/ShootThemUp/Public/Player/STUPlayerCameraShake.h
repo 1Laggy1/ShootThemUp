@@ -7,6 +7,7 @@
 #include "STUPlayerCameraShake.generated.h"
 
 
+class UCameraComponent;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SHOOTTHEMUP_API USTUPlayerCameraShake : public UActorComponent
 {
@@ -14,7 +15,8 @@ class SHOOTTHEMUP_API USTUPlayerCameraShake : public UActorComponent
 
   public:
     USTUPlayerCameraShake();
-
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UCameraComponent *CameraComponent;
   protected:
     virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shake")
