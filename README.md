@@ -92,3 +92,11 @@ AI Damage sense:
 - Add more gamemodes (Flag capture, King of the hill).
 ## Notes
 With this project I almost fully transition my engineering skills from Unity C# to Unreal Engine C++. I prioritized creating reusable systems, and now they can be extended for larger prototypes.
+
+## License
+
+Copyright (c) 2025 Andrew Shchigol.  
+All rights reserved.
+
+This repository is for **viewing and educational purposes only**.  
+You are **not allowed to copy, modify, distribute, or use the code** in your own projects, whether commercial or non-commercial, without explicit permission from the author.
