@@ -32,10 +32,10 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     UFUNCTION(NetMulticast, Reliable)
     void OnPlayerChanged_Multicast(FPlayerInfo PlayerChanged);
     UFUNCTION(Server, Reliable)
-    void ChangeTeamName_Server(const FString &TeamName, const FString &NewTeamName);
+    void ChangeTeamName_Server(const FString &PlayerID, const FString &NewTeamName);
 
     UFUNCTION(Server, Reliable)
-    void ChangeTeamColor_Server(const FString &TeamName, const FLinearColor &Color);
+    void ChangeTeamColor_Server(const FString &PlayerID, const FLinearColor &Color);
 
     UFUNCTION(Server, Reliable)
     void ChangeWeapons_Server(TSubclassOf<ASTUBaseWeapon> WeaponToChoose, const FString &PlayerID);
@@ -90,4 +90,5 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     int TeamNumbers = 2;
     ASTULobbyGameMode *STULobbyGamemode;
     USTUGameInstance* STUGameInstance;
+    bool CheckSTUGameInstance();
 };

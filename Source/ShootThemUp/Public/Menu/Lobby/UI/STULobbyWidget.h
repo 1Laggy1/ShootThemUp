@@ -17,6 +17,9 @@ class UHorizontalBox;
 class USTULevelItemWidget;
 class USTUGameInstance;
 class UScrollBox;
+class USlider;
+class UEditableTextBox;
+class USTUWeaponItemWidget;
 UCLASS()
 class SHOOTTHEMUP_API USTULobbyWidget : public USTUBaseWidget
 {
@@ -32,19 +35,41 @@ class SHOOTTHEMUP_API USTULobbyWidget : public USTUBaseWidget
 
     UPROPERTY(meta = (BindWidget))
     UScrollBox *LevelItemsBox;
+    UPROPERTY(meta = (BindWidget))
+    UScrollBox *WeaponsItemsBox;
+    UPROPERTY(meta = (BindWidget))
+    USlider *Slider_R;
+    UPROPERTY(meta = (BindWidget))
+    USlider *Slider_G;
+    UPROPERTY(meta = (BindWidget))
+    USlider *Slider_B;
+    UPROPERTY(meta = (BindWidget))
+    UButton *ChangeColorButton;
+    UPROPERTY(meta = (BindWidget))
+    UEditableTextBox *TeamNameInputBox;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     TSubclassOf<UUserWidget> LevelItemWidgetClass;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    TSubclassOf<UUserWidget> WeaponWidgetClass;
     UPROPERTY(meta = (BindWidgetAnim), Transient)
     UWidgetAnimation *LoadAnim;
+    UFUNCTION()
+    void OnChangeColorClicked();
+    UFUNCTION()
+    void HandleTeamNameCommitted(const FText & Text, ETextCommit::Type CommitMethod);
     virtual void NativeOnInitialized() override;
   private:
     UPROPERTY()
     TArray<USTULevelItemWidget *> LevelItemWidgets;
+    UPROPERTY()
+    TArray<USTUWeaponItemWidget *> WeaponItemWidgets;
     UFUNCTION()
     void OnStartGame();
     UFUNCTION()
     void OnQuitGame();
     void InitLevelItems();
+    void InitWeaponsItems();
     void OnLevelSelected(const FLevelData &Data);
+    void OnWeaponSelected(const FWeaponItemData &Data);
     USTUGameInstance *GetSTUGameInstance() const;
 };

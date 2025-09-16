@@ -26,7 +26,8 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
     bool TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount);
     void Zoom(bool Enabled);
     bool bWeaponsSpawned;
-    
+    UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "Weapon")
+    TSubclassOf<ASTUBaseWeapon> DefaultWeaponClass;
   protected:
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
     UFUNCTION()

@@ -186,19 +186,33 @@ struct FPlayerInfo
 //};
 
 USTRUCT(BlueprintType)
-struct FLevelData
+struct FItemData
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    FName DisplayName = NAME_None;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    UTexture2D *Thumb;
+};
+
+USTRUCT(BlueprintType)
+struct  FLevelData : public FItemData
 {
     GENERATED_USTRUCT_BODY()
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
     FName LevelName = NAME_None;
+};
+USTRUCT(BlueprintType)
+struct FWeaponItemData : public FItemData
+{
+    GENERATED_USTRUCT_BODY()
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
-    FName LevelDisplayName = NAME_None;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
-    UTexture2D *LevelThumb;
+    TSubclassOf<ASTUBaseWeapon> WeaponClass;
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData &)
-
+    DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponSelectedSignature,
+                                        const FWeaponItemData &)
     extern const FName NAME_STUSpectating;
 
 UENUM(BlueprintType)

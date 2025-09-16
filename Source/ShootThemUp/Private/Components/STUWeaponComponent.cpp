@@ -12,6 +12,7 @@
 #include "Weapon/STUBaseWeapon.h"
 
 #include "STUCoreTypes.h"
+#include "STUUtils.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All, All)
 
@@ -58,9 +59,19 @@ void USTUWeaponComponent::SpawnWeapons_Implementation()
     Params.Owner = Character;
     Params.Instigator = Character;
     Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    UE_LOG(LogWeaponComponent, Display, TEXT("SpawnInfo: %s"), *Character->SpawnInfo.PlayerID);
-    FPlayerInfo PlayerInfo = Character->SpawnInfo;
-    UClass *WeaponClassLoaded = Character->SpawnInfo.WeaponClass.LoadSynchronous();
+    UE_LOG(LogWeaponComponent, Display, TEXT("SpawnInfo: %s"), *Character->PlayerID);
+    UClass *WeaponClassLoaded; 
+    if (!GetWorld()->GetGameInstance<USTUGameInstance>()->Teams.IsEmpty())
+    {
+        FPlayerInfo *PlayerInfo =
+            STUUtils::FindPlayerByPlayerID(Character->PlayerID, GetWorld()->GetGameInstance<USTUGameInstance>()->Teams);
+        WeaponClassLoaded = PlayerInfo->WeaponClass.LoadSynchronous();
+    }
+    else
+    {
+        WeaponClassLoaded = DefaultWeaponClass;
+    }
+    
     TSubclassOf<ASTUBaseWeapon> WeaponSubclass = WeaponClassLoaded;
     ASTUBaseWeapon *Weapon =
         GetWorld()->SpawnActor<ASTUBaseWeapon>(WeaponSubclass,
@@ -294,6 +305,8 @@ void USTUWeaponComponent::InitAnimations()
     }
     // for (auto OneWeaponData : WeaponData)
     //{
+    if (!CurrentWeapon)
+        return;
     auto ReloadFinishedNotify =
         AnimUtils::FindNotifyByClass<USTUReloadFinishedAnimNotify>(CurrentWeapon->ReloadAnimMontage);
     if (!ReloadFinishedNotify)

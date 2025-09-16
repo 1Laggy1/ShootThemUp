@@ -14,6 +14,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnNewPawnEvent, APawn*);
 class USTURespawnComponent;
 class ASTUBaseCharacter;
 class UCameraComponent;
+class ASTUGameStateBase;
+class ASTULobbyGameState;
 UCLASS()
 class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
 {
@@ -56,7 +58,12 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     UFUNCTION(Server, Reliable)
     void PlayerLoadedWorld();
     void CheckPlayerFullyLoadedWorld();
-    
+    UFUNCTION(Server, Reliable)
+    void RequestColorChange_Server(const FLinearColor &Color);
+    UFUNCTION(Server, Reliable)
+    void RequestTeamNameChange_Server(const FString &NewName);
+    UFUNCTION(Server, Reliable)
+    void RequestWeaponsChange_Server(TSubclassOf<ASTUBaseWeapon> WeaponToChoose);
   protected:
     FTimerHandle CheckWorldTimerHandle;
     //virtual void OnPossess(APawn *InPawn) override;
@@ -70,6 +77,7 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
   private:
     void OnPauseGame();
     void OnMatchStateChanged(ESTUMatchState State);
+    ASTULobbyGameState *STULobbyGameState;
     
 
 };

@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "STUGameStateBase.h"
 #include "Player/STUPlayerState.h"
+#include "Menu/Lobby/STULobbyGameState.h"
 
 DECLARE_LOG_CATEGORY_CLASS(LogSTUPlayerController, All, All);
 
@@ -127,6 +128,7 @@ void ASTUPlayerController::BeginPlay()
         {
             Gamemode->OnMatchStateChanged.AddUObject(this, &ASTUPlayerController::OnMatchStateChanged);
         }
+        STULobbyGameState = Cast<ASTULobbyGameState>(GetWorld()->GetGameState<ASTULobbyGameState>());
     }
 }
 
@@ -166,6 +168,33 @@ void ASTUPlayerController::CheckPlayerFullyLoadedWorld()
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("I am Player %s not loaded fully yet, waiting..."), *GetNameSafe(this));
+    }
+}
+
+void ASTUPlayerController::RequestColorChange_Server_Implementation(const FLinearColor &Color)
+{
+    if (STULobbyGameState)
+    {
+        STULobbyGameState->ChangeTeamColor_Server(
+            PlayerState->GetUniqueId()->ToString(), Color);
+    }
+}
+
+void ASTUPlayerController::RequestTeamNameChange_Server_Implementation(const FString &NewName)
+{
+    if (STULobbyGameState)
+    {
+        STULobbyGameState->ChangeTeamName_Server(
+            PlayerState->GetUniqueId()->ToString(), NewName);
+    }
+}
+
+void ASTUPlayerController::RequestWeaponsChange_Server_Implementation(TSubclassOf<ASTUBaseWeapon> WeaponToChoose)
+{
+    if (STULobbyGameState)
+    {
+        STULobbyGameState->ChangeWeapons_Server(
+            WeaponToChoose, PlayerState->GetUniqueId()->ToString());
     }
 }
 

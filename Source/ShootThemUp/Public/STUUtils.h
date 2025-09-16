@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Player/STUPlayerState.h"
 #include "STUGameInstance.h"
 #include "STUCoreTypes.h"
@@ -83,6 +83,8 @@ class STUUtils
 
     static FPlayerInfo *FindPlayerByPlayerID(const FString &PlayerID, TArray<FTeamInfo> &Teams)
     {
+        if (Teams.IsEmpty())
+            return nullptr;
         for (FTeamInfo &Team : Teams)
         {
             FPlayerInfo *Player =
