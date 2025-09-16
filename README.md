@@ -1,7 +1,7 @@
 # ShootThemUp
 First Steam multiplayer build here! Check it out with you friends, download 1.1 release!
 
-Currently working on teams implementation on [Teams branch](https://github.com/1Laggy1/ShootThemUp/tree/Teams).
+Currently working on UI in LobbyLevel on [LobbyUI branch](https://github.com/1Laggy1/ShootThemUp/tree/LobbyUI).
 
 A third person shooter built in Unreal Engine 5.6. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
 ## Summary
