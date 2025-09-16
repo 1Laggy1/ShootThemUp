@@ -42,7 +42,10 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    //DOREPLIFETIME(ASTUBaseCharacter, PlayerID);
+    DOREPLIFETIME(ASTUBaseCharacter, PlayerID);
+    DOREPLIFETIME(ASTUBaseCharacter, PlayerName);
+    DOREPLIFETIME(ASTUBaseCharacter, PlayerColor);
+
 }
 
 void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser)
@@ -52,20 +55,30 @@ void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor *Da
 
     // UGameplayStatics::PlaySoundAtLocation(GetWorld(), DamageSound, GetActorLocation());
 }
-void ASTUBaseCharacter::InitPlayer_Multicast_Implementation(const FString &PlayerID)
+void ASTUBaseCharacter::InitPlayer()
 {
-    FString Check = PlayerID;
-    UE_LOG(LogTemp, Display, TEXT("%s"), *Check);
-    USTUGameInstance *STUGameInstance = GetWorld()->GetGameInstance<USTUGameInstance>();
+    /*USTUGameInstance *STUGameInstance = GetWorld()->GetGameInstance<USTUGameInstance>();
     if (STUGameInstance)
     {
         PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
     }
 
     if (!PlayerInfo)
+        return;*/
+    SetPlayerColor(PlayerColor);
+    if (GetWorld() && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "LobbyLevel")
+    {
         return;
+    }
+    UE_LOG(BaseCharacterLog, Display, TEXT("Am I need to Possess? My %s FirstPC %s"), *PlayerID,
+           *GetWorld()->GetFirstPlayerController()->PlayerState->GetUniqueId()->ToString());
+    if (PlayerID == GetWorld()->GetFirstPlayerController()->PlayerState->GetUniqueId()->ToString())
+    {
+        UE_LOG(BaseCharacterLog, Display, TEXT("Yes! Requesting possess now"));
+        Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController())->RequestPossess_Server(this);
 
-    SetPlayerColor(PlayerInfo->Color);
+        
+    }
 }
 // Called when the game starts or when spawned
 void ASTUBaseCharacter::BeginPlay()
@@ -85,6 +98,7 @@ void ASTUBaseCharacter::BeginPlay()
     }
 
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), RespawnSound, GetActorLocation());
+    InitPlayer();
 }
 
 void ASTUBaseCharacter::SetPlayerColor(const FLinearColor &Color)

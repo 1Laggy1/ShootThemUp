@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 
 #include "STUGameStateBase.h"
@@ -7,6 +7,8 @@
 #include "Player/STUPlayerState.h"
 #include "Net/UnrealNetwork.h"
 #include "STUGameModeBase.h"
+#include "STUUtils.h"
+#include "STUCoreTypes.h"
 void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -16,6 +18,7 @@ void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUGameStateBase, CurrentRound);
     DOREPLIFETIME(ASTUGameStateBase, RoundCountDown);
     DOREPLIFETIME(ASTUGameStateBase, MatchState);
+    DOREPLIFETIME(ASTUGameStateBase, WaitingTimeNow);
     //DOREPLIFETIME(ASTUGameStateBase, MatchStatistics);
 }
 
@@ -46,14 +49,42 @@ void ASTUGameStateBase::ResetOnePlayerMulticast_Implementation(AActor *DiedActor
         DiedActor->SetActorRotation(Spawn->GetActorRotation());
     }*/
 }
-void ASTUGameStateBase::SetPlayerColorMulticast_Implementation(AActor *Player, FLinearColor TeamColor)
-{
-    if (!Player)
-        return;
-
-    const auto Character = Cast<ASTUBaseCharacter>(Player);
-    if (!Character)
-        return;
-
-    Character->SetPlayerColor(TeamColor);
-}
+//void ASTUGameStateBase::SetPlayerColorMulticast_Implementation(AActor *Player, FLinearColor TeamColor)
+//{
+//    if (!Player)
+//        return;
+//
+//    const auto Character = Cast<ASTUBaseCharacter>(Player);
+//    if (!Character)
+//        return;
+//
+//    Character->SetPlayerColor(TeamColor);
+//}
+//
+//void ASTUGameStateBase::InitPlayer_Multicast_Implementation(const FString &PlayerID, ASTUBaseCharacter *Character)
+//{
+//
+//    FTimerHandle TempHandle;
+//    GetWorld()->GetTimerManager().SetTimer(
+//        TempHandle,
+//        [this, Character, PlayerID, TempHandle]() mutable {
+//            if (!Character || !GetWorld() || !IsValid(Character) || !Character->HasActorBegunPlay() || !Character->GetWorld())
+//                InitPlayer_Multicast_Implementation(PlayerID, Character);
+//
+//            auto STUGameInstance = GetWorld()->GetGameInstance<USTUGameInstance>();
+//            if (!STUGameInstance)
+//                InitPlayer_Multicast_Implementation(PlayerID, Character);
+//
+//            FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+//            if (!PlayerInfo)
+//                InitPlayer_Multicast_Implementation(PlayerID, Character);
+//
+//            //Character->InitPlayer(PlayerID, GetWorld());
+//            Character->SetPlayerColor(PlayerInfo->Color);
+//
+//            GetWorld()->GetTimerManager().ClearTimer(TempHandle);
+//        },
+//        0.5f, false);
+//
+//
+//}

@@ -13,6 +13,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStateChanged, ESTUMatchState);
 /**
  * 
  */
+class ASTUBaseCharacter;
 UCLASS()
 class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
 {
@@ -31,7 +32,11 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     TArray<FTeamInfo> TeamsStats;
     UFUNCTION(Server, Reliable)
     void PlayerConnected(APlayerController *PC);
-
+    UPROPERTY(Replicated)
+    float WaitingTimeNow = 30.0f;
+    /*UFUNCTION(NetMulticast, Reliable)
+    void InitPlayer_Multicast(const FString &PlayerID, ASTUBaseCharacter* Character);*/
+    /*void WaitForPlayer(ASTUBaseCharacter *Character);*/
     
     /*UPROPERTY(Replicated)
     FMatchStatistics Statistics;
@@ -52,8 +57,8 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     FOnMatchStateChanged OnMatchStateChanged;
 
   public:
-    UFUNCTION(NetMulticast, Reliable)
-    void SetPlayerColorMulticast(AActor *Player, FLinearColor TeamColor);
+    /*UFUNCTION(NetMulticast, Reliable)
+    void SetPlayerColorMulticast(AActor *Player, FLinearColor TeamColor);*/
     UFUNCTION(NetMulticast, Reliable)
     void ResetOnePlayerMulticast(AActor *DiedActor, AActor *Spawn);
     FGameData GetGameData()

@@ -22,8 +22,12 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     
     FOnNewPawnEvent OnNewPawnEvent;
     ASTUPlayerController();
+    UFUNCTION(Server, Reliable)
+    void RequestPossess_Server(APawn *InPawn);
     UFUNCTION(Client, Reliable)
-    void Possess_Client(APawn *InPawn);
+    void OnRequestPossess_Client(APawn *InPawn);
+    /*UFUNCTION(Client, Reliable)
+    void Possess_Client(APawn *InPawn);*/
     void SetPreviousCameraPosition(FVector PreviousLocation, FRotator PreviousRotation)
     {
         PreviousCameraPosition = PreviousLocation;
@@ -38,25 +42,31 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
         return PreviousCameraRotation;
     };
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
-    UFUNCTION()
-    void OnRep_Possesed();
+    /*UFUNCTION()
+    void OnRep_Possesed();*/
     UFUNCTION(NetMulticast, Reliable)
     void StartSpectatingMulticast(APawn* PawnSpectator);
-    UPROPERTY(ReplicatedUsing = OnRep_Possesed)
-    APawn *ControlledPawn;
+    //UPROPERTY(Replicated)//Using = OnRep_Possesed)
+    //APawn *ControlledPawn;
     FPlayerInfo SpawnInfo;
     UPROPERTY(ReplicatedUsing = OnRep_SetCamera)
     ACameraActor *LobbyCamera;
     UFUNCTION()
     void OnRep_SetCamera();
+    UFUNCTION(Server, Reliable)
+    void PlayerLoadedWorld();
+    void CheckPlayerFullyLoadedWorld();
+    
   protected:
-    virtual void OnPossess(APawn *InPawn) override;
+    FTimerHandle CheckWorldTimerHandle;
+    //virtual void OnPossess(APawn *InPawn) override;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     USTURespawnComponent *STURespawnComponent;
     FVector PreviousCameraPosition;
     FRotator PreviousCameraRotation;
     virtual void BeginPlay() override;
     virtual void SetupInputComponent() override;
+    virtual void NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest) override;
   private:
     void OnPauseGame();
     void OnMatchStateChanged(ESTUMatchState State);

@@ -11,6 +11,7 @@
 
 class AAIController;
 class ASTUGameStateBase;
+class USTUGameInstance;
 UCLASS()
 class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 {
@@ -70,4 +71,13 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void LogPlayerInfo();
     void StartRespawn(AController *DiedActor);
     void GameOver();
+    USTUGameInstance *STUGameInstance;
+    FTimerHandle WaitingForPlayersTimerHandle;
+    int PlayersNum;
+    int PlayersReady = 0;
+    void WaitingForPlayers();
+    float WaitingTime = 30.0f;
+    float BeforeStartTime = 10.0f;
+    bool BeforeStart = false;
+    TArray<FString> PlayersReadyIDs;
 };

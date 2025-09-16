@@ -60,16 +60,41 @@ void ASTUGameModeBase::StartPlay()
     }
     auto GState = GetWorld()->GetGameState();
     STUGameStateBase = Cast<ASTUGameStateBase>(GState);
-    USTUGameInstance *STUGameInstance = GetGameInstance<USTUGameInstance>();
+    STUGameInstance = GetGameInstance<USTUGameInstance>();
     if (STUGameInstance && STUGameStateBase->TeamsStats.IsEmpty())
     {
         STUGameStateBase->SetGameData(GameData, STUGameInstance->Teams);
+        PlayersNum = 0;
+        for (const FTeamInfo &Team : STUGameInstance->Teams)
+        {
+            PlayersNum += Team.PlayersInfos.Num();
+            UE_LOG(LogTemp, Warning, TEXT("Team has %d players"), Team.PlayersInfos.Num());
+        }
     }
+    GetWorld()
+        ->GetTimerManager().SetTimer(WaitingForPlayersTimerHandle, this, &ASTUGameModeBase::WaitingForPlayers, 1.0f,
+                                           true);
+    STUGameStateBase->CurrentRound = 0;
     // SpawnBots();
     // CreateTeamsInfo();
-    STUGameStateBase->CurrentRound = 1;
-    StartRound();
-    ChangeState(ESTUMatchState::InProgress);
+}
+
+void ASTUGameModeBase::WaitingForPlayers()
+{
+    if (PlayersReady == PlayersNum && !BeforeStart)
+    {
+        BeforeStart = true;
+        STUGameStateBase->WaitingTimeNow = BeforeStartTime;
+    }
+    if (STUGameStateBase->WaitingTimeNow <= 0)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(WaitingForPlayersTimerHandle);
+        StartRound();
+        
+        return;
+    }
+    STUGameStateBase->WaitingTimeNow -= 1.0f;
+    UE_LOG(LogSTUGameModeBase, Display, TEXT("Waiting for players: %f %d/%d"), STUGameStateBase->WaitingTimeNow, PlayersReady, PlayersNum);
 }
 
 UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AController *InController)
@@ -87,15 +112,6 @@ UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AContr
 void ASTUGameModeBase::PostLogin(APlayerController *NewPlayer)
 {
     Super::PostLogin(NewPlayer);
-    auto GState = GetWorld()->GetGameState();
-    STUGameStateBase = Cast<ASTUGameStateBase>(GState);
-    USTUGameInstance *STUGameInstance = GetGameInstance<USTUGameInstance>();
-    if (STUGameInstance && STUGameStateBase->TeamsStats.IsEmpty())
-    {
-        STUGameStateBase->SetGameData(GameData, STUGameInstance->Teams);
-    }
-    UE_LOG(LogSTUGameModeBase, Display, TEXT("DefaultPawnClass=%s"), *GetNameSafe(DefaultCharacterClass));
-    ResetOnePlayer(NewPlayer);
 }
 
 void ASTUGameModeBase::SpawnBots()
@@ -114,6 +130,9 @@ void ASTUGameModeBase::SpawnBots()
 
 void ASTUGameModeBase::StartRound()
 {
+    ChangeState(ESTUMatchState::InProgress);
+    STUGameStateBase->CurrentRound++;
+    ResetPlayers();
     STUGameStateBase->RoundCountDown = GameData.RoundTime;
     GetWorldTimerManager().SetTimer(GameRoundTimerHandle, this, &ASTUGameModeBase::GameTimerUpdate, 1.0f, true);
 }
@@ -127,8 +146,8 @@ void ASTUGameModeBase::GameTimerUpdate()
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
         if (STUGameStateBase->CurrentRound + 1 <= GameData.RoundsNum)
         {
-            STUGameStateBase->CurrentRound++;
-            ResetPlayers();
+            
+            
             StartRound();
         }
         else
@@ -179,20 +198,24 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
         FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
                                ? Controller->PlayerState->GetUniqueId()->ToString()
                                : TEXT("UnknownID");
+        FPlayerInfo* PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+        NewCharacter->PlayerColor = PlayerInfo->Color;
+        NewCharacter->PlayerName = Controller->PlayerState->GetPlayerName();
+        NewCharacter->PlayerID = PlayerID;
 
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
         // NewCharacter->OnRep_PlayerID();
     }
-    auto STUPlayerController = Cast<ASTUPlayerController>(Controller);
-    if (!STUPlayerController)
-        return;
-    
-    STUPlayerController->ControlledPawn = NewCharacter;
-    STUPlayerController->OnRep_Possesed();
-    FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
+    //auto STUPlayerController = Cast<ASTUPlayerController>(Controller);
+    //if (!STUPlayerController)
+    //    return;
+    //STUPlayerController->Possess(NewCharacter);
+    //STUPlayerController->ControlledPawn = NewCharacter;
+    //STUPlayerController->OnRep_Possesed();
+    /*FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
                            ? Controller->PlayerState->GetUniqueId()->ToString()
-                           : TEXT("UnknownID");
-    NewCharacter->InitPlayer_Multicast(PlayerID);
+                           : TEXT("UnknownID");*/
+    //STUGameStateBase->InitPlayer_Multicast(PlayerID, NewCharacter);
     // Controller->Possess(NewCharacter);
 }
 
@@ -339,6 +362,8 @@ void ASTUGameModeBase::GameOver()
     ChangeState(ESTUMatchState::GameOver);
 }
 
+
+
 void ASTUGameModeBase::RespawnRequest(AController *Controller)
 {
     ResetOnePlayer(Controller);
@@ -414,9 +439,11 @@ bool ASTUGameModeBase::ClearPause()
 
 void ASTUGameModeBase::PlayerConnected(APlayerController *PC)
 {
-    if (PC)
+    if (PC && !PlayersReadyIDs.Contains(PC->PlayerState->GetUniqueId()->ToString()))
     {
-        auto GState = GetWorld()->GetGameState();
+        PlayersReady++;
+        PlayersReadyIDs.Add(PC->PlayerState->GetUniqueId()->ToString());
+        /*auto GState = GetWorld()->GetGameState();
         STUGameStateBase = Cast<ASTUGameStateBase>(GState);
         USTUGameInstance *STUGameInstance = GetGameInstance<USTUGameInstance>();
         if (STUGameInstance && STUGameStateBase->TeamsStats.IsEmpty())
@@ -424,6 +451,8 @@ void ASTUGameModeBase::PlayerConnected(APlayerController *PC)
             STUGameStateBase->SetGameData(GameData, STUGameInstance->Teams);
         }
         UE_LOG(LogSTUGameModeBase, Display, TEXT("DefaultPawnClass=%s"), *GetNameSafe(DefaultCharacterClass));
-        ResetOnePlayer(PC);
+        ResetOnePlayer(PC);*/
     }
 }
+
+

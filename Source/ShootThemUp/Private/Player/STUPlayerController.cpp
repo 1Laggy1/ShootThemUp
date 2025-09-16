@@ -12,6 +12,8 @@
 #include "Camera/CameraActor.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "STUGameStateBase.h"
+#include "Player/STUPlayerState.h"
 
 DECLARE_LOG_CATEGORY_CLASS(LogSTUPlayerController, All, All);
 
@@ -20,15 +22,42 @@ ASTUPlayerController::ASTUPlayerController()
     STURespawnComponent = CreateDefaultSubobject<USTURespawnComponent>("RespawnComponent");
 }
 
-void ASTUPlayerController::Possess_Client_Implementation(APawn *InPawn)
+void ASTUPlayerController::OnRequestPossess_Client_Implementation(APawn *InPawn)
 {
     if (InPawn == nullptr)
-    {
-        UE_LOG(LogSTUPlayerController, Warning, TEXT("Possess_Client: InPawn was nullptr"));
         return;
+    bShowMouseCursor = false;
+    // ControlledPawn = InPawn;
+    OnNewPawnEvent.Broadcast(InPawn);
+    SetInputMode(FInputModeGameOnly());
+    if (InPawn->IsA<ASpectatorPawn>())
+    {
+        //
     }
-    Possess(InPawn);
+    else if (InPawn->IsA<ACharacter>())
+    {
+        //
+    }
 }
+
+void ASTUPlayerController::RequestPossess_Server_Implementation(APawn *InPawn)
+{
+    bShowMouseCursor = false;
+    Possess(InPawn);
+    SetInputMode(FInputModeGameOnly());
+    OnRequestPossess_Client(InPawn);
+}
+
+//void ASTUPlayerController::Possess_Client_Implementation(APawn *InPawn)
+//{
+//    if (InPawn == nullptr)
+//    {
+//        UE_LOG(LogSTUPlayerController, Warning, TEXT("Possess_Client: InPawn was nullptr"));
+//        return;
+//    }
+//    UE_LOG(LogSTUPlayerController, Display, TEXT("Possess_Client: Possesing %s"), *InPawn->GetFullName());
+//    Possess(InPawn);
+//}
 
 void ASTUPlayerController::StartSpectatingMulticast_Implementation(APawn *PawnSpectator)
 {
@@ -43,46 +72,49 @@ void ASTUPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
 {
 
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    DOREPLIFETIME(ASTUPlayerController, ControlledPawn);
+    //DOREPLIFETIME(ASTUPlayerController, ControlledPawn);
     DOREPLIFETIME(ASTUPlayerController, LobbyCamera);
 }
 
-void ASTUPlayerController::OnRep_Possesed()
-{
-    
-    
-    FTimerHandle TempHandle;
-    GetWorld()->GetTimerManager().SetTimer(
-        TempHandle,
-        [this]() {
-            if (ControlledPawn)
-            {
-                Possess(ControlledPawn);
-                OnNewPawnEvent.Broadcast(ControlledPawn);
-                return;
-            }
-            OnRep_Possesed();
-        },
-        0.5f, false);
-}
+//void ASTUPlayerController::OnRep_Possesed()
+//{
+//    
+//    
+//    FTimerHandle TempHandle;
+//    GetWorld()->GetTimerManager().SetTimer(
+//        TempHandle,
+//        [this]() {
+//            if (ControlledPawn)
+//            {
+//                Possess(ControlledPawn);
+//                //OnNewPawnEvent.Broadcast(ControlledPawn);
+//                UE_LOG(LogPlayerController, Display, TEXT("%s POSSESING %s"), *GetFullName(),
+//                       *ControlledPawn->GetFullName());
+//                return;
+//            }
+//            OnRep_Possesed();
+//        },
+//        0.5f, false);
+//}
 
-void ASTUPlayerController::OnPossess(APawn *InPawn)
-{
-    bShowMouseCursor = false;
-    if (InPawn == nullptr)
-        return;
-    ControlledPawn = InPawn;
-    Super::OnPossess(InPawn);
-    OnNewPawnEvent.Broadcast(InPawn);
-    if (InPawn->IsA<ASpectatorPawn>())
-    {
-        //
-    }
-    else if (InPawn->IsA<ACharacter>())
-    {
-        //
-    }
-}
+
+//void ASTUPlayerController::OnPossess(APawn *InPawn)
+//{
+//    if (InPawn == nullptr)
+//        return;
+//    bShowMouseCursor = false;
+//    //ControlledPawn = InPawn;
+//    Super::OnPossess(InPawn);
+//    OnNewPawnEvent.Broadcast(InPawn);
+//    if (InPawn->IsA<ASpectatorPawn>())
+//    {
+//        //
+//    }
+//    else if (InPawn->IsA<ACharacter>())
+//    {
+//        //
+//    }
+//}
 
 void ASTUPlayerController::BeginPlay()
 {
@@ -105,6 +137,36 @@ void ASTUPlayerController::SetupInputComponent()
         return;
 
     InputComponent->BindAction("PauseGame", IE_Pressed, this, &ASTUPlayerController::OnPauseGame);
+}
+
+void ASTUPlayerController::NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest)
+{
+    Super::NotifyLoadedWorld(WorldPackageName, bFinalDest);
+    if (WorldPackageName != "LobbyLevel" && IsLocalController() && bFinalDest)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("I am Player %s has loaded world, notifying server"), *GetNameSafe(this));
+        PlayerLoadedWorld();
+        //GetWorld()->GetTimerManager().SetTimer(CheckWorldTimerHandle, this,
+        //                                       &ASTUPlayerController::CheckPlayerFullyLoadedWorld,
+        //                                      0.5f, true);
+    }
+}
+
+void ASTUPlayerController::CheckPlayerFullyLoadedWorld()
+{
+    auto Gamestate = GetWorld()->GetGameState<ASTUGameStateBase>();
+    if (Gamestate)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("I am Player %s has fully loaded world, notifying server"), *GetNameSafe(this));
+        GetWorld()->GetTimerManager().ClearTimer(CheckWorldTimerHandle);
+        PlayerLoadedWorld();
+
+        return;
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("I am Player %s not loaded fully yet, waiting..."), *GetNameSafe(this));
+    }
 }
 
 void ASTUPlayerController::OnPauseGame()
@@ -148,4 +210,20 @@ void ASTUPlayerController::OnRep_SetCamera()
 
     UE_LOG(LogTemp, Warning, TEXT("Switching view to camera: %s"), *GetNameSafe(LobbyCamera));
     SetViewTarget(LobbyCamera);
+}
+
+void ASTUPlayerController::PlayerLoadedWorld_Implementation()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Player %s loaded world, getting gamemode"), *GetNameSafe(this));
+    auto GamemodeBase = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
+    if (!GamemodeBase)
+        return;
+    UE_LOG(LogTemp, Warning, TEXT("Player %s loaded world, informing gamemode"), *GetNameSafe(this));
+    if (Cast<ASTUPlayerState>(PlayerState)->LoadedAndNotifiedServer)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Player %s already informed gamemode"), *GetNameSafe(this));
+        return;
+    }
+    GamemodeBase->PlayerConnected(this);
+    Cast<ASTUPlayerState>(PlayerState)->LoadedAndNotifiedServer = true;
 }

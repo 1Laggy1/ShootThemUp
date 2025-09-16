@@ -54,6 +54,7 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
                           const FOnlineSessionSearchResult &InviteResult);
     
     TArray<FTeamInfo> Teams;
+    
   protected:
     IOnlineSessionPtr SessionInterface;
     IOnlineSubsystem *Subsystem;
