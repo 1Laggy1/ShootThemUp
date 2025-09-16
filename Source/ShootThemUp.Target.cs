@@ -9,7 +9,7 @@ public class ShootThemUpTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
-
-		ExtraModuleNames.AddRange( new string[] { "ShootThemUp" } );
+        bUsesSteam = true;
+        ExtraModuleNames.AddRange( new string[] { "ShootThemUp" } );
 	}
 }

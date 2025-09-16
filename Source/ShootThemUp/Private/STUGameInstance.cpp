@@ -45,8 +45,6 @@ void USTUGameInstance::InitSteamSocketsNetDriver()
     UWorld *World = GetWorld();
     if (!World)
         return;
-
-    // Already created? Skip
     if (World->GetNetDriver())
         return;
 
@@ -54,7 +52,6 @@ void USTUGameInstance::InitSteamSocketsNetDriver()
         NewObject<USteamSocketsNetDriver>(GetTransientPackage(), USteamSocketsNetDriver::StaticClass());
     NetDriver->SetWorld(World);
 
-    // Optional: avoid MappedClientConnections assertion
     NetDriver->RecentlyDisconnectedTrackingTime = 10.0f;
 
     FURL ListenURL;
@@ -92,19 +89,14 @@ void USTUGameInstance::CreateLobby()
         return;
     }
 
-    // Destroy existing session first
     if (SessionInterface->GetNamedSession(FName(NAME_GameSession)))
     {
         SessionInterface->DestroySession(FName(NAME_GameSession));
     }
-
-    // Create session settings for Steam lobby
     FOnlineSessionSettings SessionSettings;
-
-    // CRITICAL: These settings are required for Steam invites
     SessionSettings.bIsLANMatch = false;
     SessionSettings.bUsesPresence = true;
-    SessionSettings.bUseLobbiesIfAvailable = true; // This is key for Steam lobbies
+    SessionSettings.bUseLobbiesIfAvailable = true;
     SessionSettings.bUseLobbiesVoiceChatIfAvailable = false;
     SessionSettings.NumPublicConnections = 4;
     SessionSettings.bAllowJoinInProgress = true;
@@ -113,11 +105,9 @@ void USTUGameInstance::CreateLobby()
     SessionSettings.bAllowJoinViaPresence = true;
     SessionSettings.bAllowJoinViaPresenceFriendsOnly = false;
 
-    // Set up for Steam networking
     SessionSettings.Set(SETTING_GAMEMODE, FString("Lobby"), EOnlineDataAdvertisementType::ViaOnlineService);
     SessionSettings.Set(SETTING_MAPNAME, FString("LobbyLevel"), EOnlineDataAdvertisementType::ViaOnlineService);
 
-    // Create the session
     bool bSuccess = SessionInterface->CreateSession(0, NAME_GameSession, SessionSettings);
 
     if (!bSuccess)
@@ -152,7 +142,6 @@ void USTUGameInstance::OnInviteAccepted(const bool bWasSuccessful, int32 Control
     }
     UE_LOG(LogTemp, Log, TEXT("Invite accepted, attempting to join session..."));
 
-    // Join the session from the invite
     bool bJoinSuccess = SessionInterface->JoinSession(ControllerId, NAME_GameSession, InviteResult);
 
     if (!bJoinSuccess)

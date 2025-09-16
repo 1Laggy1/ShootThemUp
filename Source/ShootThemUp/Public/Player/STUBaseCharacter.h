@@ -40,7 +40,10 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     USoundCue *RespawnSound;
     UPROPERTY(EditDefaultsOnly, Category = "Sound")
     USoundCue *DamageSound;
+    
+    FPlayerInfo* PlayerInfo;
 
+    
     //UPROPERTY(Replicated)
     FRotator AimRotation;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
@@ -56,7 +59,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     ASTUBaseCharacter(const FObjectInitializer &ObjInit);
     virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
-    FPlayerSpawnInfo SpawnInfo;
+    FPlayerInfo SpawnInfo;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUHealthActorComponent *HealthComponent;
     
@@ -70,9 +73,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UFUNCTION(NetMulticast, Reliable)
     void MulticastStartSprint(bool Start);
     AController *GetInstigatorControllerFromDamageCauser(AActor *DamageCauser);
-    // Called to bind functionality to input
-    
-
+    void InitPlayer();
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement", meta = (ClampMin = "1.1", ClampMax = "10.0"))
     float SprintSpeedMultiplier = 2.0f;
 
@@ -88,6 +89,13 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     virtual bool IsSprinting();
     void UpdateHealthWidgetVisibility(AActor *DamageCauser);
 
+    UPROPERTY(Replicated)
+    FLinearColor PlayerColor = FLinearColor::White;
+    UPROPERTY(Replicated)
+    FString PlayerName = "Player";
+
+    UPROPERTY(Replicated)
+    FString PlayerID = "PlayerID";
   private:
     
     

@@ -159,21 +159,31 @@ struct FPlayerStats
     FLinearColor TeamColor;
 };
 USTRUCT(BlueprintType)
-struct FPlayerSpawnInfo
+struct FPlayerInfo
 {
     GENERATED_USTRUCT_BODY()
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     FLinearColor Color = FLinearColor::White;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
-    TSubclassOf<ASTUBaseWeapon> WeaponClass;
-};
-USTRUCT(BlueprintType)
-struct FMatchStatistics
-{
-    GENERATED_USTRUCT_BODY()
+    TSoftClassPtr<ASTUBaseWeapon> WeaponClass;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
+    FString PlayerName;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
+    FString PlayerID;
     UPROPERTY()
-    TArray<FPlayerStats> Stats;
+    int32 TeamID;
+    UPROPERTY()
+    FPlayerStats Stats;
+    APlayerController *ThisPlayerController;
+
 };
+//USTRUCT(BlueprintType)
+//struct FMatchStatistics
+//{
+//    GENERATED_USTRUCT_BODY()
+//    UPROPERTY()
+//    TArray<FPlayerStats> Stats;
+//};
 
 USTRUCT(BlueprintType)
 struct FLevelData
@@ -197,4 +207,34 @@ enum class STUPlayerStateEnum : uint8
     None = 0,
     Gaming,
     Spectating
+};
+
+USTRUCT(BlueprintType)
+struct FTeamInfo
+{
+    GENERATED_USTRUCT_BODY()
+
+    FTeamInfo()
+        : TeamID(1)
+        , TeamColor(FLinearColor::White)
+        , TeamName("Team 1")
+    {}
+
+    FTeamInfo(int32 ID, const FLinearColor& Color = FLinearColor::White, const FString& Name = FString())
+        : TeamID(ID)
+        , TeamColor(Color)
+        , TeamName(Name.IsEmpty() ? FString("Team ") + FString::FromInt(ID) : Name)
+    {}
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 TeamID = 1;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FLinearColor TeamColor = FLinearColor::White;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString TeamName = "Team 1";
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TArray<FPlayerInfo> PlayersInfos;
 };

@@ -7,7 +7,9 @@
 #include "STUGameInstance.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "GameFramework/PlayerStart.h"
+#include "GameFramework/PlayerController.h"
+#include "STUUtils.h"
 void USTULobbyWidget::NativeOnInitialized()
 {
     if (StartGameButton)
@@ -100,10 +102,11 @@ void USTULobbyWidget::OnStartGame()
     //        PC->Destroy();
     //    }
     //}
-
+    
     // ServerTravel
+
     FString Level = "/Game/Levels/" + GetSTUGameInstance()->GetStartupLevel().LevelName.ToString();
-    World->ServerTravel(Level, false, false);
+    World->ServerTravel(Level, true, false);
 }
 void USTULobbyWidget::OnQuitGame()
 {

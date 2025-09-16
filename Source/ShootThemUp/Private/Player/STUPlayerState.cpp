@@ -10,7 +10,7 @@ ASTUPlayerState::ASTUPlayerState()
 }
 void ASTUPlayerState::LogInfo()
 {
-    UE_LOG(LogSTUPlayerState, Display, TEXT("TeamID: %i, Kills: %i, Deaths: %i"), TeamID, KillsNum, DeathsNum)
+    /*UE_LOG(LogSTUPlayerState, Display, TEXT("TeamID: %i, Kills: %i, Deaths: %i"), TeamID, KillsNum, DeathsNum);*/
 }
 
 void ASTUPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const

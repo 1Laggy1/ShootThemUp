@@ -19,8 +19,8 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
 {
     GENERATED_BODY()
   public:
-    ASTUPlayerCharacter(const FObjectInitializer &ObjInit);
-
+    ASTUPlayerCharacter(const FObjectInitializer &ObjInit); 
+    
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USpringArmComponent *SpringArmComponent;

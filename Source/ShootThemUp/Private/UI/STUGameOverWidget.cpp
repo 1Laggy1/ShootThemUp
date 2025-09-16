@@ -38,7 +38,7 @@ void USTUGameOverWidget::UpdatePlayersStat()
 
     PlayerStatBox->ClearChildren();
 
-    for (auto Info : GameState->MatchStatistics.Stats)
+    /*for (auto Info : GameState->MatchStatistics.Stats)
     {
 
         FPlayerStats PlayerStat = Info;
@@ -50,7 +50,7 @@ void USTUGameOverWidget::UpdatePlayersStat()
             continue;
         PlayerStatBox->AddChild(PlayerStatRowWidget);
         PlayerStatRowWidget->SetRowInfo(RowInfo);
-    }
+    }*/
 }
 
 void USTUGameOverWidget::OnMatchStateChanged(ESTUMatchState State)

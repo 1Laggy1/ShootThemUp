@@ -8,6 +8,7 @@
 #include "Menu/Lobby/STULobbyPlayerStart.h"
 #include "STULobbyGameMode.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FSTUOnPostLogin, APlayerController*)
 class ASTUBaseCharacter;
 /**
  * 
@@ -20,19 +21,15 @@ class SHOOTTHEMUP_API ASTULobbyGameMode : public AGameModeBase
 
   public:
     void StartPlay() override;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FPlayerSpawnInfo DefaultSpawnInfo;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TSubclassOf<ASTUBaseCharacter> BaseCharacter;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<ASTULobbyPlayerStart *> PlayerStarts;
-
+    FSTUOnPostLogin STUOnPostLogin;
+    
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    //TArray<ASTULobbyPlayerStart *> PlayerStarts;
+    
   protected:
-    AActor *LobbyCamera;
-    void SetCamera();
+    
   private:
-    UPROPERTY(EditDefaultsOnly)
+    /*UPROPERTY(EditDefaultsOnly)
     float XStart;
     UPROPERTY(EditDefaultsOnly)
     float YStart;
@@ -51,7 +48,7 @@ class SHOOTTHEMUP_API ASTULobbyGameMode : public AGameModeBase
     float Height;
     bool FirstSpawnPosition = true;
     void BeginFindPlayerStarts();
-    FVector GetNextPlayerStart();
+    FVector GetNextPlayerStart();*/
     virtual void PostLogin(APlayerController *NewPlayer) override;
     void SpawnLobbyCharacter(APlayerController *Player);
     void HandleStartingNewPlayer_Implementation(APlayerController *NewPlayer) override;

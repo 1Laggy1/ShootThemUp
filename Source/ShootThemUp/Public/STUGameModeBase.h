@@ -11,6 +11,7 @@
 
 class AAIController;
 class ASTUGameStateBase;
+class USTUGameInstance;
 UCLASS()
 class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 {
@@ -21,6 +22,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     AActor* GetRandomSpawnPoint(UWorld *World);
     virtual UClass *GetDefaultPawnClassForController_Implementation(AController *InController) override;
     void Killed(AController *KillerActor, AController *DiedActor);
+
   //  FGameData GetGameData()
   //  {
   //      return GameData;
@@ -37,7 +39,8 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 
     virtual bool SetPause(APlayerController *PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
     virtual bool ClearPause() override;
-    FLinearColor DetermineColorByTeamID(int32 TeamID) const;
+    void PlayerConnected(APlayerController *PC);
+    //FLinearColor DetermineColorByTeamID(int32 TeamID) const;
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
@@ -47,6 +50,10 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     TSubclassOf<APawn> AIPawnClass;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FGameData GameData;
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
+    TSubclassOf<APawn> DefaultCharacterClass;
+    FPlayerInfo *FindPlayerByPlayerID(const FString &PlayerID);
+    void PostSeamlessTravel() override;
   private:
     
     virtual void PostLogin(APlayerController *NewPlayer) override;
@@ -59,12 +66,18 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void GameTimerUpdate();
     void ResetPlayers();
     void ResetOnePlayer(AController *Controller);
-
-    void CreateTeamsInfo();
-    int32 TeamIDNow = 1;
     void SetPlayerColor(AActor *Character, FLinearColor TeamColor);
-    void SetPlayerInfo(APlayerController *Controller);
+    /*void SetPlayerInfo(APlayerController *Controller);*/
     void LogPlayerInfo();
     void StartRespawn(AController *DiedActor);
     void GameOver();
+    USTUGameInstance *STUGameInstance;
+    FTimerHandle WaitingForPlayersTimerHandle;
+    int PlayersNum;
+    int PlayersReady = 0;
+    void WaitingForPlayers();
+    float WaitingTime = 30.0f;
+    float BeforeStartTime = 10.0f;
+    bool BeforeStart = false;
+    TArray<FString> PlayersReadyIDs;
 };

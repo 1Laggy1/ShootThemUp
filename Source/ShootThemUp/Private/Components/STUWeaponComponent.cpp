@@ -33,19 +33,19 @@ void USTUWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
     // checkf(WeaponData.Num() == WeaponNum,
-           //TEXT("Only exactly %i weapons on 1 character is allowed: Change Weapon data in WeaponComponent"), WeaponNum);
-           CurrentWeaponIndex = 0;
-           
-           if (GetOwner()->HasAuthority())
-           {
-               SpawnWeapons();
-               InitAnimations();
-           }
-           
+    // TEXT("Only exactly %i weapons on 1 character is allowed: Change Weapon data in WeaponComponent"), WeaponNum);
+    CurrentWeaponIndex = 0;
+
+    if (GetOwner()->HasAuthority())
+    {
+        SpawnWeapons();
+        InitAnimations();
+    }
 }
 
 void USTUWeaponComponent::SpawnWeapons_Implementation()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("SpawnWeapons_Implementation"));
     if (bWeaponsSpawned)
         return;
     bWeaponsSpawned = true;
@@ -58,8 +58,12 @@ void USTUWeaponComponent::SpawnWeapons_Implementation()
     Params.Owner = Character;
     Params.Instigator = Character;
     Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-    ASTUBaseWeapon *Weapon = GetWorld()->SpawnActor<ASTUBaseWeapon>(Character->SpawnInfo.WeaponClass,
+    UE_LOG(LogWeaponComponent, Display, TEXT("SpawnInfo: %s"), *Character->SpawnInfo.PlayerID);
+    FPlayerInfo PlayerInfo = Character->SpawnInfo;
+    UClass *WeaponClassLoaded = Character->SpawnInfo.WeaponClass.LoadSynchronous();
+    TSubclassOf<ASTUBaseWeapon> WeaponSubclass = WeaponClassLoaded;
+    ASTUBaseWeapon *Weapon =
+        GetWorld()->SpawnActor<ASTUBaseWeapon>(WeaponSubclass,
                                                                     FVector::ZeroVector, FRotator::ZeroRotator, Params);
     if (!Weapon)
         return;
@@ -168,6 +172,7 @@ void USTUWeaponComponent::StartFire()
 
 void USTUWeaponComponent::StopFire()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("StopFire"));
     if (!CurrentWeapon)
         return;
     CurrentWeapon->StopFire();
@@ -266,6 +271,7 @@ void USTUWeaponComponent::GetWeapons(int32 MaxRetries)
 
 void USTUWeaponComponent::PlayAnimMontage(UAnimMontage *Animation)
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("PlayAnimMontage"));
     ACharacter *Character = Cast<ACharacter>(GetOwner());
     if (!Character)
         return;
@@ -275,6 +281,7 @@ void USTUWeaponComponent::PlayAnimMontage(UAnimMontage *Animation)
 
 void USTUWeaponComponent::InitAnimations()
 {
+    UE_LOG(LogWeaponComponent, Warning, TEXT("InitAnimations"));
 
     auto EquipFinishedNotify = AnimUtils::FindNotifyByClass<USTUEquipFinishedAnimNotify>(EquipAnimMontage);
     if (EquipFinishedNotify)
@@ -285,14 +292,14 @@ void USTUWeaponComponent::InitAnimations()
     {
         UE_LOG(LogWeaponComponent, Error, TEXT("Equip anim notify on weapon is not set"));
     }
-    //for (auto OneWeaponData : WeaponData)
+    // for (auto OneWeaponData : WeaponData)
     //{
-        auto ReloadFinishedNotify =
-            AnimUtils::FindNotifyByClass<USTUReloadFinishedAnimNotify>(CurrentWeapon->ReloadAnimMontage);
-        if (!ReloadFinishedNotify)
-            return;
+    auto ReloadFinishedNotify =
+        AnimUtils::FindNotifyByClass<USTUReloadFinishedAnimNotify>(CurrentWeapon->ReloadAnimMontage);
+    if (!ReloadFinishedNotify)
+        return;
 
-        ReloadFinishedNotify->OnNotified.AddUObject(this, &USTUWeaponComponent::OnReloadFinished);
+    ReloadFinishedNotify->OnNotified.AddUObject(this, &USTUWeaponComponent::OnReloadFinished);
     //}
 }
 
