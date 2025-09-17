@@ -1,6 +1,8 @@
 # ShootThemUp
 First Steam multiplayer build here! Check it out with you friends, download 1.1 release!
 
+Currently working on main soccer like Gamemode in [Gamemode branch.](https://github.com/1Laggy1/ShootThemUp/tree/Gamemode)
+
 A third person shooter built in Unreal Engine 5.6. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
 ## Summary
 ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 years of Unity developing. In this project I have implemented a full gameplay loop (movement, weapons, health, AI, pickups, UI, VFX, sound, steam multiplayer) and is designed to show practical engineering decisions and reusable systems.
