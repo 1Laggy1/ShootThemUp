@@ -26,7 +26,7 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     int32 CurrentRound = 0;
     UPROPERTY(Replicated)
     int32 RoundCountDown = 0;
-    UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(ReplicatedUsing = OnRep_MatchState, EditAnywhere, BlueprintReadWrite)
     ESTUMatchState MatchState = ESTUMatchState::WaitingToStart;
     UPROPERTY(Replicated)
     TArray<FTeamInfo> TeamsStats;
@@ -81,6 +81,11 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     void SetMatchState(ESTUMatchState State)
     {
         MatchState = State;
+    }
+    UFUNCTION()
+    void OnRep_MatchState()
+    {
+        OnMatchStateChanged.Broadcast(MatchState);
     }
   protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;

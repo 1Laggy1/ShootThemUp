@@ -199,6 +199,7 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
                                ? Controller->PlayerState->GetUniqueId()->ToString()
                                : TEXT("UnknownID");
         FPlayerInfo* PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+        PlayerState->SetPlayerStats(PlayerID);
         NewCharacter->PlayerColor = PlayerInfo->Color;
         NewCharacter->PlayerName = Controller->PlayerState->GetPlayerName();
         NewCharacter->PlayerID = PlayerID;
@@ -387,12 +388,12 @@ void ASTUGameModeBase::Killed(AController *KillerActor, AController *DiedActor)
         {
             if (KillerInfo->TeamID == VictimInfo->TeamID)
             {
-                KillerInfo->Stats.Kills--;
+                KillerInfo->Kills--;
             }
             else
             {
-                KillerInfo->Stats.Kills++;
-                VictimInfo->Stats.Deaths++;
+                KillerInfo->Kills++;
+                VictimInfo->Deaths++;
             }
         }
     }

@@ -10,6 +10,7 @@
 
 class UVerticalBox;
 class UButton;
+class UTextBlock;
 UCLASS()
 class SHOOTTHEMUP_API USTUGameOverWidget : public USTUBaseWidget
 {
@@ -25,6 +26,8 @@ class SHOOTTHEMUP_API USTUGameOverWidget : public USTUBaseWidget
 
     UPROPERTY(meta = (BindWidget))
     UButton *ResetLevelButton;
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock *TeamWinText;
     virtual void NativeOnInitialized() override;
   private:
     void OnMatchStateChanged(ESTUMatchState State);

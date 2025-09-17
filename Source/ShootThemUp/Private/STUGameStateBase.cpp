@@ -19,6 +19,7 @@ void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUGameStateBase, RoundCountDown);
     DOREPLIFETIME(ASTUGameStateBase, MatchState);
     DOREPLIFETIME(ASTUGameStateBase, WaitingTimeNow);
+    DOREPLIFETIME(ASTUGameStateBase, TeamsStats);
     //DOREPLIFETIME(ASTUGameStateBase, MatchStatistics);
 }
 

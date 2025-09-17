@@ -66,6 +66,7 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
     bool isPlayerDead = false;
     void OnHealthChanged(float Health);
     void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
+
     ASTUGameStateBase *CurrentGamemodeState;
     void OnNewPawn(APawn *NewPawn);
     void UpdateHealthBar();
