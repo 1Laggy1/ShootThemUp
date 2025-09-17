@@ -3,6 +3,7 @@
 // weapon
 class ASTUBaseWeapon;
 class USoundCue;
+class ASTUTeamPlayerStart;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipSignature, ASTUBaseWeapon *);
 
 USTRUCT(BlueprintType)
@@ -183,6 +184,8 @@ struct FTeamInfo
     TArray<FPlayerInfo> PlayersInfos;
     UPROPERTY()
     int32 Score;
+    UPROPERTY()
+    TArray<ASTUTeamPlayerStart *> TeamStarts;
 };
 
 //USTRUCT(BlueprintType)

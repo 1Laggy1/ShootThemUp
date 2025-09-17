@@ -80,4 +80,6 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     float BeforeStartTime = 10.0f;
     bool BeforeStart = false;
     TArray<FString> PlayersReadyIDs;
+    void GetTeamsStarts();
+    AActor* GetRandomTeamStart(int32 TeamID);
 };

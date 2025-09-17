@@ -13,11 +13,11 @@
 #include "Player/STUBaseCharacter.h"
 #include "Player/STUPlayerController.h"
 #include "Player/STUPlayerState.h"
-#include "Player/STUTeamPlayerStart.h"
 #include "STUGameInstance.h"
 #include "STUGameStateBase.h"
 #include "STUUtils.h"
 #include "UI/STUGameHUD.h"
+#include "Player/STUTeamPlayerStart.h"
 DEFINE_LOG_CATEGORY_STATIC(LogSTUGameModeBase, All, All)
 
 ASTUGameModeBase::ASTUGameModeBase()
@@ -73,8 +73,9 @@ void ASTUGameModeBase::StartPlay()
         }
     }
     GetTeamsStarts();
-    GetWorld()->GetTimerManager().SetTimer(WaitingForPlayersTimerHandle, this, &ASTUGameModeBase::WaitingForPlayers,
-                                           1.0f, true);
+    GetWorld()
+        ->GetTimerManager().SetTimer(WaitingForPlayersTimerHandle, this, &ASTUGameModeBase::WaitingForPlayers, 1.0f,
+                                           true);
     STUGameStateBase->CurrentRound = 0;
     // SpawnBots();
     // CreateTeamsInfo();
@@ -122,29 +123,16 @@ void ASTUGameModeBase::WaitingForPlayers()
     }
     if (STUGameStateBase->WaitingTimeNow <= 0)
     {
-        for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
-        {
-            const auto Controller = It->Get();
-            if (!Controller)
-                continue;
-            const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
-            if (!PlayerState)
-                continue;
-            FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
-                                   ? Controller->PlayerState->GetUniqueId()->ToString()
-                                   : TEXT("UnknownID");
-            PlayerState->SetPlayerStats(PlayerID);
-            
-        }
         GetWorld()->GetTimerManager().ClearTimer(WaitingForPlayersTimerHandle);
         StartRound();
-
+        
         return;
     }
     STUGameStateBase->WaitingTimeNow -= 1.0f;
-    UE_LOG(LogSTUGameModeBase, Display, TEXT("Waiting for players: %f %d/%d"), STUGameStateBase->WaitingTimeNow,
-           PlayersReady, PlayersNum);
+    UE_LOG(LogSTUGameModeBase, Display, TEXT("Waiting for players: %f %d/%d"), STUGameStateBase->WaitingTimeNow, PlayersReady, PlayersNum);
 }
+
+
 
 UClass *ASTUGameModeBase::GetDefaultPawnClassForController_Implementation(AController *InController)
 {
@@ -195,7 +183,8 @@ void ASTUGameModeBase::GameTimerUpdate()
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
         if (STUGameStateBase->CurrentRound + 1 <= GameData.RoundsNum)
         {
-
+            
+            
             StartRound();
         }
         else
@@ -247,9 +236,8 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
         FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
                                ? Controller->PlayerState->GetUniqueId()->ToString()
                                : TEXT("UnknownID");
-        FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
-        
-
+        FPlayerInfo* PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+        PlayerState->SetPlayerStats(PlayerID);
         NewCharacter->PlayerColor = PlayerInfo->Color;
         NewCharacter->PlayerName = Controller->PlayerState->GetPlayerName();
         NewCharacter->PlayerID = PlayerID;
@@ -257,17 +245,17 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
         // NewCharacter->OnRep_PlayerID();
     }
-    // auto STUPlayerController = Cast<ASTUPlayerController>(Controller);
-    // if (!STUPlayerController)
-    //     return;
-    // STUPlayerController->Possess(NewCharacter);
-    // STUPlayerController->ControlledPawn = NewCharacter;
-    // STUPlayerController->OnRep_Possesed();
+    //auto STUPlayerController = Cast<ASTUPlayerController>(Controller);
+    //if (!STUPlayerController)
+    //    return;
+    //STUPlayerController->Possess(NewCharacter);
+    //STUPlayerController->ControlledPawn = NewCharacter;
+    //STUPlayerController->OnRep_Possesed();
     /*FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
                            ? Controller->PlayerState->GetUniqueId()->ToString()
                            : TEXT("UnknownID");*/
-    // STUGameStateBase->InitPlayer_Multicast(PlayerID, NewCharacter);
-    //  Controller->Possess(NewCharacter);
+    //STUGameStateBase->InitPlayer_Multicast(PlayerID, NewCharacter);
+    // Controller->Possess(NewCharacter);
 }
 
 void ASTUGameModeBase::SetPlayerColor(AActor *Player, FLinearColor TeamColor)
@@ -413,6 +401,8 @@ void ASTUGameModeBase::GameOver()
     ChangeState(ESTUMatchState::GameOver);
 }
 
+
+
 void ASTUGameModeBase::RespawnRequest(AController *Controller)
 {
     ResetOnePlayer(Controller);
@@ -503,3 +493,5 @@ void ASTUGameModeBase::PlayerConnected(APlayerController *PC)
         ResetOnePlayer(PC);*/
     }
 }
+
+

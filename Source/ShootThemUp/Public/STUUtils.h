@@ -76,9 +76,9 @@ class STUUtils
         RowInfo.TeamColor = PlayerInfo.Color;
         return RowInfo;
     }
-    FTeamInfo static *FindTeamByTeamID(int32 TeamID, USTUGameInstance *GameInstance)
+    FTeamInfo static *FindTeamByTeamID(int32 TeamID, TArray<FTeamInfo> &Teams)
     {
-        return GameInstance->Teams.FindByPredicate([TeamID](const FTeamInfo &Team) { return Team.TeamID == TeamID; });
+        return Teams.FindByPredicate([TeamID](const FTeamInfo &Team) { return Team.TeamID == TeamID; });
     }
 
     static FPlayerInfo *FindPlayerByPlayerID(const FString &PlayerID, TArray<FTeamInfo> &Teams)
