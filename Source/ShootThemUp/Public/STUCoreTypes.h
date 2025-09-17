@@ -133,31 +133,7 @@ struct FStatRowInfo
     UPROPERTY()
     FLinearColor TeamColor;
 };
-USTRUCT(BlueprintType)
-struct FPlayerStats
-{
 
-    GENERATED_USTRUCT_BODY()
-    /*FPlayerStats() {};
-    FPlayerStats(ASTUPlayerState *PlayerState)
-    {
-        PlayerName = PlayerState->GetPlayerName();
-        Kills = PlayerState->GetKillsNum();
-        Deaths = PlayerState->GetDeathsNum();
-        TeamID = PlayerState->GetTeamID();
-        TeamColor = PlayerState->GetTeamColor();
-    }*/
-    UPROPERTY()
-    FString PlayerName;
-    UPROPERTY()
-    int32 Kills;
-    UPROPERTY()
-    int32 Deaths;
-    UPROPERTY()
-    int32 TeamID;
-    UPROPERTY()
-    FLinearColor TeamColor;
-};
 USTRUCT(BlueprintType)
 struct FPlayerInfo
 {
@@ -173,40 +149,11 @@ struct FPlayerInfo
     UPROPERTY()
     int32 TeamID;
     UPROPERTY()
-    FPlayerStats Stats;
+    int32 Kills;
+    UPROPERTY()
+    int32 Deaths;
     APlayerController *ThisPlayerController;
 
-};
-//USTRUCT(BlueprintType)
-//struct FMatchStatistics
-//{
-//    GENERATED_USTRUCT_BODY()
-//    UPROPERTY()
-//    TArray<FPlayerStats> Stats;
-//};
-
-USTRUCT(BlueprintType)
-struct FLevelData
-{
-    GENERATED_USTRUCT_BODY()
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
-    FName LevelName = NAME_None;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
-    FName LevelDisplayName = NAME_None;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
-    UTexture2D *LevelThumb;
-};
-
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData &)
-
-    extern const FName NAME_STUSpectating;
-
-UENUM(BlueprintType)
-enum class STUPlayerStateEnum : uint8
-{
-    None = 0,
-    Gaming,
-    Spectating
 };
 
 USTRUCT(BlueprintType)
@@ -214,17 +161,14 @@ struct FTeamInfo
 {
     GENERATED_USTRUCT_BODY()
 
-    FTeamInfo()
-        : TeamID(1)
-        , TeamColor(FLinearColor::White)
-        , TeamName("Team 1")
-    {}
+    FTeamInfo() : TeamID(1), TeamColor(FLinearColor::White), TeamName("Team 1")
+    {
+    }
 
-    FTeamInfo(int32 ID, const FLinearColor& Color = FLinearColor::White, const FString& Name = FString())
-        : TeamID(ID)
-        , TeamColor(Color)
-        , TeamName(Name.IsEmpty() ? FString("Team ") + FString::FromInt(ID) : Name)
-    {}
+    FTeamInfo(int32 ID, const FLinearColor &Color = FLinearColor::White, const FString &Name = FString())
+        : TeamID(ID), TeamColor(Color), TeamName(Name.IsEmpty() ? FString("Team ") + FString::FromInt(ID) : Name)
+    {
+    }
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 TeamID = 1;
@@ -237,4 +181,53 @@ struct FTeamInfo
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<FPlayerInfo> PlayersInfos;
+    UPROPERTY()
+    int32 Score;
 };
+
+//USTRUCT(BlueprintType)
+//struct FMatchStatistics
+//{
+//    GENERATED_USTRUCT_BODY()
+//    UPROPERTY()
+//    TArray<FPlayerStats> Stats;
+//};
+
+USTRUCT(BlueprintType)
+struct FItemData
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    FName DisplayName = NAME_None;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    UTexture2D *Thumb;
+};
+
+USTRUCT(BlueprintType)
+struct  FLevelData : public FItemData
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    FName LevelName = NAME_None;
+};
+USTRUCT(BlueprintType)
+struct FWeaponItemData : public FItemData
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    TSubclassOf<ASTUBaseWeapon> WeaponClass;
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData &)
+    DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponSelectedSignature,
+                                        const FWeaponItemData &)
+    extern const FName NAME_STUSpectating;
+
+UENUM(BlueprintType)
+enum class STUPlayerStateEnum : uint8
+{
+    None = 0,
+    Gaming,
+    Spectating
+};
+

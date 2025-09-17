@@ -121,9 +121,9 @@ FString USTUPlayerHUDWidget::GetRoundsInfo()
 
 FString USTUPlayerHUDWidget::GetKills()
 {
-    if (!GetWorld() || !CurrentGamemodeState || !GetOwningPlayerPawn() || !GetOwningPlayerPawn()->Controller)
+    if (!GetWorld() || !CurrentGamemodeState || !GetWorld()->GetFirstPlayerController())//!GetOwningPlayerPawn() || !GetOwningPlayerPawn()->Controller)
         return "Kills: 0";
-    const auto PlayerState = Cast<ASTUPlayerState>(GetOwningPlayerPawn()->Controller->PlayerState);
+    const auto PlayerState = Cast<ASTUPlayerState>(GetWorld()->GetFirstPlayerController()->PlayerState);
     if (!PlayerState)
         return "Kills: 0";
     FString Kills = "Kills: ";

@@ -1,17 +1,22 @@
 # ShootThemUp
 First Steam multiplayer build here! Check it out with you friends, download 1.1 release!
 
-Currently working on UI in LobbyLevel on [LobbyUI branch](https://github.com/1Laggy1/ShootThemUp/tree/LobbyUI).
-
 A third person shooter built in Unreal Engine 5.6. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
 ## Summary
-ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 years of Unity developing. In this project I have implemented a full gameplay loop (movement, weapons, health, AI, pickups, UI, VFX, sound, and game flow) and is designed to show practical engineering decisions and reusable systems.
+ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 years of Unity developing. In this project I have implemented a full gameplay loop (movement, weapons, health, AI, pickups, UI, VFX, sound, steam multiplayer) and is designed to show practical engineering decisions and reusable systems.
 ## Highlights
-- Fully working multiplayer (`Replicated`, `RPC`, `Lobby`)
 
-<img width="1978" height="1237" alt="{C8F44DBB-BF43-42FE-AC2C-A6A3E115541D}" src="https://github.com/user-attachments/assets/48c0b6e3-e41d-4501-9a7c-9cd781da7731" />
+- Fully working multiplayer through Steam relay, with working steam invites (`Replicated` variables, `RPC` methods, Fully working Lobby)
+
+![Steam](https://github.com/user-attachments/assets/8c9938ab-ed5f-49e1-834c-bb1f36f89a58)
+
+- This is the lobby, you can see every player here. Change your weapon, change team color, and team name. Also the host can change the level to play on:
+
+![Lobby](https://github.com/user-attachments/assets/2bd03367-5b88-4f6b-a379-200f52528f3f)
 
 - Full movement, animations, weapons shooting, equiping, replication between clients, and host.
+
+https://github.com/user-attachments/assets/08498f1e-a5b4-4016-a251-f1b7824aec4c
 
 ![Multiplayer](https://github.com/user-attachments/assets/15a20c3f-78b4-4851-a782-56db97237731)
 
@@ -54,7 +59,9 @@ AI Damage sense:
 
 - UMG HUD and self created `UserWidgets` driven from c++ with data binding using `BindWidget` and `BindWidgetAnim` (Health, ammo, scoreboard, spectator UI, levels).
 
-<img width="2560" height="1440" alt="{E21245B3-9AF3-4645-84A9-E1F4CB3851C5}" src="https://github.com/user-attachments/assets/2427c077-c97f-4568-8ef4-cd4c827a7ee2" />
+<img width="2560" height="1363" alt="LobbyUI" src="https://github.com/user-attachments/assets/cace92ca-9116-4c98-80e7-6c8b52ba1e66" />
+
+<img width="2560" height="1363" alt="GameOverUI" src="https://github.com/user-attachments/assets/cc252c38-cb07-462a-af97-c33680556bca" />
 
 <img width="2560" height="1440" alt="{F7E8ED97-B0DE-4327-A53B-949572A10E15}" src="https://github.com/user-attachments/assets/b5e7c98b-1f16-4dbf-9d8b-2a38fcd92783" />
 
@@ -77,23 +84,31 @@ AI Damage sense:
 - `Niagara` and `Decal` usage, `Mesh Sockets`, `Physic Materials`, working with `Bone` names.
 - Creating, subscribing and broadcasting `Delegates`, OnTakeDamage, OnHealthChanged, OnAnimEnd etc., working with timers (WorldTimerManager).
 - Full sound creation `Sound Cue`, `Sound wave`, `Attenuation`, `UAudioComponent`, `USoundClass`, `USoundMix`
-## [Gameplay youtube link](https://youtu.be/bS7BoY_a3ME)
+
+## [STU 1.2 Multiplayer Gameplay youtube link](https://youtu.be/EuI6q9YkiPk)
+Older videos:
+[ STU 1.0 Gameplay youtube link](https://youtu.be/bS7BoY_a3ME)
+
+## Next steps
+- ~~Multiplayer (`Replication`, steam integration).~~ Done.
+- Add abilities to players that they can choose.
+- Add more weapons to players that they can choose.
+- Add random spawned weapons that players can pick up.
+- Add main soccer like gamemode.
+- Add objects that players can "Hack" making them control environment.
+- Add simple destruction.
 
 ## How to run
 ### Project
 - Install Unreal Engine 5.6 from Epic Games launcher, or compile from Source.
 - Clone this repository `git clone github.com/1Laggy1/ShootThemUp`.
-- If tou are using Visual Studio generate project files (right-click .uproject -> Generate Visual Studio project)
+- If you are using Visual Studio generate project files (right-click .uproject -> Generate Visual Studio project)
 - Start up .uproject file or Unreal Engine -> Open Project and project will be open.
 ### Game
-- You can simply download recent Release in Release section, this is for windows only.
-## Next steps
-- Multiplayer (`Replication`, steam integration).
-- Add abilities to players that they can choose.
-- Add more weapons to players that they can choose.
-- Add more gamemodes (Flag capture, King of the hill).
+- You can simply download recent Release in Release section, this is for windows only but you can try proton on linux which I not tested.
+
 ## Notes
-With this project I almost fully transition my engineering skills from Unity C# to Unreal Engine C++. I prioritized creating reusable systems, and now they can be extended for larger prototypes.
+With this project I almost fully transition my engineering skills from Unity C# to Unreal Engine C++. I prioritized creating reusable systems, so I can now extend them.
 
 ## License
 

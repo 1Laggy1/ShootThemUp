@@ -18,39 +18,57 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
     ASTUPlayerState();
     void SetTeamID(int32 ID)
     {
-        TeamID = ID;
+        if (!Stats)
+            return;
+        Stats->TeamID = ID;
     }
     int32 GetTeamID() const
     {
-        return TeamID;
+        if (!Stats)
+            return 0;
+        return Stats->TeamID;
     }
     void SetTeamColor(const FLinearColor &Color)
     {
-        TeamColor = Color;
+        if (!Stats)
+            return;
+        Stats->Color = Color;
     }
     FLinearColor GetTeamColor() const
     {
-        return TeamColor;
+        if (!Stats)
+            return FLinearColor::White;
+        return Stats->Color;
     }
     void AddKill()
     {
-        KillsNum++;
+        if (!Stats)
+            return;
+        Stats->Kills++;
     }
     void RemoveKill()
     {
-        KillsNum--;
+        if (!Stats)
+            return;
+        Stats->Kills--;
     }
     int32 GetKillsNum()
     {
-        return KillsNum;
+        if (!Stats)
+            return 0;
+        return Stats->Kills;
     }
     int32 GetDeathsNum()
     {
-        return DeathsNum;
+        if (!Stats)
+            return 0;
+        return Stats->Deaths;
     }
     void AddDeath()
     {
-        DeathsNum++;
+        if (!Stats)
+            return;
+        Stats->Deaths++;
     }
     void LogInfo();
     STUPlayerStateEnum GetSTUPlayerState()
@@ -61,18 +79,20 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
     {
         PlayerStateNow = State;
     }
+    UFUNCTION(Client, Reliable)
+    void SetPlayerStats(const FString& SetPlayerID);
     UPROPERTY(Replicated)
     STUPlayerStateEnum PlayerStateNow = STUPlayerStateEnum::None;
     bool LoadedAndNotifiedServer = false;
   private:
-    UPROPERTY(Replicated)
+    /*UPROPERTY(Replicated)
     int32 TeamID;
     UPROPERTY(Replicated)
     FLinearColor TeamColor;
     UPROPERTY(Replicated)
     int32 KillsNum = 0;
     UPROPERTY(Replicated)
-    int32 DeathsNum = 0;
-    
+    int32 DeathsNum = 0;*/
+    FPlayerInfo *Stats;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 };

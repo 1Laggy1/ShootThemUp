@@ -10,6 +10,7 @@
 #include "STUGameStateBase.h"
 #include "UI/STUPlayerStatRowWidget.h"
 #include "STUUtils.h"
+#include "Components/TextBlock.h"
 void USTUGameOverWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
@@ -37,20 +38,49 @@ void USTUGameOverWidget::UpdatePlayersStat()
         return;
 
     PlayerStatBox->ClearChildren();
+    int32 HighestScore = 0;
+    FTeamInfo* WinnerTeam = nullptr;
+    TArray<FPlayerInfo> MyPlayersInfo;
 
-    /*for (auto Info : GameState->MatchStatistics.Stats)
+    for (FTeamInfo &Info : GameState->TeamsStats)
     {
+        if (Info.Score > HighestScore)
+        {
+            WinnerTeam = &Info;
+        }
+        for (FPlayerInfo& PlayerInfo : Info.PlayersInfos)
+        {
+            MyPlayersInfo.Add(PlayerInfo);
+            
+        }
+    }
+    MyPlayersInfo.Sort([](const FPlayerInfo &A, const FPlayerInfo &B) { return A.Kills > B.Kills; });
+    for (FPlayerInfo& PlayerInfo : MyPlayersInfo)
+    {
+        FStatRowInfo RowInfo = STUUtils::GetStatRowInfoFromFPlayerStats(PlayerInfo);
 
-        FPlayerStats PlayerStat = Info;
-        
-        FStatRowInfo RowInfo = STUUtils::GetStatRowInfoFromFPlayerStats(PlayerStat);
-        
+        if (GetWorld()->GetFirstPlayerController()->PlayerState->GetUniqueId()->ToString() == PlayerInfo.PlayerID)
+            RowInfo.PlayerIndicatorVisibility = true;
+        else
+            RowInfo.PlayerIndicatorVisibility = false;
+
         const auto PlayerStatRowWidget = CreateWidget<USTUPlayerStatRowWidget>(GetWorld(), PlayerStatRowWidgetClass);
         if (!PlayerStatRowWidget)
             continue;
         PlayerStatBox->AddChild(PlayerStatRowWidget);
         PlayerStatRowWidget->SetRowInfo(RowInfo);
-    }*/
+    }
+    FString WinnerName = "";
+    if (WinnerTeam)
+    {
+        WinnerName = WinnerTeam->TeamName + " WON";
+        
+    }
+    else
+    {
+        WinnerName = "DRAW";
+    }
+    TeamWinText->SetText(FText::FromString(WinnerName));
 }
 
 void USTUGameOverWidget::OnMatchStateChanged(ESTUMatchState State)

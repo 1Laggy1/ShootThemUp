@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Player/STUPlayerState.h"
 #include "STUGameInstance.h"
 #include "STUCoreTypes.h"
@@ -54,9 +54,9 @@ class STUUtils
 
         return nullptr;
     }
-    FPlayerStats static GetPlayerStatsFromPlayerState(ASTUPlayerState* PlayerState)
+   /* FPlayerInfo static GetPlayerStatsFromPlayerState(ASTUPlayerState* PlayerState)
     {
-        FPlayerStats NewPlayerStats;
+        FPlayerInfo NewPlayerStats;
         if (!PlayerState)
             return NewPlayerStats;
         NewPlayerStats.PlayerName = PlayerState->GetPlayerName();
@@ -65,15 +65,15 @@ class STUUtils
         NewPlayerStats.TeamID = PlayerState->GetTeamID();
         NewPlayerStats.TeamColor = PlayerState->GetTeamColor();
         return NewPlayerStats;
-    }
-    FStatRowInfo static GetStatRowInfoFromFPlayerStats(FPlayerStats &PlayerStats)
+    }*/
+    FStatRowInfo static GetStatRowInfoFromFPlayerStats(FPlayerInfo &PlayerInfo)
     {
         FStatRowInfo RowInfo;
-        RowInfo.PlayerNameText = PlayerStats.PlayerName;
-        RowInfo.KillsText = FString::FromInt(PlayerStats.Kills);
-        RowInfo.DeathsText = FString::FromInt(PlayerStats.Deaths);
-        RowInfo.TeamText = FString::FromInt(PlayerStats.TeamID);
-        RowInfo.TeamColor = PlayerStats.TeamColor;
+        RowInfo.PlayerNameText = PlayerInfo.PlayerName;
+        RowInfo.KillsText = FString::FromInt(PlayerInfo.Kills);
+        RowInfo.DeathsText = FString::FromInt(PlayerInfo.Deaths);
+        RowInfo.TeamText = FString::FromInt(PlayerInfo.TeamID);
+        RowInfo.TeamColor = PlayerInfo.Color;
         return RowInfo;
     }
     FTeamInfo static *FindTeamByTeamID(int32 TeamID, USTUGameInstance *GameInstance)
@@ -83,6 +83,8 @@ class STUUtils
 
     static FPlayerInfo *FindPlayerByPlayerID(const FString &PlayerID, TArray<FTeamInfo> &Teams)
     {
+        if (Teams.IsEmpty())
+            return nullptr;
         for (FTeamInfo &Team : Teams)
         {
             FPlayerInfo *Player =
