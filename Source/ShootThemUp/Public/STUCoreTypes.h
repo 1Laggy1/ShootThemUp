@@ -4,6 +4,7 @@
 class ASTUBaseWeapon;
 class USoundCue;
 class ASTUTeamPlayerStart;
+class ASTUBallSpawn;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipSignature, ASTUBaseWeapon *);
 
 USTRUCT(BlueprintType)
@@ -186,6 +187,8 @@ struct FTeamInfo
     int32 Score;
     UPROPERTY()
     TArray<ASTUTeamPlayerStart *> TeamStarts;
+    UPROPERTY()
+    ASTUBallSpawn *BallSpawnPoint = nullptr;
 };
 
 //USTRUCT(BlueprintType)

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "STUCoreTypes.h"
+#include "Resources/STUBall.h"
 #include "STUGameModeBase.generated.h"
 
 
@@ -82,4 +83,14 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     TArray<FString> PlayersReadyIDs;
     void GetTeamsStarts();
     AActor* GetRandomTeamStart(int32 TeamID);
+
+    void SpawnBall(int32 TeamID = 0);
+    ASTUBallSpawn* GetRandomBallSpawn();
+    void FindAllBallSpawns();
+    UPROPERTY(EditDefaultsOnly, Category = "STU")
+    TSubclassOf<ASTUBall> BallClass;
+    AActor *BallInstance;
+    TArray<ASTUBallSpawn *> DefaultBallSpawns;
+
+    void SetPlayerStatsToAllPlayers();
 };

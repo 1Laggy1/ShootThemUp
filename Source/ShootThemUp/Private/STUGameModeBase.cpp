@@ -18,6 +18,9 @@
 #include "STUGameStateBase.h"
 #include "STUUtils.h"
 #include "UI/STUGameHUD.h"
+#include "Resources/STUBall.h"
+#include "Resources/STUBallSpawn.h"
+#include "Camera/CameraActor.h"
 DEFINE_LOG_CATEGORY_STATIC(LogSTUGameModeBase, All, All)
 
 ASTUGameModeBase::ASTUGameModeBase()
@@ -73,6 +76,7 @@ void ASTUGameModeBase::StartPlay()
         }
     }
     GetTeamsStarts();
+    FindAllBallSpawns();
     GetWorld()->GetTimerManager().SetTimer(WaitingForPlayersTimerHandle, this, &ASTUGameModeBase::WaitingForPlayers,
                                            1.0f, true);
     STUGameStateBase->CurrentRound = 0;
@@ -113,6 +117,83 @@ AActor *ASTUGameModeBase::GetRandomTeamStart(int32 TeamID)
     return Team->TeamStarts[RandIndex];
 }
 
+void ASTUGameModeBase::SpawnBall(int32 TeamID)
+{
+    if (BallInstance)
+    {
+        BallInstance->Destroy();
+    }
+    ASTUBallSpawn *BallSpawn = nullptr;
+    if (TeamID == 0)
+    {
+        BallSpawn = GetRandomBallSpawn();
+        if (!BallSpawn)
+            return;
+        BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, BallSpawn->GetActorTransform());
+        return;
+    }
+    
+    FTeamInfo *Team = STUUtils::FindTeamByTeamID(TeamID, STUGameStateBase->TeamsStats);
+    if (!Team || !Team->BallSpawnPoint)
+        return;
+    BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, Team->BallSpawnPoint->GetActorLocation(),
+                                                    Team->BallSpawnPoint->GetActorRotation());
+}
+
+ASTUBallSpawn* ASTUGameModeBase::GetRandomBallSpawn()
+{
+    if (!GetWorld())
+        return nullptr;
+    if (DefaultBallSpawns.IsEmpty())
+        return nullptr;
+    int32 RandIndex = FMath::RandRange(0, DefaultBallSpawns.Num() - 1);
+    return DefaultBallSpawns[RandIndex];
+}
+
+void ASTUGameModeBase::FindAllBallSpawns()
+{
+    if (!GetWorld())
+        return;
+    DefaultBallSpawns.Empty();
+    TArray<AActor *> BallSpawns;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASTUBallSpawn::StaticClass(), BallSpawns);
+    for (AActor *Spawn : BallSpawns)
+    {
+        const auto BallSpawn = Cast<ASTUBallSpawn>(Spawn);
+        if (BallSpawn)
+        {
+            if (BallSpawn->GetTeamID() == 0)
+            {
+                DefaultBallSpawns.Add(BallSpawn);
+                continue;
+            }
+            
+            FTeamInfo *Team = STUUtils::FindTeamByTeamID(BallSpawn->GetTeamID(), STUGameStateBase->TeamsStats);
+            if (Team)
+            {
+                Team->BallSpawnPoint = BallSpawn;
+            }
+        }
+    }
+}
+
+void ASTUGameModeBase::SetPlayerStatsToAllPlayers()
+{
+    for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
+    {
+        const auto Controller = It->Get();
+        if (!Controller)
+            continue;
+        const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
+        if (!PlayerState)
+            continue;
+        FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
+                               ? Controller->PlayerState->GetUniqueId()->ToString()
+                               : TEXT("UnknownID");
+        PlayerState->SetPlayerStats(PlayerID);
+    }
+}
+
 void ASTUGameModeBase::WaitingForPlayers()
 {
     if (PlayersReady == PlayersNum && !BeforeStart)
@@ -122,20 +203,7 @@ void ASTUGameModeBase::WaitingForPlayers()
     }
     if (STUGameStateBase->WaitingTimeNow <= 0)
     {
-        for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
-        {
-            const auto Controller = It->Get();
-            if (!Controller)
-                continue;
-            const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
-            if (!PlayerState)
-                continue;
-            FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
-                                   ? Controller->PlayerState->GetUniqueId()->ToString()
-                                   : TEXT("UnknownID");
-            PlayerState->SetPlayerStats(PlayerID);
-            
-        }
+        SetPlayerStatsToAllPlayers();
         GetWorld()->GetTimerManager().ClearTimer(WaitingForPlayersTimerHandle);
         StartRound();
 
@@ -183,6 +251,7 @@ void ASTUGameModeBase::StartRound()
     STUGameStateBase->CurrentRound++;
     ResetPlayers();
     STUGameStateBase->RoundCountDown = GameData.RoundTime;
+    SpawnBall(0);
     GetWorldTimerManager().SetTimer(GameRoundTimerHandle, this, &ASTUGameModeBase::GameTimerUpdate, 1.0f, true);
 }
 
@@ -233,7 +302,8 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
     RestartPlayer(Controller);*/
     /*AActor* Spawn = GetRandomSpawnPoint(GetWorld());
     APawn *NewDefaultPawn = SpawnDefaultPawnFor(Controller, Spawn);*/
-    AActor *Spawn = GetRandomTeamStart(PlayerState ? PlayerState->GetTeamID() : 0);
+    AActor *Spawn = GetRandomTeamStart(
+        STUUtils::FindPlayerByPlayerID(PlayerState->GetUniqueId()->ToString(), STUGameInstance->Teams)->TeamID);
     FVector SpawnLocation = Spawn ? Spawn->GetActorLocation() : FVector::Zero();
     FRotator SpawnRotation = Spawn ? Spawn->GetActorRotation() : FRotator::ZeroRotator;
     FTransform SpawnTransform(SpawnRotation, SpawnLocation);
@@ -248,7 +318,6 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
                                ? Controller->PlayerState->GetUniqueId()->ToString()
                                : TEXT("UnknownID");
         FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
-        
 
         NewCharacter->PlayerColor = PlayerInfo->Color;
         NewCharacter->PlayerName = Controller->PlayerState->GetPlayerName();
@@ -492,6 +561,7 @@ void ASTUGameModeBase::PlayerConnected(APlayerController *PC)
     {
         PlayersReady++;
         PlayersReadyIDs.Add(PC->PlayerState->GetUniqueId()->ToString());
+        
         /*auto GState = GetWorld()->GetGameState();
         STUGameStateBase = Cast<ASTUGameStateBase>(GState);
         USTUGameInstance *STUGameInstance = GetGameInstance<USTUGameInstance>();
