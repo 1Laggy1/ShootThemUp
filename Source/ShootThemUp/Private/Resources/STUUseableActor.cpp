@@ -9,7 +9,7 @@ ASTUUseableActor::ASTUUseableActor()
 
 }
 
-void ASTUUseableActor::Use()
+void ASTUUseableActor::Use(FVector Location, FVector Rotation)
 {
     if (CooldownRemaining > 0.0f)
         return;

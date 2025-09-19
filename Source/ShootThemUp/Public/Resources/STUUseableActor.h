@@ -14,7 +14,7 @@ class SHOOTTHEMUP_API ASTUUseableActor : public AActor
 public:	
 	
 	ASTUUseableActor();
-  virtual void Use();
+  virtual void Use(FVector Location, FVector Rotation);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "STU")

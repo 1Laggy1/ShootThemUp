@@ -16,12 +16,18 @@ void UPlayerUseComponent::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
-void UPlayerUseComponent::UseAnItem_Implementation()
+void UPlayerUseComponent::Use()
+{
+    FVector CameraLocation;
+    FRotator CameraRotation;
+    Cast<APawn>(GetOwner())->GetController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
+    UseAnItem(GetOwner()->GetActorLocation(), CameraRotation.Vector());
+}
+void UPlayerUseComponent::UseAnItem_Implementation(FVector Location, FVector Rotation)
 {
     if (Item)
     {
-		Item->Use();
+        Item->Use(Location, Rotation);
         Item = nullptr;
     }
 }

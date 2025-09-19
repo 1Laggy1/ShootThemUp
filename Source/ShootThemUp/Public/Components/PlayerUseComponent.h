@@ -16,8 +16,9 @@ class SHOOTTHEMUP_API UPlayerUseComponent : public UActorComponent
     UPlayerUseComponent();
     //UPROPERTY(Replicated)
     ASTUUseableActor *Item;
+    void Use();
     UFUNCTION(Server, Reliable)
-    virtual void UseAnItem();
+    virtual void UseAnItem(FVector Location, FVector Rotation);
   protected:
     virtual void BeginPlay() override;
     

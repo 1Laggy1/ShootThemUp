@@ -68,7 +68,7 @@ void ASTUPlayerCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInput
     PlayerInputComponent->BindAction<FZoomInputSignature>("Zoom", EInputEvent::IE_Released, WeaponComponent,
                                                           &USTUWeaponComponent::Zoom, false);
     PlayerInputComponent->BindAction("UseItem", EInputEvent::IE_Pressed, PlayerUseComponent,
-                                     &UPlayerUseComponent::UseAnItem);
+                                     &UPlayerUseComponent::Use);
 }
 
 void ASTUPlayerCharacter::MoveForward(float Amount)

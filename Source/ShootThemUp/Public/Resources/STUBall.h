@@ -11,6 +11,8 @@ class UStaticMeshComponent;
 class UPointLightComponent;
 class UMaterialInterface;
 class USphereComponent;
+class ASTUBaseCharacter;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
@@ -19,8 +21,9 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
 
   public:
     ASTUBall();
-    APlayerController *PlayerController;
-    virtual void Use() override;
+    UPROPERTY(Replicated)
+    ASTUBaseCharacter *PlayerCharacter;
+    virtual void Use(FVector Location, FVector Rotation) override;
 
   protected:
     UPROPERTY(EditDefaultsOnly, Category = "STU")
@@ -43,8 +46,18 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
     virtual void BeginPlay() override;
 
     virtual void Tick(float DeltaTime) override;
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
     UFUNCTION()
     void OnInteractionOverlapBegin(UPrimitiveComponent *OverlappedComp, AActor *OtherActor,
                                    UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                    const FHitResult &SweepResult);
+    UFUNCTION(NetMulticast, Reliable)
+    void SetReplicated(bool set);
+
+  private:
+    UFUNCTION(NetMulticast, Reliable)
+    void ChangeBallColor(FLinearColor NewColor);
+    void PickUpBall(ASTUBaseCharacter *Character);
+    UPROPERTY()
+    UMaterialInstanceDynamic *DynamicMaterial;
 };
