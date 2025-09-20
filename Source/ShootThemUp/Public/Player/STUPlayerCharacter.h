@@ -13,6 +13,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class USphereComponent;
+class UPlayerUseComponent;
 
 UCLASS()
 class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
@@ -28,6 +29,8 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     UCameraComponent *CameraComponent;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USphereComponent *CameraCollisionComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UPlayerUseComponent *PlayerUseComponent;
     virtual void OnDeath() override;
     virtual void BeginPlay() override;
     void SnapCamera();

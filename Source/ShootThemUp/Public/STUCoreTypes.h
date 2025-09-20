@@ -3,6 +3,8 @@
 // weapon
 class ASTUBaseWeapon;
 class USoundCue;
+class ASTUTeamPlayerStart;
+class ASTUBallSpawn;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipSignature, ASTUBaseWeapon *);
 
 USTRUCT(BlueprintType)
@@ -77,13 +79,20 @@ struct FGameData
     GENERATED_USTRUCT_BODY()
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "1"))
     int32 PlayersNum = 2;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "1"))
+    /*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "1"))
     int32 RoundsNum = 4;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "3"))
-    /// <summary>
-    /// in seconds
-    /// </summary>
-    int32 RoundTime = 10;
+    int32 RoundTime = 10;*/
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "3"))
+    int32 GameTime = 120;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "3"))
+    int32 AfterGoalTime = 5;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "3"))
+    int32 BetweenGoalsRespawnTime = 5;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "3"))
+    float WaitingTime = 30.0f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "3"))
+    float BeforeStartTime = 10.0f;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FLinearColor DefaultTeamColor = FLinearColor::White;
 
@@ -147,9 +156,9 @@ struct FPlayerInfo
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     FString PlayerID;
     UPROPERTY()
-    int32 TeamID;
+    int32 TeamID = 0;
     UPROPERTY()
-    int32 Kills;
+    int32 Kills = 0;
     UPROPERTY()
     int32 Deaths;
     APlayerController *ThisPlayerController;
@@ -182,7 +191,11 @@ struct FTeamInfo
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<FPlayerInfo> PlayersInfos;
     UPROPERTY()
-    int32 Score;
+    int32 Score = 0;
+    UPROPERTY()
+    TArray<ASTUTeamPlayerStart *> TeamStarts;
+    UPROPERTY()
+    ASTUBallSpawn *BallSpawnPoint = nullptr;
 };
 
 //USTRUCT(BlueprintType)

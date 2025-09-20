@@ -44,6 +44,8 @@ void USTUGameOverWidget::UpdatePlayersStat()
 
     for (FTeamInfo &Info : GameState->TeamsStats)
     {
+        UE_LOG(LogTemp, Display, TEXT("USTUGameOverWidget::UpdatePlayersStat: Team %d score is %d"), Info.TeamID,
+               Info.Score);
         if (Info.Score > HighestScore)
         {
             WinnerTeam = &Info;

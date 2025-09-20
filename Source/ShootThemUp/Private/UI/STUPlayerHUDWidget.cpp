@@ -110,13 +110,13 @@ bool USTUPlayerHUDWidget::isPlayerSpectating() const
 
 FString USTUPlayerHUDWidget::GetRoundsInfo()
 {
-    if (!GetWorld() || !CurrentGamemodeState)
+    /*if (!GetWorld() || !CurrentGamemodeState)
         return "Rounds: 0/0";
     FString RoundsInfo = "Round: ";
     FGameData GameData = CurrentGamemodeState->GetGameData();
     RoundsInfo = RoundsInfo + FString::FromInt(CurrentGamemodeState->GetCurrentRound()) + "/" +
-                 FString::FromInt(GameData.RoundsNum);
-    return RoundsInfo;
+                 FString::FromInt(GameData.RoundsNum);*/
+    return "0/0";
 }
 
 FString USTUPlayerHUDWidget::GetKills()
@@ -136,8 +136,8 @@ FString USTUPlayerHUDWidget::GetCurrentTime()
     if (!GetWorld() || !CurrentGamemodeState)
         return "00:00";
     FString Time;
-    int32 Minutes = CurrentGamemodeState->GetRoundCountDown() / 60;
-    int32 Seconds = CurrentGamemodeState->GetRoundCountDown() % 60;  
+    int32 Minutes = CurrentGamemodeState->GetGameCountDown() / 60;
+    int32 Seconds = CurrentGamemodeState->GetGameCountDown() % 60;  
     Time = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
     return Time;
 }

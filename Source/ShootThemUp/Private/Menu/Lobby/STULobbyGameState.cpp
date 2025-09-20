@@ -245,7 +245,7 @@ void ASTULobbyGameState::OnTeamChanged_Multicast_Implementation(FTeamInfo NewTea
         return;
     UE_LOG(LogSTULobbyGameState, Display,
            TEXT("ASTULobbyGameState::OnTeamChanged_Multicast_Implementation - Team %s changed"), *NewTeam.TeamName);
-    FTeamInfo *Team = STUUtils::FindTeamByTeamID(NewTeam.TeamID, STUGameInstance);
+    FTeamInfo *Team = STUUtils::FindTeamByTeamID(NewTeam.TeamID, STUGameInstance->Teams);
     if (Team)
     {
         *Team = NewTeam;

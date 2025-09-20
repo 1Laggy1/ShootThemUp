@@ -22,10 +22,14 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     void BeginPlay() override;
     UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
     FGameData GameData;
+    /*UPROPERTY(Replicated)
+    int32 CurrentRound = 0;*/
     UPROPERTY(Replicated)
-    int32 CurrentRound = 0;
+    int32 GameCountDown = 0;
     UPROPERTY(Replicated)
-    int32 RoundCountDown = 0;
+    int32 BetweenGoalsCountDown = 0;
+    UPROPERTY(Replicated)
+    int32 AfterGoalCountDown = 0;
     UPROPERTY(ReplicatedUsing = OnRep_MatchState, EditAnywhere, BlueprintReadWrite)
     ESTUMatchState MatchState = ESTUMatchState::WaitingToStart;
     UPROPERTY(Replicated)
@@ -55,7 +59,6 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     }*/
     //FOnMatchStatistics OnMatchStatistics;
     FOnMatchStateChanged OnMatchStateChanged;
-
   public:
     /*UFUNCTION(NetMulticast, Reliable)
     void SetPlayerColorMulticast(AActor *Player, FLinearColor TeamColor);*/
@@ -69,14 +72,17 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     {
         GameData = GameDataServer;
         TeamsStats = TeamsInfo;
+        GameCountDown = GameData.GameTime;
+        BetweenGoalsCountDown = GameData.BetweenGoalsRespawnTime;
+        AfterGoalCountDown = GameData.AfterGoalTime;
     }
-    int32 GetCurrentRound()
+    //int32 GetCurrentRound()
+    //{
+    //    return CurrentRound;
+    //}
+    int32 GetGameCountDown()
     {
-        return CurrentRound;
-    }
-    int32 GetRoundCountDown()
-    {
-        return RoundCountDown;
+        return GameCountDown;
     }
     void SetMatchState(ESTUMatchState State)
     {

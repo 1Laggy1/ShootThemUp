@@ -11,6 +11,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "Components/PlayerUseComponent.h"
+
 #include "Player/STUPlayerController.h"
 DEFINE_LOG_CATEGORY_STATIC(STUPlayerCharacter, All, All);
 ASTUPlayerCharacter::ASTUPlayerCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)
@@ -28,6 +30,8 @@ ASTUPlayerCharacter::ASTUPlayerCharacter(const FObjectInitializer &ObjInit) : Su
     CameraCollisionComponent->SetSphereRadius(10.0f);
     CameraCollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
     STUPlayerCameraShake = CreateDefaultSubobject<USTUPlayerCameraShake>("Player Camera Shake");
+    PlayerUseComponent = CreateDefaultSubobject<UPlayerUseComponent>("PlayerUseComponent");
+    
 }
 void ASTUPlayerCharacter::BeginPlay()
 {
@@ -63,6 +67,8 @@ void ASTUPlayerCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInput
                                                           &USTUWeaponComponent::Zoom, true);
     PlayerInputComponent->BindAction<FZoomInputSignature>("Zoom", EInputEvent::IE_Released, WeaponComponent,
                                                           &USTUWeaponComponent::Zoom, false);
+    PlayerInputComponent->BindAction("UseItem", EInputEvent::IE_Pressed, PlayerUseComponent,
+                                     &UPlayerUseComponent::Use);
 }
 
 void ASTUPlayerCharacter::MoveForward(float Amount)
@@ -76,12 +82,15 @@ void ASTUPlayerCharacter::MoveForward(float Amount)
     {
          isWalking = false;
      }*/
+    if (!MovementEnabled)
+        return;
     AddMovementInput(GetActorForwardVector(), Amount);
 }
 
-// Called every frame
 void ASTUPlayerCharacter::MoveRight(float Amount)
 {
+    if (!MovementEnabled)
+        return;
     AddMovementInput(GetActorRightVector(), Amount);
 }
 

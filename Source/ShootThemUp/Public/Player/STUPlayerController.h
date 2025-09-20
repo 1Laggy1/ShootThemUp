@@ -19,9 +19,8 @@ class ASTULobbyGameState;
 UCLASS()
 class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
   public:
-    
     FOnNewPawnEvent OnNewPawnEvent;
     ASTUPlayerController();
     UFUNCTION(Server, Reliable)
@@ -47,9 +46,9 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     /*UFUNCTION()
     void OnRep_Possesed();*/
     UFUNCTION(NetMulticast, Reliable)
-    void StartSpectatingMulticast(APawn* PawnSpectator);
-    //UPROPERTY(Replicated)//Using = OnRep_Possesed)
-    //APawn *ControlledPawn;
+    void StartSpectatingMulticast(APawn *PawnSpectator);
+    // UPROPERTY(Replicated)//Using = OnRep_Possesed)
+    // APawn *ControlledPawn;
     FPlayerInfo SpawnInfo;
     UPROPERTY(ReplicatedUsing = OnRep_SetCamera)
     ACameraActor *LobbyCamera;
@@ -75,6 +74,7 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     virtual void SetupInputComponent() override;
     virtual void NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest) override;
   private:
+    bool MovementEnabled = true;
     void OnPauseGame();
     void OnMatchStateChanged(ESTUMatchState State);
     ASTULobbyGameState *STULobbyGameState;

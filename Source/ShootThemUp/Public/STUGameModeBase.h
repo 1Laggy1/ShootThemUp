@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "STUCoreTypes.h"
+#include "Resources/STUBall.h"
 #include "STUGameModeBase.generated.h"
 
 
@@ -12,6 +13,8 @@
 class AAIController;
 class ASTUGameStateBase;
 class USTUGameInstance;
+class ASTUBall;
+class ASTUGoal;
 UCLASS()
 class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 {
@@ -41,6 +44,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     virtual bool ClearPause() override;
     void PlayerConnected(APlayerController *PC);
     //FLinearColor DetermineColorByTeamID(int32 TeamID) const;
+    void Goal(ASTUBall *Ball, ASTUGoal* Goal);
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
@@ -61,9 +65,14 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     //int32 CurrentRound = 1;
     //int32 RoundCountDown = 0;
     FTimerHandle GameRoundTimerHandle;
+    FTimerHandle WaitingForPlayersTimerHandle;
+    FTimerHandle AfterGoalTimerHandle;
+    FTimerHandle BetweenGoalsTimerHandle;
     void SpawnBots();
     void StartRound();
     void GameTimerUpdate();
+    void BetweenGoalsTimerUpdate();
+    void AfterGoalTimerUpdate();
     void ResetPlayers();
     void ResetOnePlayer(AController *Controller);
     void SetPlayerColor(AActor *Character, FLinearColor TeamColor);
@@ -72,12 +81,24 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void StartRespawn(AController *DiedActor);
     void GameOver();
     USTUGameInstance *STUGameInstance;
-    FTimerHandle WaitingForPlayersTimerHandle;
+    
     int PlayersNum;
     int PlayersReady = 0;
     void WaitingForPlayers();
-    float WaitingTime = 30.0f;
-    float BeforeStartTime = 10.0f;
+    
     bool BeforeStart = false;
     TArray<FString> PlayersReadyIDs;
+    void GetTeamsStarts();
+    AActor* GetRandomTeamStart(int32 TeamID);
+
+    void SpawnBall(int32 TeamID = 0);
+    ASTUBallSpawn* GetRandomBallSpawn();
+    void FindAllBallSpawns();
+    UPROPERTY(EditDefaultsOnly, Category = "STU")
+    TSubclassOf<ASTUBall> BallClass;
+    AActor *BallInstance;
+    TArray<ASTUBallSpawn *> DefaultBallSpawns;
+
+    void SetPlayerStatsToAllPlayers();
+    void SetMovement(bool Active);
 };

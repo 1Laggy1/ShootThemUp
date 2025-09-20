@@ -45,6 +45,7 @@ void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUBaseCharacter, PlayerID);
     DOREPLIFETIME(ASTUBaseCharacter, PlayerName);
     DOREPLIFETIME(ASTUBaseCharacter, PlayerColor);
+    DOREPLIFETIME(ASTUBaseCharacter, MovementEnabled);
 
 }
 

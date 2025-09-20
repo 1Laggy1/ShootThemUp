@@ -96,6 +96,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 
     UPROPERTY(Replicated)
     FString PlayerID = "PlayerID";
+    UPROPERTY(Replicated)
+    bool MovementEnabled;
   private:
     
     
