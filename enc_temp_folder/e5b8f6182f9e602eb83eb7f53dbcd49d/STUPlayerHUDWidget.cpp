@@ -12,7 +12,6 @@
 #include "STUCoreTypes.h"
 
 #include "Player/STUPlayerController.h"
-#include "Components/TextBlock.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 void USTUPlayerHUDWidget::NativeOnInitialized()
@@ -26,7 +25,6 @@ void USTUPlayerHUDWidget::NativeOnInitialized()
     }
     
     CurrentGamemodeState = Cast<ASTUGameStateBase>(GetWorld()->GetGameState());
-    CurrentGamemodeState->OnTimerChanged.AddUObject(this, &USTUPlayerHUDWidget::OnTimerChanged);
     return;
 }
 void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
@@ -131,20 +129,6 @@ FString USTUPlayerHUDWidget::GetKills()
     FString Kills = "Kills: ";
     Kills += FString::FromInt(PlayerState->GetKillsNum());
     return Kills;
-}
-
-void USTUPlayerHUDWidget::OnTimerChanged(int32 CurrentTime)
-{
-    if (CurrentTime > 0)
-    {
-        TimerText->SetVisibility(ESlateVisibility::Visible);
-        PlayAnimation(TimerAnimation);
-        TimerText->SetText(FText::FromString(FString::FromInt(CurrentTime)));
-    }
-    else
-    {
-        TimerText->SetVisibility(ESlateVisibility::Visible);
-    }
 }
 
 FString USTUPlayerHUDWidget::GetCurrentTime()

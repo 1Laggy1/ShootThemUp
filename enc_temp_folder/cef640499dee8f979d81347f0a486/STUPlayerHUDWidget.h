@@ -38,8 +38,6 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
     FString GetKills();
     UFUNCTION(BlueprintImplementableEvent, Category = "UI")
     void OnTakeDamage();
-    UFUNCTION()
-    void OnTimerChanged(int32 CurrentTime);
     UFUNCTION(BlueprintCallable, Category = "UI")
     bool GetIsPlayerDead() const
     {

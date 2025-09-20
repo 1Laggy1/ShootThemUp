@@ -43,7 +43,7 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     UAnimMontage *ReloadAnimMontage;
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    USkeletalMeshComponent *WeaponMesh;
+    UMeshComponent *WeaponMesh;
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     FName MuzzleSocketName = "MuzzleFlashSocket";
     UPROPERTY(EditAnywhere, Category = "Stats")

@@ -251,7 +251,6 @@ void ASTUGameModeBase::WaitingForPlayers()
         return;
     }
     STUGameStateBase->WaitingTimeNow -= 1.0f;
-    STUGameStateBase->OnRep_TimerChanged();
     UE_LOG(LogSTUGameModeBase, Display, TEXT("Waiting for players: %f %d/%d"), STUGameStateBase->WaitingTimeNow,
            PlayersReady, PlayersNum);
 }
@@ -305,9 +304,7 @@ void ASTUGameModeBase::GameTimerUpdate()
 {
     // UE_LOG(LogSTUGameModeBase, Display, TEXT("Time: %i / Round: %i/%i"), RoundCountDown, CurrentRound,
     // GameData.RoundsNum);
-    STUGameStateBase->GameCountDown--;
-    STUGameStateBase->OnRep_TimerChanged();
-    if (STUGameStateBase->GameCountDown == 0)
+    if (STUGameStateBase->GameCountDown-- == 0)
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
         /*if (STUGameStateBase->CurrentRound + 1 <= GameData.RoundsNum)
@@ -324,9 +321,7 @@ void ASTUGameModeBase::GameTimerUpdate()
 
 void ASTUGameModeBase::BetweenGoalsTimerUpdate()
 {
-    STUGameStateBase->BetweenGoalsCountDown--;
-    STUGameStateBase->OnRep_TimerChanged();
-    if (STUGameStateBase->BetweenGoalsCountDown <= 0)
+    if (STUGameStateBase->BetweenGoalsCountDown-- <= 0)
     {
         GetWorldTimerManager().ClearTimer(BetweenGoalsTimerHandle);
         SetMovement(true);
@@ -345,8 +340,6 @@ void ASTUGameModeBase::BetweenGoalsTimerUpdate()
 
 void ASTUGameModeBase::AfterGoalTimerUpdate()
 {
-
-
     if (STUGameStateBase->AfterGoalCountDown-- <= 0)
     {
         GetWorldTimerManager().ClearTimer(AfterGoalTimerHandle);

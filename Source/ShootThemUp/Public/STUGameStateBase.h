@@ -9,6 +9,7 @@
 
 //DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStatistics, FMatchStatistics *);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStateChanged, ESTUMatchState);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTimerChanged, int32);
 
 /**
  * 
@@ -26,7 +27,7 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     int32 CurrentRound = 0;*/
     UPROPERTY(Replicated)
     int32 GameCountDown = 0;
-    UPROPERTY(Replicated)
+    UPROPERTY(ReplicatedUsing = OnRep_TimerChanged)
     int32 BetweenGoalsCountDown = 0;
     UPROPERTY(Replicated)
     int32 AfterGoalCountDown = 0;
@@ -36,7 +37,7 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     TArray<FTeamInfo> TeamsStats;
     UFUNCTION(Server, Reliable)
     void PlayerConnected(APlayerController *PC);
-    UPROPERTY(Replicated)
+    UPROPERTY(ReplicatedUsing = OnRep_TimerChanged)
     float WaitingTimeNow = 30.0f;
     /*UFUNCTION(NetMulticast, Reliable)
     void InitPlayer_Multicast(const FString &PlayerID, ASTUBaseCharacter* Character);*/
@@ -59,6 +60,7 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     }*/
     //FOnMatchStatistics OnMatchStatistics;
     FOnMatchStateChanged OnMatchStateChanged;
+    FOnTimerChanged OnTimerChanged;
   public:
     /*UFUNCTION(NetMulticast, Reliable)
     void SetPlayerColorMulticast(AActor *Player, FLinearColor TeamColor);*/
@@ -73,8 +75,6 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
         GameData = GameDataServer;
         TeamsStats = TeamsInfo;
         GameCountDown = GameData.GameTime;
-        BetweenGoalsCountDown = GameData.BetweenGoalsRespawnTime;
-        AfterGoalCountDown = GameData.AfterGoalTime;
     }
     //int32 GetCurrentRound()
     //{
@@ -93,6 +93,8 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     {
         OnMatchStateChanged.Broadcast(MatchState);
     }
+    UFUNCTION()
+    void OnRep_TimerChanged();
   protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
     

@@ -12,7 +12,7 @@
 void ASTUGameStateBase::OnRep_TimerChanged()
 {
     int32 TimeNow = WaitingTimeNow + BetweenGoalsCountDown;
-    OnTimerChanged.Broadcast(TimeNow);
+
 }
 void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
