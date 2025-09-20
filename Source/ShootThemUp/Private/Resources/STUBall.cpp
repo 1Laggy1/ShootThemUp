@@ -73,6 +73,7 @@ void ASTUBall::OnInteractionOverlapBegin(UPrimitiveComponent *OverlappedComp, AA
     ASTUBaseCharacter *Character = Cast<ASTUBaseCharacter>(OtherActor);
     if (Character)
     {
+        
         PickUpBall(Character);
     }
 }
@@ -113,6 +114,7 @@ void ASTUBall::PickUpBall(ASTUBaseCharacter *Character)
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     APlayerController *PlayerController = Cast<APlayerController>(Character->GetController());
     USTUGameInstance *STUGameInstance = Cast<USTUGameInstance>(GetWorld()->GetGameInstance());
+    PreviousPlayerCharacter = Character;
     if (PlayerController && STUGameInstance)
     {
 

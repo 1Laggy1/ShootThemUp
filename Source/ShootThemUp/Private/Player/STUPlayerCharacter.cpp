@@ -82,12 +82,15 @@ void ASTUPlayerCharacter::MoveForward(float Amount)
     {
          isWalking = false;
      }*/
+    if (!MovementEnabled)
+        return;
     AddMovementInput(GetActorForwardVector(), Amount);
 }
 
-// Called every frame
 void ASTUPlayerCharacter::MoveRight(float Amount)
 {
+    if (!MovementEnabled)
+        return;
     AddMovementInput(GetActorRightVector(), Amount);
 }
 

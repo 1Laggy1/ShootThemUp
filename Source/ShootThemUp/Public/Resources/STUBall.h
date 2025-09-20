@@ -23,9 +23,11 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
     ASTUBall();
     UPROPERTY(Replicated)
     ASTUBaseCharacter *PlayerCharacter;
+    ASTUBaseCharacter *PreviousPlayerCharacter;
     virtual void Use(FVector Location, FVector Rotation) override;
 
   protected:
+    
     UPROPERTY(EditDefaultsOnly, Category = "STU")
     float BallInteractionRadius = 100.0f;
     UPROPERTY(EditDefaultsOnly, Category = "STU")
