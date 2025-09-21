@@ -4,6 +4,7 @@
 #include "Resources/STUGoal.h"
 #include "Components/BoxComponent.h"
 #include "Resources/STUBall.h"
+#include "NiagaraFunctionLibrary.h"
 #include "STUGameModeBase.h"
 
 ASTUGoal::ASTUGoal()
@@ -15,7 +16,7 @@ ASTUGoal::ASTUGoal()
     BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     BoxComponent->SetCollisionObjectType(ECC_WorldDynamic);
     BoxComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
-
+    bReplicates = true; 
 
 }
 
@@ -43,6 +44,13 @@ void ASTUGoal::OnBoxOverlapBegin(UPrimitiveComponent *OverlappedComp, AActor *Ot
 
 void ASTUGoal::Goal(ASTUBall *Ball)
 {
+    GoalFX_Multicast();
     STUGameModeBase->Goal(Ball, this);
+}
+
+void ASTUGoal::GoalFX_Multicast_Implementation()
+{
+     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GoalNiagaraEffect, GetActorLocation(),
+                                                   GetActorRotation());
 }
 

@@ -112,13 +112,13 @@ bool USTUPlayerHUDWidget::isPlayerSpectating() const
 
 FString USTUPlayerHUDWidget::GetRoundsInfo()
 {
-    /*if (!GetWorld() || !CurrentGamemodeState)
+    if (!GetWorld() || !CurrentGamemodeState)
         return "Rounds: 0/0";
-    FString RoundsInfo = "Round: ";
-    FGameData GameData = CurrentGamemodeState->GetGameData();
-    RoundsInfo = RoundsInfo + FString::FromInt(CurrentGamemodeState->GetCurrentRound()) + "/" +
-                 FString::FromInt(GameData.RoundsNum);*/
-    return "0/0";
+    FString RoundsInfo = "";
+    RoundsInfo += FString::FromInt(CurrentGamemodeState->TeamsStats[0].Score);
+    RoundsInfo += "/";
+    RoundsInfo += FString::FromInt(CurrentGamemodeState->TeamsStats[1].Score);
+    return RoundsInfo;
 }
 
 FString USTUPlayerHUDWidget::GetKills()
