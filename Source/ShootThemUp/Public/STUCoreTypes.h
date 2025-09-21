@@ -100,6 +100,8 @@ struct FGameData
     TArray<FLinearColor> TeamColors;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "0"))
     int32 RespawnTime = 5; // in seconds
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game", meta = (ClampMin = "3"))
+    float BallSpawnTime = 15;
 };
 
 UENUM(BlueprintType)

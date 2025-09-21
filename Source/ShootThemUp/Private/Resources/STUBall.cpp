@@ -8,8 +8,11 @@
 #include "Player/STUBaseCharacter.h"
 #include "Components/PlayerUseComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+#include "UI/STUBallWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "STUUtils.h"
+#include "Components/STUHealthActorComponent.h"
 
 ASTUBall::ASTUBall()
 {
@@ -31,6 +34,8 @@ ASTUBall::ASTUBall()
     InteractionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
     InteractionSphere->SetGenerateOverlapEvents(true);
+    BallWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("SpawnWidgetComponent"));
+    BallWidgetComponent->SetupAttachment(RootComponent);
     SetReplicates(true);
     SetReplicateMovement(true);
 }
@@ -56,6 +61,12 @@ void ASTUBall::BeginPlay()
             MeshComponent->SetMaterial(0, DynamicMaterial);
             UE_LOG(LogTemp, Warning, TEXT("Material found: %s"), *CurrentMaterial->GetName());
         }
+    }
+
+    if (BallWidgetComponent)
+    {
+
+        BallWidget = Cast<USTUBallWidget>(BallWidgetComponent->GetUserWidgetObject());
     }
 
 
@@ -97,7 +108,8 @@ void ASTUBall::ChangeBallColor_Implementation(FLinearColor NewColor)
         DynamicMaterial->SetVectorParameterValue(FName("Color"), NewColor);
         PointLight->SetLightColor(NewColor.ToFColor(true));
         PointLight->SetIntensity(OriginalIntensity);
-        
+        if (BallWidget)
+            BallWidget->ChangeColor(NewColor);
     }
 
     
@@ -114,6 +126,8 @@ void ASTUBall::PickUpBall(ASTUBaseCharacter *Character)
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     APlayerController *PlayerController = Cast<APlayerController>(Character->GetController());
     USTUGameInstance *STUGameInstance = Cast<USTUGameInstance>(GetWorld()->GetGameInstance());
+    const auto CharacterHealthComponent = Character->GetComponentByClass<USTUHealthActorComponent>();
+    CharacterHealthComponent->OnDeath.AddUObject(this, &ASTUBall::CharacterDied);
     PreviousPlayerCharacter = Character;
     if (PlayerController && STUGameInstance)
     {
@@ -145,19 +159,18 @@ void ASTUBall::Use(FVector Location, FVector Rotation)
 
     if (!PlayerCharacter)
         return;
-    SetReplicated(true);
-    MeshComponent->SetSimulatePhysics(true);
-    MeshComponent->WakeAllRigidBodies();
+
+    
     
     FVector SpawnLocation = Location +
                             PlayerCharacter->GetActorRotation().RotateVector(RelativeStartImpulseLocation);
-    PlayerCharacter = nullptr;
+    UnAttach();
 
     FRotator Rotator = Rotation.Rotation();
     FVector LaunchDirection = Rotator.Vector();
 
     SetActorLocation(SpawnLocation, false, nullptr, ETeleportType::TeleportPhysics);
-    MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    
     
     if (MeshComponent && MeshComponent->IsSimulatingPhysics())
     {
@@ -165,7 +178,18 @@ void ASTUBall::Use(FVector Location, FVector Rotation)
     }
     
 }
-
+void ASTUBall::CharacterDied()
+{
+    UnAttach();
+}
+void ASTUBall::UnAttach()
+{
+    PlayerCharacter = nullptr;
+    SetReplicated(true);
+    MeshComponent->SetSimulatePhysics(true);
+    MeshComponent->WakeAllRigidBodies();
+    MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
 void ASTUBall::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);

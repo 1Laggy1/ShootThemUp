@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Resources/STUUseableActor.h"
+#include "Components/WidgetComponent.h"
 #include "STUBall.generated.h"
 
 class UStaticMeshComponent;
@@ -13,6 +14,8 @@ class UMaterialInterface;
 class USphereComponent;
 class ASTUBaseCharacter;
 class UMaterialInstanceDynamic;
+class UWidgetComponent;
+class USTUBallWidget;
 
 UCLASS()
 class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
@@ -25,7 +28,8 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
     ASTUBaseCharacter *PlayerCharacter;
     ASTUBaseCharacter *PreviousPlayerCharacter;
     virtual void Use(FVector Location, FVector Rotation) override;
-
+    UFUNCTION()
+    void CharacterDied();
   protected:
     
     UPROPERTY(EditDefaultsOnly, Category = "STU")
@@ -43,8 +47,12 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
     UPROPERTY(VisibleAnywhere)
     UPointLightComponent *PointLight;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UWidgetComponent *BallWidgetComponent;
+
     UMaterialInterface *CurrentMaterial;
     USphereComponent *InteractionSphere;
+
     virtual void BeginPlay() override;
 
     virtual void Tick(float DeltaTime) override;
@@ -60,6 +68,9 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
     UFUNCTION(NetMulticast, Reliable)
     void ChangeBallColor(FLinearColor NewColor);
     void PickUpBall(ASTUBaseCharacter *Character);
+    void UnAttach();
+    
     UPROPERTY()
     UMaterialInstanceDynamic *DynamicMaterial;
+    USTUBallWidget *BallWidget;
 };

@@ -152,17 +152,19 @@ void ASTUGameModeBase::SpawnBall(int32 TeamID)
     if (TeamID == 0)
     {
         BallSpawn = GetRandomBallSpawn();
+        BallSpawn->StartSpawning(GameData.BallSpawnTime);
         if (!BallSpawn)
             return;
-        BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, BallSpawn->GetActorTransform());
+        
         return;
     }
 
     FTeamInfo *Team = STUUtils::FindTeamByTeamID(TeamID, STUGameStateBase->TeamsStats);
     if (!Team || !Team->BallSpawnPoint)
         return;
-    BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, Team->BallSpawnPoint->GetActorLocation(),
-                                                    Team->BallSpawnPoint->GetActorRotation());
+    /*BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, Team->BallSpawnPoint->GetActorLocation(),
+                                                    Team->BallSpawnPoint->GetActorRotation());*/
+    //Team->BallSpawnPoint->StartSpawning(GameData.BallSpawnTime);
 }
 
 ASTUBallSpawn *ASTUGameModeBase::GetRandomBallSpawn()
