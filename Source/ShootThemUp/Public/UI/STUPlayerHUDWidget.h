@@ -14,6 +14,7 @@ class USTUWeaponComponent;
 class USTUHealthActorComponent;
 class UProgressBar;
 class ASTUGameStateBase;
+class UTextBlock;
 UCLASS()
 class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
 {
@@ -37,6 +38,8 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
     FString GetKills();
     UFUNCTION(BlueprintImplementableEvent, Category = "UI")
     void OnTakeDamage();
+    UFUNCTION()
+    void OnTimerChanged(int32 CurrentTime);
     UFUNCTION(BlueprintCallable, Category = "UI")
     bool GetIsPlayerDead() const
     {
@@ -62,6 +65,10 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
     UProgressBar *HealthProgressBar;
     UPROPERTY(meta = (BindWidgetAnim), Transient)
     UWidgetAnimation *DamageAnimation;
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock *TimerText;
+    UPROPERTY(meta = (BindWidgetAnim), Transient)
+    UWidgetAnimation *TimerAnimation;
 
     bool isPlayerDead = false;
     void OnHealthChanged(float Health);

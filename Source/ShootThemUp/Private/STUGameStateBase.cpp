@@ -9,6 +9,11 @@
 #include "STUGameModeBase.h"
 #include "STUUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
+void ASTUGameStateBase::OnRep_TimerChanged()
+{
+    int32 TimeNow = WaitingTimeNow + BetweenGoalsCountDown;
+    OnTimerChanged.Broadcast(TimeNow);
+}
 void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -20,6 +25,8 @@ void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUGameStateBase, MatchState);
     DOREPLIFETIME(ASTUGameStateBase, WaitingTimeNow);
     DOREPLIFETIME(ASTUGameStateBase, TeamsStats);
+    DOREPLIFETIME(ASTUGameStateBase, BetweenGoalsCountDown);
+    DOREPLIFETIME(ASTUGameStateBase, AfterGoalCountDown);
     
     // DOREPLIFETIME(ASTUGameStateBase, MatchStatistics);
 }

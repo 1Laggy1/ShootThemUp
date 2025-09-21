@@ -1,11 +1,20 @@
 # ShootThemUp
-First Steam multiplayer build here! Check it out with you friends, download 1.1 release!
 
-Currently working on main soccer like Gamemode in [Gamemode branch.](https://github.com/1Laggy1/ShootThemUp/tree/Gamemode)
+Full multiplayer and soccer mode here! Check it out with you friends, download 1.2.1 release!
 
-A third person shooter built in Unreal Engine 5.6. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
+A third person shooter built in Unreal Engine 5.6, focused on Embark Studios Dynamism genre. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
+
 ## Summary
 ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 years of Unity developing. In this project I have implemented a full gameplay loop (movement, weapons, health, AI, pickups, UI, VFX, sound, steam multiplayer) and is designed to show practical engineering decisions and reusable systems.
+
+## Videos of Gameplay
+### [STU 1.2.1 Soccer Gameplay](https://youtu.be/-2R0pDLVn30)
+Older videos:
+
+[STU 1.2 Multiplayer Gameplay youtube link](https://youtu.be/EuI6q9YkiPk)
+
+[ STU 1.0 Gameplay youtube link](https://youtu.be/bS7BoY_a3ME)
+
 ## Highlights
 
 - Fully working multiplayer through Steam relay, with working steam invites (`Replicated` variables, `RPC` methods, Fully working Lobby)
@@ -32,6 +41,11 @@ https://github.com/user-attachments/assets/08498f1e-a5b4-4016-a251-f1b7824aec4c
 `LineTrace` for rifle weapon, and `UGameplayStatics::ApplyRadialDamage` for Launcher radial damage.
 
 ![WeaponComponent](https://github.com/user-attachments/assets/f154198a-d45e-44f7-9a4e-614368fa509b)
+
+- Useable component, and PlayerUseComponent, to interact with objects.
+
+![Soccer(2)](https://github.com/user-attachments/assets/bb677721-b998-456b-bcf1-315d52bac8ee)
+
 
 - Health system using self created Actor component `HealthActorComponent`. Subscribed to GetOwner delegates OnTakeDamage it uses his own methods to determine whether the health will be changed, and broadcasting the OnHealthChanged delegate to notify other systems of health changes.
 
@@ -87,27 +101,23 @@ AI Damage sense:
 - Creating, subscribing and broadcasting `Delegates`, OnTakeDamage, OnHealthChanged, OnAnimEnd etc., working with timers (WorldTimerManager).
 - Full sound creation `Sound Cue`, `Sound wave`, `Attenuation`, `UAudioComponent`, `USoundClass`, `USoundMix`
 
-## [STU 1.2 Multiplayer Gameplay youtube link](https://youtu.be/EuI6q9YkiPk)
-Older videos:
-[ STU 1.0 Gameplay youtube link](https://youtu.be/bS7BoY_a3ME)
-
 ## Next steps
 - ~~Multiplayer (`Replication`, steam integration).~~ Done.
 - Add abilities to players that they can choose.
 - Add more weapons to players that they can choose.
 - Add random spawned weapons that players can pick up.
-- Add main soccer like gamemode.
+~~- Add main soccer like gamemode.~~ Done.
 - Add objects that players can "Hack" making them control environment.
 - Add simple destruction.
 
 ## How to run
+### Game
+- You can simply download recent Release in Release section, this is for windows only but you can try proton on linux which I not tested.
 ### Project
 - Install Unreal Engine 5.6 from Epic Games launcher, or compile from Source.
 - Clone this repository `git clone github.com/1Laggy1/ShootThemUp`.
 - If you are using Visual Studio generate project files (right-click .uproject -> Generate Visual Studio project)
 - Start up .uproject file or Unreal Engine -> Open Project and project will be open.
-### Game
-- You can simply download recent Release in Release section, this is for windows only but you can try proton on linux which I not tested.
 
 ## Notes
 With this project I almost fully transition my engineering skills from Unity C# to Unreal Engine C++. I prioritized creating reusable systems, so I can now extend them.

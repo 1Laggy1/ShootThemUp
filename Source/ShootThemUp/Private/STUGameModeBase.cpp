@@ -152,17 +152,19 @@ void ASTUGameModeBase::SpawnBall(int32 TeamID)
     if (TeamID == 0)
     {
         BallSpawn = GetRandomBallSpawn();
+        BallSpawn->StartSpawning(GameData.BallSpawnTime);
         if (!BallSpawn)
             return;
-        BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, BallSpawn->GetActorTransform());
+        
         return;
     }
 
     FTeamInfo *Team = STUUtils::FindTeamByTeamID(TeamID, STUGameStateBase->TeamsStats);
     if (!Team || !Team->BallSpawnPoint)
         return;
-    BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, Team->BallSpawnPoint->GetActorLocation(),
-                                                    Team->BallSpawnPoint->GetActorRotation());
+    /*BallInstance = GetWorld()->SpawnActor<ASTUBall>(BallClass, Team->BallSpawnPoint->GetActorLocation(),
+                                                    Team->BallSpawnPoint->GetActorRotation());*/
+    //Team->BallSpawnPoint->StartSpawning(GameData.BallSpawnTime);
 }
 
 ASTUBallSpawn *ASTUGameModeBase::GetRandomBallSpawn()
@@ -251,6 +253,7 @@ void ASTUGameModeBase::WaitingForPlayers()
         return;
     }
     STUGameStateBase->WaitingTimeNow -= 1.0f;
+    STUGameStateBase->OnRep_TimerChanged();
     UE_LOG(LogSTUGameModeBase, Display, TEXT("Waiting for players: %f %d/%d"), STUGameStateBase->WaitingTimeNow,
            PlayersReady, PlayersNum);
 }
@@ -304,7 +307,9 @@ void ASTUGameModeBase::GameTimerUpdate()
 {
     // UE_LOG(LogSTUGameModeBase, Display, TEXT("Time: %i / Round: %i/%i"), RoundCountDown, CurrentRound,
     // GameData.RoundsNum);
-    if (STUGameStateBase->GameCountDown-- == 0)
+    STUGameStateBase->GameCountDown--;
+    STUGameStateBase->OnRep_TimerChanged();
+    if (STUGameStateBase->GameCountDown == 0)
     {
         GetWorldTimerManager().ClearTimer(GameRoundTimerHandle);
         /*if (STUGameStateBase->CurrentRound + 1 <= GameData.RoundsNum)
@@ -321,7 +326,9 @@ void ASTUGameModeBase::GameTimerUpdate()
 
 void ASTUGameModeBase::BetweenGoalsTimerUpdate()
 {
-    if (STUGameStateBase->BetweenGoalsCountDown-- <= 0)
+    STUGameStateBase->BetweenGoalsCountDown--;
+    STUGameStateBase->OnRep_TimerChanged();
+    if (STUGameStateBase->BetweenGoalsCountDown <= 0)
     {
         GetWorldTimerManager().ClearTimer(BetweenGoalsTimerHandle);
         SetMovement(true);
@@ -340,6 +347,8 @@ void ASTUGameModeBase::BetweenGoalsTimerUpdate()
 
 void ASTUGameModeBase::AfterGoalTimerUpdate()
 {
+
+
     if (STUGameStateBase->AfterGoalCountDown-- <= 0)
     {
         GetWorldTimerManager().ClearTimer(AfterGoalTimerHandle);

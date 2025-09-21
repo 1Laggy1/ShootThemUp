@@ -50,12 +50,6 @@ void USTULobbyWidget::OnChangeColorClicked()
     float G = Slider_G->GetValue();
     float B = Slider_B->GetValue();
 
-    int32 R_Int = FMath::RoundToInt(R * 255.0f);
-    int32 G_Int = FMath::RoundToInt(G * 255.0f);
-    int32 B_Int = FMath::RoundToInt(B * 255.0f);
-
-    UE_LOG(LogTemp, Log, TEXT("Color: R=%d, G=%d, B=%d"), R_Int, G_Int, B_Int);
-
     FLinearColor NewColor(R, G, B, 1.0f);
     auto PC = Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController());
     if (!GetWorld() || !GetWorld()->GetFirstPlayerController())

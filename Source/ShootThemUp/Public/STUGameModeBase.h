@@ -45,6 +45,10 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void PlayerConnected(APlayerController *PC);
     //FLinearColor DetermineColorByTeamID(int32 TeamID) const;
     void Goal(ASTUBall *Ball, ASTUGoal* Goal);
+    void SetBallInstance(AActor* Ball)
+    {
+        BallInstance = Ball;
+    }
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
@@ -94,8 +98,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void SpawnBall(int32 TeamID = 0);
     ASTUBallSpawn* GetRandomBallSpawn();
     void FindAllBallSpawns();
-    UPROPERTY(EditDefaultsOnly, Category = "STU")
-    TSubclassOf<ASTUBall> BallClass;
+    
     AActor *BallInstance;
     TArray<ASTUBallSpawn *> DefaultBallSpawns;
 

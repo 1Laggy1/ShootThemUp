@@ -12,6 +12,7 @@
 #include "STUCoreTypes.h"
 
 #include "Player/STUPlayerController.h"
+#include "Components/TextBlock.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 void USTUPlayerHUDWidget::NativeOnInitialized()
@@ -25,6 +26,7 @@ void USTUPlayerHUDWidget::NativeOnInitialized()
     }
     
     CurrentGamemodeState = Cast<ASTUGameStateBase>(GetWorld()->GetGameState());
+    CurrentGamemodeState->OnTimerChanged.AddUObject(this, &USTUPlayerHUDWidget::OnTimerChanged);
     return;
 }
 void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
@@ -110,13 +112,13 @@ bool USTUPlayerHUDWidget::isPlayerSpectating() const
 
 FString USTUPlayerHUDWidget::GetRoundsInfo()
 {
-    /*if (!GetWorld() || !CurrentGamemodeState)
+    if (!GetWorld() || !CurrentGamemodeState)
         return "Rounds: 0/0";
-    FString RoundsInfo = "Round: ";
-    FGameData GameData = CurrentGamemodeState->GetGameData();
-    RoundsInfo = RoundsInfo + FString::FromInt(CurrentGamemodeState->GetCurrentRound()) + "/" +
-                 FString::FromInt(GameData.RoundsNum);*/
-    return "0/0";
+    FString RoundsInfo = "";
+    RoundsInfo += FString::FromInt(CurrentGamemodeState->TeamsStats[0].Score);
+    RoundsInfo += "/";
+    RoundsInfo += FString::FromInt(CurrentGamemodeState->TeamsStats[1].Score);
+    return RoundsInfo;
 }
 
 FString USTUPlayerHUDWidget::GetKills()
@@ -129,6 +131,20 @@ FString USTUPlayerHUDWidget::GetKills()
     FString Kills = "Kills: ";
     Kills += FString::FromInt(PlayerState->GetKillsNum());
     return Kills;
+}
+
+void USTUPlayerHUDWidget::OnTimerChanged(int32 CurrentTime)
+{
+    if (CurrentTime > 0)
+    {
+        TimerText->SetVisibility(ESlateVisibility::Visible);
+        PlayAnimation(TimerAnimation);
+        TimerText->SetText(FText::FromString(FString::FromInt(CurrentTime)));
+    }
+    else
+    {
+        TimerText->SetVisibility(ESlateVisibility::Visible);
+    }
 }
 
 FString USTUPlayerHUDWidget::GetCurrentTime()
