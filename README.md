@@ -106,7 +106,7 @@ AI Damage sense:
 - Add abilities to players that they can choose.
 - Add more weapons to players that they can choose.
 - Add random spawned weapons that players can pick up.
-~~- Add main soccer like gamemode.~~ Done.
+- ~~Add main soccer like gamemode.~~ Done.
 - Add objects that players can "Hack" making them control environment.
 - Add simple destruction.
 
@@ -120,7 +120,7 @@ AI Damage sense:
 - Start up .uproject file or Unreal Engine -> Open Project and project will be open.
 
 ## Notes
-With this project I almost fully transition my engineering skills from Unity C# to Unreal Engine C++. I prioritized creating reusable systems, so I can now extend them.
+With this project I fully transition my engineering skills from Unity C# to Unreal Engine C++. I prioritized creating reusable systems, so I can now extend them.
 
 ## License
 
