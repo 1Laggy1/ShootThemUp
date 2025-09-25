@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Weapon/Components/STUWeaponFXComponent.h"
 #include "Sound/SoundCue.h"
-#include "GameFramework/Character.h"
 
 ASTUProjectile::ASTUProjectile()
 {
@@ -78,22 +77,10 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
         for (auto &Result : Overlaps)
         {
             UPrimitiveComponent *OverlappedComp = Result.GetComponent();
-            AActor *OverlappedActor = Result.GetActor();
-
-            if (ACharacter *HitCharacter = Cast<ACharacter>(OverlappedActor))
+            if (OverlappedComp && OverlappedComp->IsSimulatingPhysics())
             {
-                FVector Direction = HitCharacter->GetActorLocation() - GetActorLocation();
-                Direction.Normalize();
-
-                float Strength = 1200.0f; // сила відкидання
-                FVector LaunchVelocity = Direction * Strength;
-                LaunchVelocity.Z += 500.0f; // додатково вгору, як від вибуху
-
-                HitCharacter->LaunchCharacter(LaunchVelocity, true, true);
-            }
-            else if (OverlappedComp && OverlappedComp->IsSimulatingPhysics())
-            {
-                OverlappedComp->AddRadialImpulse(GetActorLocation(), DamageRadius, ExplosionStrength, ERadialImpulseFalloff::RIF_Linear,
+                OverlappedComp->AddRadialImpulse(GetActorLocation(), DamageRadius, ExplosionStrength,
+                                                 ERadialImpulseFalloff::RIF_Linear,
                                                  true);
             }
         }
