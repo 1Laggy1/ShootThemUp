@@ -161,7 +161,6 @@ bool ASTUBall::Use(FVector Location, FVector Rotation)
 {
     if (CooldownRemaining > 0.0f)
         return false;
-    //checkf(false, TEXT("CRASH TEST!"));
     
 
     if (!PlayerCharacter)
