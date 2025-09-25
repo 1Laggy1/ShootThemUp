@@ -41,6 +41,8 @@ ASTUBall::ASTUBall()
     BallWidgetComponent->SetupAttachment(RootComponent);
     SetReplicates(true);
     SetReplicateMovement(true);
+    NetUpdateFrequency = 200.f;
+    MinNetUpdateFrequency = 33.f;
 }
 
 
@@ -220,9 +222,10 @@ void ASTUBall::PullBall(FVector Position)
 }
 void ASTUBall::UnAttach()
 {
-    UPlayerUseComponent *UseComponent = PlayerCharacter->FindComponentByClass<UPlayerUseComponent>();
-    if (!UseComponent)
-        return;
+    UPlayerUseComponent *UseComponent = nullptr; 
+    if (PlayerCharacter)
+    UseComponent = PlayerCharacter->FindComponentByClass<UPlayerUseComponent>();
+    if (UseComponent)
     UseComponent->HoldItem = nullptr;
     PlayerCharacter = nullptr;
     SetReplicated(true);

@@ -36,7 +36,7 @@ ASTUUseableActor *UPlayerUseComponent::GetItemInFront()
 
     FVector Start = CameraLocation;
     FVector End = Start + (CameraRotation.Vector() * MaxDistance);
-
+    
     FHitResult Hit;
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(Owner);
@@ -51,6 +51,8 @@ ASTUUseableActor *UPlayerUseComponent::GetItemInFront()
             ASTUUseableActor *UseableActor = Cast<ASTUUseableActor>(HitActor);
             if (UseableActor)
             {
+                APawn *OwnerPawn = Cast<APawn>(GetOwner());
+                if (OwnerPawn && OwnerPawn->IsLocallyControlled())
                 UseableActor->ShowItem();
                 return UseableActor;
             }
