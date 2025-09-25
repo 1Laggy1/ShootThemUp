@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 
 #include "Components/PlayerUseComponent.h"
@@ -16,6 +16,49 @@ void UPlayerUseComponent::BeginPlay()
 	Super::BeginPlay();
 	
 }
+ASTUUseableActor *UPlayerUseComponent::GetItemInFront()
+{
+    AActor *Owner = GetOwner();
+    if (!Owner)
+        return nullptr;
+
+    APawn *PawnOwner = Cast<APawn>(Owner);
+    if (!PawnOwner)
+    return nullptr;
+
+    APlayerController *PC = Cast<APlayerController>(PawnOwner->GetController());
+    if (!PC)
+    return nullptr;
+
+    FVector CameraLocation;
+    FRotator CameraRotation;
+    PC->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+    FVector Start = CameraLocation;
+    FVector End = Start + (CameraRotation.Vector() * MaxDistance);
+
+    FHitResult Hit;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(Owner);
+
+    GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+
+    if (Hit.bBlockingHit)
+    {
+        AActor *HitActor = Hit.GetActor();
+        if (HitActor)
+        {
+            ASTUUseableActor *UseableActor = Cast<ASTUUseableActor>(HitActor);
+            if (UseableActor)
+            {
+                UseableActor->ShowItem();
+                return UseableActor;
+            }
+        }
+    }
+
+    return nullptr;
+}
 void UPlayerUseComponent::Use()
 {
     FVector CameraLocation;
@@ -25,10 +68,14 @@ void UPlayerUseComponent::Use()
 }
 void UPlayerUseComponent::UseAnItem_Implementation(FVector Location, FVector Rotation)
 {
+    if (HoldItem)
+    {
+        HoldItem->Use(Location, Rotation);
+        return;
+    }
     if (Item)
     {
         Item->Use(Location, Rotation);
-        Item = nullptr;
     }
 }
 
@@ -37,5 +84,9 @@ void UPlayerUseComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+    Item = GetItemInFront();
+
+    
+    
 }
 
