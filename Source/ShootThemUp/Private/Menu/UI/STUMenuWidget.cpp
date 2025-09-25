@@ -24,8 +24,12 @@ void USTUMenuWidget::NativeOnInitialized()
     {
         QuitGameButton->OnClicked.AddDynamic(this, &USTUMenuWidget::OnQuitGame);
     }
-    /*GetSTUGameInstance()->GetOnlineSubsystem()->GetSessionInterface()->OnCreateSessionCompleteDelegates.AddUObject(
-        this, &USTUMenuWidget::OnCreateSessionComplete);*/
+
+    if (GetSTUGameInstance())
+    {
+        GetSTUGameInstance()->RemoveLobby();
+    }
+    
 }
 
 //void USTUMenuWidget::OnAnimationFinished_Implementation(const UWidgetAnimation *Animation)

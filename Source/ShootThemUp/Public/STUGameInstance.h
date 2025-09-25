@@ -51,6 +51,7 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
     {
         return LobbyLevelName;
     }
+    void RemoveLobby();
     void ToggleVolume();
     void CreateLobby();
     void InitSteamSocketsNetDriver();

@@ -1,17 +1,15 @@
 ﻿// Shoot THem Up Game. All Rights Reserved.
 
-
 #include "STUGameInstance.h"
-#include "STUSoundFunctionLibrary.h"
-#include "OnlineSessionSettings.h"
 #include "Kismet/GameplayStatics.h"
-#include "SteamSocketsNetDriver.h"
-#include "SteamSockets/Public/SteamSocketsNetDriver.h"
+#include "OnlineSessionSettings.h"
 #include "OnlineSubsystemSteam.h"
 #include "OnlineSubsystemUtils.h"
+#include "STUSoundFunctionLibrary.h"
+#include "SteamSockets/Public/SteamSocketsNetDriver.h"
+#include "SteamSocketsNetDriver.h"
 
 #include <Online/OnlineSessionNames.h>
-
 
 void USTUGameInstance::Init()
 {
@@ -37,7 +35,6 @@ void USTUGameInstance::Init()
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to init Steam subsystem!"));
     }
-
 }
 
 void USTUGameInstance::InitSteamSocketsNetDriver()
@@ -69,7 +66,6 @@ void USTUGameInstance::InitSteamSocketsNetDriver()
         UE_LOG(LogTemp, Error, TEXT("Failed to init NetDriver: %s"), *Error);
     }
 }
-
 
 void USTUGameInstance::CreateLobby()
 {
@@ -118,7 +114,7 @@ void USTUGameInstance::CreateLobby()
     {
         UE_LOG(LogTemp, Log, TEXT("Started creating Steam lobby session"));
     }
-} 
+}
 
 void USTUGameInstance::OnInviteAccepted(const bool bWasSuccessful, int32 ControllerId,
                                         TSharedPtr<const FUniqueNetId> UserId,
@@ -188,22 +184,21 @@ void USTUGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCo
 
 void USTUGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
-    
-        if (!bWasSuccessful)
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to create session!"));
-            return;
-        }
 
-        UWorld *World = GetWorld();
-        if (!World)
-            return;
+    if (!bWasSuccessful)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to create session!"));
+        return;
+    }
 
-        UE_LOG(LogTemp, Log, TEXT("Session created"));
+    UWorld *World = GetWorld();
+    if (!World)
+        return;
 
-        UGameplayStatics::OpenLevel(this, TEXT("/Game/Levels/LobbyLevel?listen"), true);
+    UE_LOG(LogTemp, Log, TEXT("Session created"));
+
+    UGameplayStatics::OpenLevel(this, TEXT("/Game/Levels/LobbyLevel?listen"), true);
 }
-
 
 void USTUGameInstance::OnEndSessionComplete(FName Name, bool bWasSuccessful)
 {
@@ -215,10 +210,20 @@ void USTUGameInstance::OnCreateSession(bool Success)
 
 void USTUGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 {
+}
 
+void USTUGameInstance::RemoveLobby()
+{
+    if (!SessionInterface.IsValid())
+        return;
+    if (SessionInterface->GetNamedSession(NAME_GameSession))
+    {
+        SessionInterface->EndSession(NAME_GameSession);
+        SessionInterface->DestroySession(NAME_GameSession);
+    }
 }
 
 void USTUGameInstance::ToggleVolume()
-    {
+{
     USTUSoundFunctionLibrary::ToggleSoundClassVolume(MasterSoundClass);
 }
