@@ -70,6 +70,7 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
     }*/
 
     TArray<FOverlapResult> Overlaps;
+    TArray<AActor*> FinishedActors;
     FCollisionShape Sphere = FCollisionShape::MakeSphere(DamageRadius);
     if (GetWorld()->OverlapMultiByChannel(Overlaps, GetActorLocation(), FQuat::Identity, ECC_PhysicsBody, Sphere))
     {
@@ -77,20 +78,22 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
         {
             UPrimitiveComponent *OverlappedComp = Result.GetComponent();
             AActor *OverlappedActor = Result.GetActor();
+            if (FinishedActors.Contains(OverlappedActor))
+                continue;
 
             if (ACharacter *HitCharacter = Cast<ACharacter>(OverlappedActor))
             {
                 FVector Direction = HitCharacter->GetActorLocation() - GetActorLocation();
-                float Damage = FMath::GetMappedRangeValueClamped(FVector2D(0.f, DamageRadius+100.f),
-                                                                 FVector2D(DamageAmount, 0.f), Direction.Size());
+                float Damage = FMath::GetMappedRangeValueClamped(FVector2D(0.f, DamageRadius), FVector2D(DamageAmount, DamageAmountMin), Direction.Size());
                 FPointDamageEvent DEvent;
                 DEvent.DamageTypeClass = UDamageType::StaticClass();
                 HitCharacter->TakeDamage(Damage, DEvent, Cast<ACharacter>(GetOwner())->Controller, this);
-
+                float ExplosionStrengthMapped = FMath::GetMappedRangeValueClamped(
+                    FVector2D(0.f, DamageRadius), FVector2D(ExplosionStrength, ExplosionStrengthMin), Direction.Size());
+                
                 Direction.Normalize();
-
-                FVector LaunchVelocity = Direction * ExplosionStrength;
-                LaunchVelocity.Z += 300.0f;
+                FVector LaunchVelocity = Direction * ExplosionStrengthMapped;
+                LaunchVelocity.Z += ExplosionStrengthMapped/3;
 
                 HitCharacter->LaunchCharacter(LaunchVelocity, true, true);
             }
@@ -99,6 +102,7 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
                 OverlappedComp->AddRadialImpulse(GetActorLocation(), DamageRadius, ExplosionStrength,
                                                  ERadialImpulseFalloff::RIF_Linear, true);
             }
+            FinishedActors.Add(OverlappedActor);
         }
     }
 

@@ -37,11 +37,15 @@ protected:
   UPROPERTY(EditDefaultsOnly, Category = "Stat")
   float DamageAmount = 50.0f;
   UPROPERTY(EditDefaultsOnly, Category = "Stat")
+  float DamageAmountMin = 30.0f;
+  UPROPERTY(EditDefaultsOnly, Category = "Stat")
   bool DoFullDamage = false;
   UPROPERTY(EditDefaultsOnly, Category = "Stat")
   float LifeSeconds = 5.0f;
   UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stat")
   float ExplosionStrength = 1000.0f;
+  UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stat")
+  float ExplosionStrengthMin = 300.0f;
   UPROPERTY(VisibleAnywhere, Category = "VFX")
   USTUWeaponFXComponent *WeaponFXComponent;
   UPROPERTY(EditDefaultsOnly, Category = "Sound")

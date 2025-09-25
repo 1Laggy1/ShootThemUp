@@ -204,6 +204,10 @@ void USTUWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
     CurrentWeapon = nullptr;
     for (auto Weapon : Weapons)
     {
+        if (!Weapon)
+            continue;
+            
+        
         Weapon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
         Weapon->Destroy();
     }
