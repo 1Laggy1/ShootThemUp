@@ -185,12 +185,12 @@ void ASTULobbyGameState::SpawnPlayer(FPlayerInfo *PlayerInfo, FVector Position)
     Character->PlayerName = PlayerInfo->PlayerName;
     Character->PlayerID = PlayerInfo->PlayerID;
     UGameplayStatics::FinishSpawningActor(Character, SpawnTransform);
-    const auto STUPlayerController = Cast<ASTUPlayerController>(PlayerInfo->ThisPlayerController);
+    /*const auto STUPlayerController = Cast<ASTUPlayerController>(PlayerInfo->ThisPlayerController);
     if (STUPlayerController)
     {
         STUPlayerController->LobbyCamera = Character->SpawnLobbyCamera();
         STUPlayerController->OnRep_SetCamera();
-    }
+    }*/
     Characters.Add(PlayerInfo->PlayerID, Character);
 }
 

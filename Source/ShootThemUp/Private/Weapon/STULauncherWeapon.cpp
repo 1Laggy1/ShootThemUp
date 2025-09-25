@@ -64,6 +64,8 @@ void ASTULauncherWeapon::SpawnProjectileServer_Implementation(FVector Direction)
 
 void ASTULauncherWeapon::MakeBurstShot()
 {
+    if (!GetOwner() || !Cast<ACharacter>(GetOwner())->Controller)
+        return;
     if (IsAmmoEmpty())
     {
         ShotsFires = 0;

@@ -120,6 +120,7 @@ void ASTUPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
 void ASTUPlayerController::BeginPlay()
 {
     Super::BeginPlay();
+    UE_LOG(LogPlayerController, Display, TEXT("ASTUPlayerController::BeginPlay"));
     if (GetWorld())
     {
         bShowMouseCursor = true;
@@ -129,6 +130,16 @@ void ASTUPlayerController::BeginPlay()
             Gamemode->OnMatchStateChanged.AddUObject(this, &ASTUPlayerController::OnMatchStateChanged);
         }
         STULobbyGameState = Cast<ASTULobbyGameState>(GetWorld()->GetGameState<ASTULobbyGameState>());
+        if (STULobbyGameState)
+        {
+            TArray<AActor *> Cameras;
+            UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), Cameras);
+            if (Cameras.IsEmpty() || !Cameras[0])
+                return;
+
+            SetViewTarget(Cameras[0]);
+        }
+        
     }
 }
 

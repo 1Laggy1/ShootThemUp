@@ -152,6 +152,8 @@ void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Dam
                                                  FName BoneName, FVector ShotFromDirection,
                                                  const UDamageType *DamageType, AActor *DamageCauser)
 {
+    if (!DamagedActor)
+        return;
     const auto FinalDamage = Damage * GetPointDamageModifier(DamagedActor, BoneName);
     UE_LOG(LogHealthComponent, Display, TEXT("On point damage: %f, final: %f, bone: %s"), Damage, FinalDamage,
            *BoneName.ToString());
