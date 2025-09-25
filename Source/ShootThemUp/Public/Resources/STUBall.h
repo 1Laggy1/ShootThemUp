@@ -27,13 +27,22 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
     UPROPERTY(Replicated)
     ASTUBaseCharacter *PlayerCharacter;
     ASTUBaseCharacter *PreviousPlayerCharacter;
-    virtual void Use(FVector Location, FVector Rotation) override;
+    virtual bool Use(FVector Location, FVector Rotation) override;
     UFUNCTION()
     void CharacterDied();
+    void PullBall(FVector Position);
   protected:
-    
+    UPROPERTY(EditDefaultsOnly, Category = "STU")
+    float MaxDistance = 3000.0f;
+    UPROPERTY(EditDefaultsOnly, Category = "STU")
+    float MaxPullStrength = 2000.0f;
+    UPROPERTY(EditDefaultsOnly, Category = "STU")
+    float MinPullStrength = 500.0f;
     UPROPERTY(EditDefaultsOnly, Category = "STU")
     float BallInteractionRadius = 100.0f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "STU")
+    float BallInteractionCooldown = 0.3f;
+    float BallInteractionCooldownRemaining = 0.3f;
     UPROPERTY(EditDefaultsOnly, Category = "STU")
     float ForceStrength = 1000.0f;
     UPROPERTY(EditDefaultsOnly, Category = "STU")

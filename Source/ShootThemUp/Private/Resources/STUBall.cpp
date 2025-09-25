@@ -16,9 +16,12 @@
 
 ASTUBall::ASTUBall()
 {
+    WidgetComponent->SetupAttachment(RootComponent);
+
 	PrimaryActorTick.bCanEverTick = true;
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
     RootComponent = MeshComponent;
+    WidgetComponent->SetupAttachment(RootComponent);
     PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLight"));
     PointLight->SetupAttachment(RootComponent);
     InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
@@ -32,7 +35,7 @@ ASTUBall::ASTUBall()
     InteractionSphere->SetCollisionObjectType(ECC_WorldDynamic);
     InteractionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
     InteractionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-
+    
     InteractionSphere->SetGenerateOverlapEvents(true);
     BallWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("SpawnWidgetComponent"));
     BallWidgetComponent->SetupAttachment(RootComponent);
@@ -77,7 +80,7 @@ void ASTUBall::OnInteractionOverlapBegin(UPrimitiveComponent *OverlappedComp, AA
 {
     if (!HasAuthority())
         return;
-    if (!OtherActor || OtherActor == this || PlayerCharacter || CooldownRemaining > 0.0f)
+    if (!OtherActor || OtherActor == this || PlayerCharacter || BallInteractionCooldownRemaining > 0.0f)
         return;
 
     UE_LOG(LogTemp, Display, TEXT("Ball blocked! Hit actor: %s"), *GetNameSafe(OtherActor));
@@ -120,7 +123,7 @@ void ASTUBall::PickUpBall(ASTUBaseCharacter *Character)
     UPlayerUseComponent *UseComponent = Character->FindComponentByClass<UPlayerUseComponent>();
     if (!UseComponent)
         return;
-    UseComponent->Item = this;
+    UseComponent->HoldItem = this;
     MeshComponent->SetSimulatePhysics(false);
     PlayerCharacter = Character;
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -129,6 +132,7 @@ void ASTUBall::PickUpBall(ASTUBaseCharacter *Character)
     const auto CharacterHealthComponent = Character->GetComponentByClass<USTUHealthActorComponent>();
     CharacterHealthComponent->OnDeath.AddUObject(this, &ASTUBall::CharacterDied);
     PreviousPlayerCharacter = Character;
+    BallInteractionCooldownRemaining = BallInteractionCooldown;
     if (PlayerController && STUGameInstance)
     {
 
@@ -153,15 +157,22 @@ void ASTUBall::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetime
     DOREPLIFETIME(ASTUBall, PlayerCharacter);
 }
 
-void ASTUBall::Use(FVector Location, FVector Rotation)
+bool ASTUBall::Use(FVector Location, FVector Rotation)
 {
-    Super::Use(Location, Rotation);
+    if (CooldownRemaining > 0.0f)
+        return false;
+    
 
     if (!PlayerCharacter)
-        return;
+    {
+        CooldownRemaining = CooldownTime;
+        GetWorldTimerManager().SetTimer(CooldownTimerHandle, this, &ASTUUseableActor::CooldownTick, 0.1f, true);
+        PullBall(Location);
+        return false;
+    }
 
     
-    
+
     FVector SpawnLocation = Location +
                             PlayerCharacter->GetActorRotation().RotateVector(RelativeStartImpulseLocation);
     UnAttach();
@@ -176,14 +187,43 @@ void ASTUBall::Use(FVector Location, FVector Rotation)
     {
         MeshComponent->AddImpulse(LaunchDirection * ForceStrength, NAME_None, true);
     }
-    
+
+    BallInteractionCooldownRemaining = BallInteractionCooldown;
+    //CooldownRemaining = CooldownTime;
+    GetWorldTimerManager().SetTimer(CooldownTimerHandle, this, &ASTUUseableActor::CooldownTick, 0.1f, true);
+    return true;
 }
 void ASTUBall::CharacterDied()
 {
     UnAttach();
 }
+void ASTUBall::PullBall(FVector Position)
+{
+    if (!MeshComponent)
+        return;
+
+    
+
+
+    FVector CurrentPosition = MeshComponent->GetComponentLocation();
+    FVector Direction = (Position - CurrentPosition);
+    float Distance = Direction.Size();
+    float Strength = FMath::GetMappedRangeValueClamped(FVector2D(0.f, MaxDistance),                
+                                                       FVector2D(MaxPullStrength, MinPullStrength),
+                                                       Distance);
+    
+
+    Direction.Normalize();
+    FVector Impulse = Direction * Strength;
+
+    MeshComponent->AddImpulse(Impulse, NAME_None, true);
+}
 void ASTUBall::UnAttach()
 {
+    UPlayerUseComponent *UseComponent = PlayerCharacter->FindComponentByClass<UPlayerUseComponent>();
+    if (!UseComponent)
+        return;
+    UseComponent->HoldItem = nullptr;
     PlayerCharacter = nullptr;
     SetReplicated(true);
     MeshComponent->SetSimulatePhysics(true);
@@ -193,6 +233,7 @@ void ASTUBall::UnAttach()
 void ASTUBall::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    WidgetComponent->SetWorldLocation(GetActorLocation() + FVector(0.f, 0.f, 70.f));
     if (PlayerCharacter)
     {
         AActor *Pawn = PlayerCharacter;
@@ -200,5 +241,9 @@ void ASTUBall::Tick(float DeltaTime)
             return;
         FVector NewLocation = Pawn->GetActorLocation() + Pawn->GetActorRotation().RotateVector(RelativeStoreLocation);
         SetActorLocation(NewLocation);
+    }
+    if (BallInteractionCooldownRemaining > 0.0f)
+    {
+        BallInteractionCooldownRemaining -= DeltaTime;
     }
 }

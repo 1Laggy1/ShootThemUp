@@ -98,7 +98,7 @@ void USTUGameInstance::CreateLobby()
     SessionSettings.bUsesPresence = true;
     SessionSettings.bUseLobbiesIfAvailable = true;
     SessionSettings.bUseLobbiesVoiceChatIfAvailable = false;
-    SessionSettings.NumPublicConnections = 4;
+    SessionSettings.NumPublicConnections = 30;
     SessionSettings.bAllowJoinInProgress = true;
     SessionSettings.bAllowInvites = true; // Enable invites
     SessionSettings.bShouldAdvertise = true;
