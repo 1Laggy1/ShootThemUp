@@ -2,7 +2,7 @@
 
 
 #include "Weapon/Components/STUWeaponFXComponent.h"
-#include "NiagaraFunctionLibrary.h"
+#include "NiagaraFunctionLibrary.h" 
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/DecalComponent.h"

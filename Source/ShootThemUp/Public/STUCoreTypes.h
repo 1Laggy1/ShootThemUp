@@ -246,14 +246,18 @@ enum class STUPlayerStateEnum : uint8
     Spectating
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FExplosionParams
 {
-    GENERATED_BODY()
-
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float DamageRadius = 300.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float DamageAmount = 100.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float DamageAmountMin = 10.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float ExplosionStrength = 1000.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float ExplosionStrengthMin = 100.0f;
 };

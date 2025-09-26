@@ -8,12 +8,22 @@
 #include "STUSoundFunctionLibrary.h"
 #include "SteamSockets/Public/SteamSocketsNetDriver.h"
 #include "SteamSocketsNetDriver.h"
-
+#include "GameFramework/GameUserSettings.h"
 #include <Online/OnlineSessionNames.h>
 
 void USTUGameInstance::Init()
 {
     Super::Init();
+    if (GEngine)
+    {
+        UGameUserSettings *Settings = GEngine->GetGameUserSettings();
+        GEngine->Exec(nullptr, TEXT("r.ScreenPercentage 100"));
+        GEngine->Exec(nullptr, TEXT("r.ScreenPercentage 100"));
+        GEngine->Exec(nullptr, TEXT("r.DynamicRes.Operation 0"));
+        Settings->ApplySettings(false);
+    }
+    
+
     InitSteamSocketsNetDriver();
     Subsystem = IOnlineSubsystem::Get(TEXT("STEAM"));
 

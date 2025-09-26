@@ -70,15 +70,19 @@ void UPlayerUseComponent::Use()
 }
 void UPlayerUseComponent::UseAnItem_Implementation(FVector Location, FVector Rotation)
 {
-    if (HoldItem)
-    {
-        HoldItem->Use(Location, Rotation);
+    const auto Owner = Cast<APawn>(GetOwner());
+    if (!Owner)
         return;
-    }
     if (Item)
     {
-        Item->Use(Location, Rotation);
+        Item->Use(Location, Rotation, Owner->GetController());
     }
+    else if (HoldItem)
+    {
+        HoldItem->Use(Location, Rotation, Owner->GetController());
+        return;
+    }
+    
 }
 
 

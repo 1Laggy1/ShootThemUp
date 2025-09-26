@@ -21,7 +21,7 @@ class SHOOTTHEMUP_API ASTUDoor : public ASTUUseableActor
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
     float Speed;
     virtual void Tick(float DeltaTime) override;
-    virtual bool Use(FVector Location, FVector Rotation) override;
+    virtual bool Use(FVector Location, FVector Rotation, AController *Instigator) override;
 
   protected:
   private:

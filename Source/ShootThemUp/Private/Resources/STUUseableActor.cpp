@@ -5,7 +5,8 @@
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
 #include "UI/STUItemUseWidget.h"
-
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 void ASTUUseableActor::ShowItem()
 {
     TimeToHideRemaining = TimeAfterHide;
@@ -25,14 +26,22 @@ ASTUUseableActor::ASTUUseableActor()
     SetReplicateMovement(true);
 }
 
-bool ASTUUseableActor::Use(FVector Location, FVector Rotation)
+bool ASTUUseableActor::Use(FVector Location, FVector Rotation, AController *InstigatedBy)
 {
     if (CooldownRemaining > 0.0f)
         return false;
 	CooldownRemaining = CooldownTime;
     GetWorldTimerManager().SetTimer(CooldownTimerHandle, this, &ASTUUseableActor::CooldownTick, 0.1f, true);
+    UseFX_Multicast();
     return true;
 	
+}
+void ASTUUseableActor::UseFX_Multicast_Implementation()
+{
+	if (UseSound)
+	{
+        UGameplayStatics::PlaySoundAtLocation(GetWorld(), UseSound, GetActorLocation());
+	}
 }
 
 void ASTUUseableActor::Tick(float DeltaTime)

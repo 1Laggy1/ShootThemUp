@@ -30,10 +30,10 @@ void ASTUDoor::Tick(float DeltaTime)
 }
 
 
-bool ASTUDoor::Use(FVector Location, FVector Rotation)
+bool ASTUDoor::Use(FVector Location, FVector Rotation, AController *InstigatedBy)
 {
 
-    bool IsUsed = Super::Use(Location, Rotation);
+    bool IsUsed = Super::Use(Location, Rotation, InstigatedBy);
     if (!IsUsed)
         return false;
     AnimDone = false;

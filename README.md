@@ -44,6 +44,8 @@ https://github.com/user-attachments/assets/08498f1e-a5b4-4016-a251-f1b7824aec4c
 
 - Useable component, and PlayerUseComponent, to interact with objects.
 
+![UseableObjects(3)](https://github.com/user-attachments/assets/e01b7dda-5208-47c2-80cd-097cd2b0ea84)
+
 ![Soccer(2)](https://github.com/user-attachments/assets/bb677721-b998-456b-bcf1-315d52bac8ee)
 
 ![Door](https://github.com/user-attachments/assets/fb6b4a74-d6b9-4196-9b50-2ba25077663d)
