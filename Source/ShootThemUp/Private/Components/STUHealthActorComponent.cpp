@@ -1,15 +1,14 @@
 // Shoot THem Up Game. All Rights Reserved.
 
 #include "Components/STUHealthActorComponent.h"
-#include "GameFramework/Character.h"
-#include "STUGameModeBase.h"
-#include "PhysicalMaterials/PhysicalMaterial.h"
-#include "Net/UnrealNetwork.h"
-#include "Player/STUPlayerState.h"
-#include "Components/STUHealthActorComponent.h"
 #include "Components/WidgetComponent.h"
-#include "STUUtils.h"
+#include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Player/STUPlayerController.h"
+#include "Player/STUPlayerState.h"
+#include "STUGameModeBase.h"
+#include "STUUtils.h"
 
 #include "UI/STUHealthBarWidget.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
@@ -28,8 +27,7 @@ void USTUHealthActorComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     if (GetOwner() && GetOwner()->GetLocalRole() == ROLE_Authority)
-    AutoHealHandle(DeltaTime);
-    
+        AutoHealHandle(DeltaTime);
 }
 
 void USTUHealthActorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
@@ -50,11 +48,11 @@ float USTUHealthActorComponent::TakeHeal(float amount)
         IsVaunded = false;
     }
     HealthChangedMulticast(Health);
-    //OnHealthChanged.Broadcast(Health);
+    // OnHealthChanged.Broadcast(Health);
     return Health;
 }
 
-void USTUHealthActorComponent::UpdateHealthWidget(AActor* DamageCauser)
+void USTUHealthActorComponent::UpdateHealthWidget(AActor *DamageCauser)
 {
     if (!GetOwner() || !HealthWidgetComponent)
         return;
@@ -69,7 +67,6 @@ void USTUHealthActorComponent::UpdateHealthWidget(AActor* DamageCauser)
             HealthWidgetComponent->SetVisibility(Distance < HealthVisibilityDistance, true);
         }
     }
-    
 
     if (!HealthBarWidget)
     {
@@ -77,8 +74,8 @@ void USTUHealthActorComponent::UpdateHealthWidget(AActor* DamageCauser)
         if (!HealthBarWidget)
             return;
     }
-
-    HealthBarWidget->SetHealthPercent(GetHealthPercent());
+    //if (DamageCauser == GetWorld()->GetFirstPlayerController())
+        HealthBarWidget->SetHealthPercent(GetHealthPercent());
 
     /*FString yes = HealthBarWidget->IsVisible() ? FString("YES") : FString("NO");
     UE_LOG(LogTemp, Warning, TEXT("Visibility of HEALTH WIDGET COMPONENT = %s HEALTH PERCENT IS %s"), *yes,
@@ -88,11 +85,11 @@ void USTUHealthActorComponent::UpdateHealthWidget(AActor* DamageCauser)
 void USTUHealthActorComponent::BeginPlay()
 {
     Super::BeginPlay();
-    
+
     HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
-    //Health = MaxHealth;
-    //HealthChangedMulticast(Health);
-    //OnHealthChanged.Broadcast(Health);
+    // Health = MaxHealth;
+    // HealthChangedMulticast(Health);
+    // OnHealthChanged.Broadcast(Health);
     AActor *ComponentOwner = GetOwner();
     if (ComponentOwner)
     {
@@ -101,9 +98,8 @@ void USTUHealthActorComponent::BeginPlay()
     }
 }
 
-
-
-void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor* DamagedActor, float Damage, AActor* DamageCauser)
+void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor *DamagedActor, float Damage,
+                                                                AActor *DamageCauser)
 {
     Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
     ApplyDamageMulticast(DamagedActor, Damage, DamageCauser);
@@ -114,8 +110,8 @@ void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor* DamagedA
             return;
         const auto ControllerVictim = Cast<ACharacter>(GetOwner())->Controller;
         const auto ControllerCauser = Cast<ACharacter>(DamageCauser)->Controller;
-        //OnDeath.Broadcast();
-        
+        // OnDeath.Broadcast();
+
         DeathMulticast(Cast<ACharacter>(DamagedActor)->GetPlayerState()->GetUniqueID());
 
         Killed(ControllerCauser, ControllerVictim);
@@ -126,12 +122,12 @@ void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *Damag
                                                                    AActor *DamageCauser)
 {
     UpdateHealthWidget(DamageCauser);
-    
-    //Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+
+    // Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
     HealDelayCurrent = 0;
     OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
     OnHealthChanged.Broadcast(Health);
-    //OnHealthChanged.Broadcast(Health);
+    // OnHealthChanged.Broadcast(Health);
     IsVaunded = true;
 }
 
@@ -164,7 +160,6 @@ void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Dam
         else
             ApplyDamage(DamagedActor, Damage, nullptr, DamageType, nullptr);
     }
-    
 }
 
 void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Damage, const UDamageType *DamageType,
@@ -182,11 +177,9 @@ void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Da
 }
 
 void USTUHealthActorComponent::ApplyDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,
-                                           const UDamageType *DamageType,
-                                           AActor *DamageCauser)
+                                           const UDamageType *DamageType, AActor *DamageCauser)
 {
     ApplyDamageServer(DamagedActor, Damage, DamageCauser);
-   
 }
 float USTUHealthActorComponent::GetPointDamageModifier(AActor *DamagedActor, const FName &BoneName)
 {
@@ -200,7 +193,6 @@ float USTUHealthActorComponent::GetPointDamageModifier(AActor *DamagedActor, con
         return 1.0f;
 
     return DamageModifiers[PhysicalMaterial];
-
 }
 
 void USTUHealthActorComponent::AutoHealHandle(float DeltaTime)
@@ -209,7 +201,6 @@ void USTUHealthActorComponent::AutoHealHandle(float DeltaTime)
     {
         return;
     }
-        
 
     if (HealDelayCurrent >= HealDelay)
     {
@@ -230,5 +221,3 @@ void USTUHealthActorComponent::Killed(AController *KillerActor, AController *Die
         return;
     GameMode->Killed(KillerActor, DiedActor);
 }
-
-

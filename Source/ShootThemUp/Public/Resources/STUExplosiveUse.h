@@ -19,10 +19,10 @@ class SHOOTTHEMUP_API ASTUExplosiveUse : public ASTUUseableActor
     virtual bool Use(FVector Location, FVector Rotation, AController *InstigatedBy) override;
 
   protected:
-    UPROPERTY(EditDefaultsOnly, Category = "Stat")
+    UPROPERTY(EditAnywhere, Category = "Stat")
     FExplosionParams ExplosionStats;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
     UNiagaraSystem *NiagaraEffect;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
     FVector RelativeExplostionPos = FVector::ZeroVector;
 };

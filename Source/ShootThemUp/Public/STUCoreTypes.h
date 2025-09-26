@@ -250,14 +250,14 @@ USTRUCT(BlueprintType)
 struct FExplosionParams
 {
     GENERATED_USTRUCT_BODY()
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explosion")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float DamageRadius = 300.0f;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explosion")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float DamageAmount = 100.0f;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explosion")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float DamageAmountMin = 10.0f;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explosion")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float ExplosionStrength = 1000.0f;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explosion")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
     float ExplosionStrengthMin = 100.0f;
 };

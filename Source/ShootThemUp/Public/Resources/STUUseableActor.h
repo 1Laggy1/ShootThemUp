@@ -37,7 +37,7 @@ class SHOOTTHEMUP_API ASTUUseableActor : public AActor
     FString ItemName;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     UWidgetComponent *WidgetComponent;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Use")
     float CooldownTime = 5.0f;
     UPROPERTY(Replicated)
     float CooldownRemaining = 0.0f;
