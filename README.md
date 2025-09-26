@@ -1,6 +1,6 @@
 # ShootThemUp
 
-Full multiplayer and soccer mode here! Check it out with you friends, download 1.2.1 release!
+Full multiplayer and soccer mode is here! Check it out with you friends, download latest release!
 
 A third person shooter built in Unreal Engine 5.6, focused on Embark Studios Dynamism genre. Demonstrates core gameplay systems, like AI, UI, VFX, and clean component-based architecture that was implemented using C++.
 
@@ -45,6 +45,10 @@ https://github.com/user-attachments/assets/08498f1e-a5b4-4016-a251-f1b7824aec4c
 - Useable component, and PlayerUseComponent, to interact with objects.
 
 ![Soccer(2)](https://github.com/user-attachments/assets/bb677721-b998-456b-bcf1-315d52bac8ee)
+
+![Door](https://github.com/user-attachments/assets/fb6b4a74-d6b9-4196-9b50-2ba25077663d)
+
+![BallPull](https://github.com/user-attachments/assets/4efa705c-bbe9-416b-8966-70a6d250db6b)
 
 
 - Health system using self created Actor component `HealthActorComponent`. Subscribed to GetOwner delegates OnTakeDamage it uses his own methods to determine whether the health will be changed, and broadcasting the OnHealthChanged delegate to notify other systems of health changes.
