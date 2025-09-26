@@ -27,7 +27,7 @@ class SHOOTTHEMUP_API ASTUBall : public ASTUUseableActor
     UPROPERTY(Replicated)
     ASTUBaseCharacter *PlayerCharacter;
     ASTUBaseCharacter *PreviousPlayerCharacter;
-    virtual bool Use(FVector Location, FVector Rotation) override;
+    virtual bool Use(FVector Location, FVector Rotation, AController *InstigatedBy) override;
     UFUNCTION()
     void CharacterDied();
     void PullBall(FVector Position);

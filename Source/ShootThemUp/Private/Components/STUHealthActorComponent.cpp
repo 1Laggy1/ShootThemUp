@@ -152,13 +152,19 @@ void USTUHealthActorComponent::OnTakePointDamage(AActor *DamagedActor, float Dam
                                                  FName BoneName, FVector ShotFromDirection,
                                                  const UDamageType *DamageType, AActor *DamageCauser)
 {
-    if (!DamagedActor || !GetOwner() || !InstigatedBy)
+    if (!DamagedActor || !GetOwner())
         return;
     const auto FinalDamage = Damage * GetPointDamageModifier(DamagedActor, BoneName);
     UE_LOG(LogHealthComponent, Display, TEXT("On point damage: %f, final: %f, bone: %s"), Damage, FinalDamage,
            *BoneName.ToString());
     if (GetOwner()->GetLocalRole() == ROLE_Authority)
-    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, InstigatedBy->GetPawn());
+    {
+        if (InstigatedBy)
+            ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, InstigatedBy->GetPawn());
+        else
+            ApplyDamage(DamagedActor, Damage, nullptr, DamageType, nullptr);
+    }
+    
 }
 
 void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Damage, const UDamageType *DamageType,
@@ -167,7 +173,12 @@ void USTUHealthActorComponent::OnTakeRadialDamage(AActor *DamagedActor, float Da
 {
     UE_LOG(LogHealthComponent, Display, TEXT("On radial damage: %f"), Damage);
     if (GetOwner()->GetLocalRole() == ROLE_Authority)
-    ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, InstigatedBy->GetPawn());
+    {
+        if (InstigatedBy)
+            ApplyDamage(DamagedActor, Damage, InstigatedBy, DamageType, InstigatedBy->GetPawn());
+        else
+            ApplyDamage(DamagedActor, Damage, nullptr, DamageType, nullptr);
+    }
 }
 
 void USTUHealthActorComponent::ApplyDamage(AActor *DamagedActor, float Damage, AController *InstigatedBy,

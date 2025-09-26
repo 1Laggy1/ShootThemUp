@@ -8,6 +8,7 @@
 
 class UWidgetComponent;
 class USTUItemUseWidget;
+class USoundCue;
 UCLASS()
 class SHOOTTHEMUP_API ASTUUseableActor : public AActor
 {
@@ -28,7 +29,7 @@ class SHOOTTHEMUP_API ASTUUseableActor : public AActor
     }
     virtual void ShowItem();
     ASTUUseableActor();
-    virtual bool Use(FVector Location, FVector Rotation);
+    virtual bool Use(FVector Location, FVector Rotation, AController *InstigatedBy);
     virtual void Tick(float DeltaTime) override;
     void CooldownTick();
   protected:
@@ -44,9 +45,13 @@ class SHOOTTHEMUP_API ASTUUseableActor : public AActor
     float TimeAfterHide = 5.0f;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
     float HideSpeed = 0.5f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
+    USoundCue *UseSound;
     float TimeToHideRemaining = 0.0f;
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+    UFUNCTION(NetMulticast, Reliable)
+    virtual void UseFX_Multicast();
     USTUItemUseWidget *ItemWidget;
     
     FTimerHandle CooldownTimerHandle;

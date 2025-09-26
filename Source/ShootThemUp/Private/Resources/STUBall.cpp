@@ -159,7 +159,7 @@ void ASTUBall::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetime
     DOREPLIFETIME(ASTUBall, PlayerCharacter);
 }
 
-bool ASTUBall::Use(FVector Location, FVector Rotation)
+bool ASTUBall::Use(FVector Location, FVector Rotation, AController *InstigatedBy)
 {
     if (CooldownRemaining > 0.0f)
         return false;
