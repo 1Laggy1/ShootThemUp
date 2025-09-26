@@ -137,7 +137,17 @@ void ASTUPlayerController::BeginPlay()
             if (Cameras.IsEmpty() || !Cameras[0])
                 return;
 
-            SetViewTarget(Cameras[0]);
+            for (AActor *Camera : Cameras)
+            {
+                if (Camera->Tags.Contains("LobbyCamera")) // or check by name
+                {
+                    if (IsLocalController())
+                    {
+                        SetViewTarget(Cameras[0]);
+                    }
+                    break;
+                }
+            }
         }
         
     }
