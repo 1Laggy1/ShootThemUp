@@ -141,8 +141,11 @@ void ASTUPlayerController::BeginPlay()
             {
                 if (Camera->Tags.Contains("LobbyCamera")) // or check by name
                 {
+                    UE_LOG(LogSTUPlayerController, Warning, TEXT("Lobby Camera pos: %s"),
+                           *Camera->GetActorLocation().ToString());
                     if (IsLocalController())
                     {
+                        
                         SetViewTarget(Cameras[0]);
                     }
                     break;
