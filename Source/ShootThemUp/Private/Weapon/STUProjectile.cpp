@@ -9,7 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/Components/STUWeaponFXComponent.h"
-
+#include "STUUtils.h"
 #include "Engine/DamageEvents.h"
 ASTUProjectile::ASTUProjectile()
 {
@@ -69,42 +69,16 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
                                             UDamageType::StaticClass(), {}, this, GetController(), DoFullDamage);
     }*/
 
-    TArray<FOverlapResult> Overlaps;
-    TArray<AActor*> FinishedActors;
-    FCollisionShape Sphere = FCollisionShape::MakeSphere(DamageRadius);
-    if (GetWorld()->OverlapMultiByChannel(Overlaps, GetActorLocation(), FQuat::Identity, ECC_PhysicsBody, Sphere))
-    {
-        for (auto &Result : Overlaps)
-        {
-            UPrimitiveComponent *OverlappedComp = Result.GetComponent();
-            AActor *OverlappedActor = Result.GetActor();
-            if (FinishedActors.Contains(OverlappedActor))
-                continue;
+    FExplosionParams ExplosionParams;
+    ExplosionParams.DamageRadius = DamageRadius;
+    ExplosionParams.DamageAmount = DamageAmount;
+    ExplosionParams.DamageAmountMin = DamageAmountMin;
+    ExplosionParams.ExplosionStrength = ExplosionStrength;
+    ExplosionParams.ExplosionStrengthMin = ExplosionStrengthMin;
 
-            if (ACharacter *HitCharacter = Cast<ACharacter>(OverlappedActor))
-            {
-                FVector Direction = HitCharacter->GetActorLocation() - GetActorLocation();
-                float Damage = FMath::GetMappedRangeValueClamped(FVector2D(0.f, DamageRadius), FVector2D(DamageAmount, DamageAmountMin), Direction.Size());
-                FPointDamageEvent DEvent;
-                DEvent.DamageTypeClass = UDamageType::StaticClass();
-                HitCharacter->TakeDamage(Damage, DEvent, Cast<ACharacter>(GetOwner())->Controller, this);
-                float ExplosionStrengthMapped = FMath::GetMappedRangeValueClamped(
-                    FVector2D(0.f, DamageRadius), FVector2D(ExplosionStrength, ExplosionStrengthMin), Direction.Size());
-                
-                Direction.Normalize();
-                FVector LaunchVelocity = Direction * ExplosionStrengthMapped;
-                LaunchVelocity.Z += ExplosionStrengthMapped/3;
-
-                HitCharacter->LaunchCharacter(LaunchVelocity, true, true);
-            }
-            else if (OverlappedComp && OverlappedComp->IsSimulatingPhysics())
-            {
-                OverlappedComp->AddRadialImpulse(GetActorLocation(), DamageRadius, ExplosionStrength,
-                                                 ERadialImpulseFalloff::RIF_Linear, true);
-            }
-            FinishedActors.Add(OverlappedActor);
-        }
-    }
+    STUUtils::ApplyRadialDamageWithLineOfSight(GetWorld(), GetActorLocation(), ExplosionParams, this,
+                                               Cast<ACharacter>(GetOwner())->Controller,
+                                               {this});
 
     Destroy();
 }

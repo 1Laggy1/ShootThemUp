@@ -246,3 +246,14 @@ enum class STUPlayerStateEnum : uint8
     Spectating
 };
 
+USTRUCT()
+struct FExplosionParams
+{
+    GENERATED_BODY()
+
+    float DamageRadius = 300.0f;
+    float DamageAmount = 100.0f;
+    float DamageAmountMin = 10.0f;
+    float ExplosionStrength = 1000.0f;
+    float ExplosionStrengthMin = 100.0f;
+};

@@ -71,10 +71,8 @@ void ASTUBaseCharacter::InitPlayer()
     {
         return;
     }
-    if (!GetWorld()->GetFirstPlayerController() || !GetWorld()->GetFirstPlayerController()->PlayerState)
-    {
-        return;
-    }
+    UE_LOG(BaseCharacterLog, Display, TEXT("Am I need to Possess? My %s FirstPC %s"), *PlayerID,
+           *GetWorld()->GetFirstPlayerController()->PlayerState->GetUniqueId()->ToString());
     if (PlayerID == GetWorld()->GetFirstPlayerController()->PlayerState->GetUniqueId()->ToString())
     {
         UE_LOG(BaseCharacterLog, Display, TEXT("Yes! Requesting possess now"));
