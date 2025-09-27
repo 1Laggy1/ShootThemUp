@@ -8,8 +8,9 @@ A third person shooter built in Unreal Engine 5.6, focused on Embark Studios Dyn
 ShootThemUp - is a project made by me while learning Unreal Engine 5.6 after 5 years of Unity developing. In this project I have implemented a full gameplay loop (movement, weapons, health, AI, pickups, UI, VFX, sound, steam multiplayer) and is designed to show practical engineering decisions and reusable systems.
 
 ## Videos of Gameplay
-### [STU 1.2.1 Soccer Gameplay](https://youtu.be/-2R0pDLVn30)
+### [STU 1.2.3.2 Soccer Gameplay](https://youtu.be/v5GIW48XS2s)
 Older videos:
+[STU 1.2.1 Soccer Gameplay](https://youtu.be/-2R0pDLVn30)
 
 [STU 1.2 Multiplayer Gameplay youtube link](https://youtu.be/EuI6q9YkiPk)
 
