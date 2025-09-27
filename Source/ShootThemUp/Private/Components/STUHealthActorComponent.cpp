@@ -52,7 +52,7 @@ float USTUHealthActorComponent::TakeHeal(float amount)
     return Health;
 }
 
-void USTUHealthActorComponent::UpdateHealthWidget(AActor *DamageCauser)
+void USTUHealthActorComponent::UpdateHealthWidget(AActor *DamageCauser, float NewHealth)
 {
     if (!GetOwner() || !HealthWidgetComponent)
         return;
@@ -75,7 +75,7 @@ void USTUHealthActorComponent::UpdateHealthWidget(AActor *DamageCauser)
             return;
     }
     //if (DamageCauser == GetWorld()->GetFirstPlayerController())
-        HealthBarWidget->SetHealthPercent(GetHealthPercent());
+    HealthBarWidget->SetHealthPercent(NewHealth/MaxHealth);
 
     /*FString yes = HealthBarWidget->IsVisible() ? FString("YES") : FString("NO");
     UE_LOG(LogTemp, Warning, TEXT("Visibility of HEALTH WIDGET COMPONENT = %s HEALTH PERCENT IS %s"), *yes,
@@ -102,7 +102,7 @@ void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor *DamagedA
                                                                 AActor *DamageCauser)
 {
     Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    ApplyDamageMulticast(DamagedActor, Damage, DamageCauser);
+    ApplyDamageMulticast(DamagedActor, Damage, DamageCauser, Health);
     if (isDead())
     {
         if (!Cast<ACharacter>(GetOwner()) || !Cast<ACharacter>(GetOwner())->GetPlayerState() ||
@@ -119,15 +119,16 @@ void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor *DamagedA
 }
 
 void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *DamagedActor, float Damage,
-                                                                   AActor *DamageCauser)
+                                                                   AActor *DamageCauser, float NewHealth)
 {
-    UpdateHealthWidget(DamageCauser);
-
-    // Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+    const auto ControllerCauser = STUUtils::GetInstigatorControllerFromDamageCauser(DamageCauser);
+    if (ControllerCauser == GetWorld()->GetFirstPlayerController())
+    {
+        UpdateHealthWidget(DamageCauser, NewHealth);
+        OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
+        OnHealthChanged.Broadcast(NewHealth);
+    }
     HealDelayCurrent = 0;
-    OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
-    OnHealthChanged.Broadcast(Health);
-    // OnHealthChanged.Broadcast(Health);
     IsVaunded = true;
 }
 
@@ -139,7 +140,7 @@ void USTUHealthActorComponent::DeathMulticast_Implementation(int32 PlayerID)
 
 void USTUHealthActorComponent::HealthChangedMulticast_Implementation(float NewHealth)
 {
-    UpdateHealthWidget(nullptr);
+    UpdateHealthWidget(nullptr, NewHealth);
     OnHealthChanged.Broadcast(NewHealth);
 }
 

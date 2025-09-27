@@ -52,10 +52,10 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     UFUNCTION()
     void Rep_HealthChanged()
     {
-        UpdateHealthWidget(nullptr);
+        //UpdateHealthWidget(nullptr, Health);
         OnHealthChanged.Broadcast(Health);
     }
-    void UpdateHealthWidget(AActor* DamageCauser);
+    void UpdateHealthWidget(AActor* DamageCauser, float NewHealth);
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     bool AutoHeal;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
@@ -91,7 +91,7 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     void ApplyDamageServer(AActor *DamagedActor, float Damage,
                            AActor* DamageCauser);
     UFUNCTION(NetMulticast, Reliable)
-    void ApplyDamageMulticast(AActor *DamagedActor, float Damage, AActor *DamageCauser);
+    void ApplyDamageMulticast(AActor *DamagedActor, float Damage, AActor *DamageCauser, float NewHealth);
     UFUNCTION(NetMulticast, Reliable)
     void DeathMulticast(int32 PlayerID);
     UFUNCTION(NetMulticast, Reliable)
