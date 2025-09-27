@@ -9,6 +9,7 @@
 class UWidgetComponent;
 class USTUItemUseWidget;
 class USoundCue;
+class UNiagaraSystem;
 UCLASS()
 class SHOOTTHEMUP_API ASTUUseableActor : public AActor
 {
@@ -47,6 +48,12 @@ class SHOOTTHEMUP_API ASTUUseableActor : public AActor
     float HideSpeed = 0.5f;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
     USoundCue *UseSound;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
+    UNiagaraSystem *NiagaraEffect;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    FVector RelativeEffectPos = FVector::ZeroVector;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    FRotator RelativeEffectRotation = FRotator(90.f, 0.f, 0.f);
     float TimeToHideRemaining = 0.0f;
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;

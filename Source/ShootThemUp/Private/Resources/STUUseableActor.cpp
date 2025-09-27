@@ -7,6 +7,7 @@
 #include "UI/STUItemUseWidget.h"
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h" 
 void ASTUUseableActor::ShowItem()
 {
     TimeToHideRemaining = TimeAfterHide;
@@ -41,6 +42,12 @@ void ASTUUseableActor::UseFX_Multicast_Implementation()
 	if (UseSound)
 	{
         UGameplayStatics::PlaySoundAtLocation(GetWorld(), UseSound, GetActorLocation());
+	}
+	if (NiagaraEffect)
+	{
+        FVector WorldOffset = GetActorRotation().RotateVector(RelativeEffectPos);
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraEffect, GetActorLocation() + WorldOffset,
+                                                       GetActorRotation() + RelativeEffectRotation);
 	}
 }
 
