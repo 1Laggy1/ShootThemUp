@@ -17,8 +17,3 @@ bool ASTUExplosiveUse::Use(FVector Location, FVector Rotation, AController *Inst
     
     return result;
 }
-
-void ASTUExplosiveUse::UseFX_Multicast_Implementation()
-{
-    
-}

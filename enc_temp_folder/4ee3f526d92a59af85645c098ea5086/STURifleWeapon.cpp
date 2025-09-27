@@ -107,7 +107,6 @@ void ASTURifleWeapon::MakeShot()
     FVector TraceEnd = GetTraceData(ViewLocation, ViewRotator);
     MakeShotFX(ViewLocation, ViewRotator, TraceEnd);
     int32 ID = Cast<ACharacter>(GetOwner())->Controller->PlayerState->GetUniqueID();
-    if (Cast<ACharacter>(GetOwner())->Controller->IsLocalPlayerController())
     MakeShotServer(ViewLocation, ViewRotator, TraceEnd, ID);
 }
 
