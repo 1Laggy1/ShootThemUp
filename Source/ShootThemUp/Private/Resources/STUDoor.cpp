@@ -3,6 +3,13 @@
 
 #include "Resources/STUDoor.h"
 
+ASTUDoor::ASTUDoor()
+{
+    // Could be too high or too low. Needs testing
+    NetUpdateFrequency = 60.f;
+    MinNetUpdateFrequency = 30.f;
+}
+
 void ASTUDoor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);

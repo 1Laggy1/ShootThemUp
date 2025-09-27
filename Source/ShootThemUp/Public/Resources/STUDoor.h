@@ -14,6 +14,7 @@ class SHOOTTHEMUP_API ASTUDoor : public ASTUUseableActor
 {
 	GENERATED_BODY()
   public:
+    ASTUDoor();
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
     FVector ClosedLocation;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
