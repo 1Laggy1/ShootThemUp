@@ -52,10 +52,10 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     UFUNCTION()
     void Rep_HealthChanged()
     {
-        //UpdateHealthWidget(nullptr, Health);
+        UpdateHealthWidget(nullptr, Health, false);
         OnHealthChanged.Broadcast(Health);
     }
-    void UpdateHealthWidget(AActor* DamageCauser, float NewHealth);
+    void UpdateHealthWidget(AActor* DamageCauser, float NewHealth, bool ShowHealth);
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     bool AutoHeal;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",

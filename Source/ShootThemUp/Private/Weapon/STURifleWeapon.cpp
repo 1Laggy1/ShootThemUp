@@ -23,7 +23,7 @@ void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotat
 {
     MakeShotMulticast(ViewLocation, ViewRotation, TraceEnd, InstigatorID);
 
-    const FVector SocketLocation = GetMuzzleWorldLocation();
+    /*const FVector SocketLocation = GetMuzzleWorldLocation();
     FHitResult HitResult;
     MakeHit(HitResult, ViewLocation, TraceEnd);
     FVector TraceFXEnd = TraceEnd;
@@ -35,8 +35,7 @@ void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotat
         {
             MakeDamage(HitResult);
         }
-    }
-    // DecreaseAmmo();
+    }*/
 }
 
 void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd)
@@ -105,6 +104,20 @@ void ASTURifleWeapon::MakeShot()
     //}
     const FVector SocketLocation = GetMuzzleWorldLocation();
     FVector TraceEnd = GetTraceData(ViewLocation, ViewRotator);
+
+    if (GetOwner() && Cast<APawn>(GetOwner())->Controller && Cast<APawn>(GetOwner())->Controller->IsLocalPlayerController())
+    {
+        FHitResult HitResult;
+        MakeHit(HitResult, ViewLocation, TraceEnd);
+        if (HitResult.bBlockingHit)
+        {
+            if (HitResult.GetActor())
+            {
+                MakeDamage_Server(HitResult);
+            }
+        }
+    }
+    
     MakeShotFX(ViewLocation, ViewRotator, TraceEnd);
     int32 ID = Cast<ACharacter>(GetOwner())->Controller->PlayerState->GetUniqueID();
     if (Cast<ACharacter>(GetOwner())->Controller->IsLocalPlayerController())
@@ -160,7 +173,7 @@ FVector ASTURifleWeapon::GetTraceData(FVector ViewLocation, FRotator ViewRotatio
 
     return TraceEnd;
 }
-void ASTURifleWeapon::MakeDamage(const FHitResult &HitResult)
+void ASTURifleWeapon::MakeDamage_Server_Implementation(const FHitResult &HitResult)
 {
     FPointDamageEvent PointDamageEvent;
     PointDamageEvent.HitInfo = HitResult;

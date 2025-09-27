@@ -6,7 +6,7 @@
 ASTUDoor::ASTUDoor()
 {
     // Could be too high or too low. Needs testing
-    NetUpdateFrequency = 100.f;
+    NetUpdateFrequency = 60.f;
     MinNetUpdateFrequency = 30.f;
 }
 
