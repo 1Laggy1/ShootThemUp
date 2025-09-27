@@ -173,30 +173,14 @@ bool ASTUBall::Use(FVector Location, FVector Rotation, AController *InstigatedBy
         return false;
     }
 
+    
+
+    FVector SpawnLocation = Location +
+                            PlayerCharacter->GetActorRotation().RotateVector(RelativeStartImpulseLocation);
+    UnAttach();
 
     FRotator Rotator = Rotation.Rotation();
     FVector LaunchDirection = Rotator.Vector();
-
-    FHitResult Hit;
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(this);
-    Params.AddIgnoredActor(PlayerCharacter);
-
-    bool bHit = GetWorld()->LineTraceSingleByChannel(
-        Hit, Location, Location + Rotator.RotateVector(RelativeStartImpulseLocation), ECC_Visibility,
-        Params);
-    FVector SpawnLocation;
-    if (bHit)
-    {
-        SpawnLocation = Hit.Location - LaunchDirection * 10.0f;
-    }
-    else
-    {
-        SpawnLocation = Location + PlayerCharacter->GetActorRotation().RotateVector(RelativeStartImpulseLocation);
-    }
-    UnAttach();
-
-    
 
     SetActorLocation(SpawnLocation, false, nullptr, ETeleportType::TeleportPhysics);
     
