@@ -12,7 +12,7 @@ class SHOOTTHEMUP_API USTUHealthBarWidget : public UUserWidget
 {
 	GENERATED_BODY()
   public:
-    void SetHealthPercent(float Percent);
+    void SetHealthPercent(float Percent, bool ShowHealth);
   protected:
     virtual void NativeTick(const FGeometry &MyGeometry, float InDeltaTime) override;
     UPROPERTY(meta = (BindWidget))

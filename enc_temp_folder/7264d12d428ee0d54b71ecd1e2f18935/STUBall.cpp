@@ -177,10 +177,10 @@ bool ASTUBall::Use(FVector Location, FVector Rotation, AController *InstigatedBy
     bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, Params);
 
     // --- Debug ---
-    //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, 2.0f, 0, 2.0f);
+    DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, 2.0f, 0, 2.0f);
     if (bHit)
     {
-        //DrawDebugSphere(GetWorld(), Hit.Location, 10.0f, 12, FColor::Red, false, 2.0f);
+        DrawDebugSphere(GetWorld(), Hit.Location, 10.0f, 12, FColor::Red, false, 2.0f);
     }
 
     FVector SpawnLocation;
@@ -191,7 +191,7 @@ bool ASTUBall::Use(FVector Location, FVector Rotation, AController *InstigatedBy
     else
     {
         SpawnLocation = TraceEnd;
-        //DrawDebugSphere(GetWorld(), SpawnLocation, 10.0f, 12, FColor::Blue, false, 2.0f);
+        DrawDebugSphere(GetWorld(), SpawnLocation, 10.0f, 12, FColor::Blue, false, 2.0f);
     }
 
     UnAttach();

@@ -217,6 +217,7 @@ FVector ASTULobbyGameState::GetNextPlayerStart()
         XNow = XStart;
         YNow = YStart;
         FirstSpawnPosition = false;
+        Row = 1;
         return FVector(XNow, YNow, Height);
     }
 

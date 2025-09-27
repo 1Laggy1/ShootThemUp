@@ -233,7 +233,7 @@ FVector ASTULobbyGameState::GetNextPlayerStart()
     {
         ++Row;
         XNow += XDifference;
-        //YNow += YDifference;
+        YNow += YDifference;
     }
 
     return FVector(XNow, YNow, Height);

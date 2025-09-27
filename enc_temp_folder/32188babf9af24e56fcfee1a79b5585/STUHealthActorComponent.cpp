@@ -130,14 +130,13 @@ void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *Damag
     if (ControllerCauser == GetWorld()->GetFirstPlayerController())
     {
         UpdateHealthWidget(DamageCauser, NewHealth, true);
-        
+        OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
+        OnHealthChanged.Broadcast(NewHealth);
     }
     else
     {
         UpdateHealthWidget(DamageCauser, NewHealth, false);
     }
-    OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
-    OnHealthChanged.Broadcast(NewHealth);
     HealDelayCurrent = 0;
     IsVaunded = true;
 }

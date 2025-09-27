@@ -4,13 +4,15 @@
 #include "UI/STUHealthBarWidget.h"
 #include "Components/ProgressBar.h"
 
-void USTUHealthBarWidget::SetHealthPercent(float Percent)
+void USTUHealthBarWidget::SetHealthPercent(float Percent, bool ShowHealth)
 {
     if (!HealthProgressBar)
         return;
-    TimeToShow = TimeToShowDefault;
-    const auto HealthBarVisibility = ESlateVisibility::Visible;
-    HealthProgressBar->SetVisibility(HealthBarVisibility);
+    if (ShowHealth)
+    {
+        TimeToShow = TimeToShowDefault;
+        HealthProgressBar->SetVisibility(ESlateVisibility::Visible);
+    }
     const auto HealthBarColor = Percent > PercentColorThreshold ? GoodColor : BadColor;
     HealthProgressBar->SetFillColorAndOpacity(HealthBarColor);
 

@@ -41,7 +41,9 @@ class SHOOTTHEMUP_API ASTURifleWeapon : public ASTUBaseWeapon
                                                   int32 InstigatorID) override;
     virtual void MakeShotFX(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd) override;
     virtual FVector GetTraceData(FVector ViewLocation, FRotator ViewRotation) const override;
-    void MakeDamage(const FHitResult& HitResult);
+    //void MakeDamage(const FHitResult& HitResult);
+    UFUNCTION(Server, Reliable)
+    void MakeDamage_Server(const FHitResult &HitResult);
   private:
     FTimerHandle ShotTimerHandle;
     UPROPERTY()

@@ -584,26 +584,38 @@ void ASTUGameModeBase::Killed(AController *KillerActor, AController *DiedActor)
     const auto VictimPlayerState = DiedActor ? Cast<ASTUPlayerState>(DiedActor->PlayerState) : nullptr;
     const auto KillerPlayerState = KillerActor ? Cast<ASTUPlayerState>(KillerActor->PlayerState) : nullptr;
 
-    if (KillerPlayerState && VictimPlayerState)
+    if (VictimPlayerState)
     {
-        FPlayerInfo *KillerInfo = FindPlayerByPlayerID(KillerPlayerState->GetUniqueId().IsValid()
-                                                           ? KillerPlayerState->GetUniqueId()->ToString()
-                                                           : TEXT("UnknownID"));
+        
+        
         FPlayerInfo *VictimInfo = FindPlayerByPlayerID(VictimPlayerState->GetUniqueId().IsValid()
                                                            ? VictimPlayerState->GetUniqueId()->ToString()
                                                            : TEXT("UnknownID"));
-        if (KillerInfo && VictimInfo)
+        if (VictimInfo)
+            VictimInfo->Deaths++;
+        
+        if (KillerPlayerState)
         {
-            if (KillerInfo->TeamID == VictimInfo->TeamID)
+            FPlayerInfo *KillerInfo = FindPlayerByPlayerID(KillerPlayerState->GetUniqueId().IsValid()
+                                                               ? KillerPlayerState->GetUniqueId()->ToString()
+                                                               : TEXT("UnknownID"));
+            if (KillerInfo && VictimInfo)
             {
-                KillerInfo->Kills--;
+                if (KillerInfo->PlayerID == VictimInfo->PlayerID)
+                {
+                    KillerInfo->Deaths++;
+                }
+                else if (KillerInfo->TeamID == VictimInfo->TeamID)
+                {
+                    KillerInfo->Kills--;
+                }
+                else
+                {
+                    KillerInfo->Kills++;
+                }
             }
-            else
-            {
-                KillerInfo->Kills++;
-                VictimInfo->Deaths++;
-            }
-        }
+        }    
+        
     }
     StartRespawn(DiedActor);
 }
@@ -648,7 +660,7 @@ bool ASTUGameModeBase::ClearPause()
 
 void ASTUGameModeBase::PlayerConnected(APlayerController *PC)
 {
-    if (PC && !PlayersReadyIDs.Contains(PC->PlayerState->GetUniqueId()->ToString()))
+    if (PC && PC->PlayerState && !PlayersReadyIDs.Contains(PC->PlayerState->GetUniqueId()->ToString()))
     {
         PlayersReady++;
         PlayersReadyIDs.Add(PC->PlayerState->GetUniqueId()->ToString());

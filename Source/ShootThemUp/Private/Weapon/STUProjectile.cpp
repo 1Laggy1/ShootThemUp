@@ -3,14 +3,14 @@
 #include "Weapon/STUProjectile.h"
 #include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/DamageType.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "STUUtils.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/Components/STUWeaponFXComponent.h"
-#include "STUUtils.h"
-#include "Engine/DamageEvents.h"
 ASTUProjectile::ASTUProjectile()
 {
     SetReplicates(false);
@@ -50,7 +50,7 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
         return;
     MovementComponent->StopMovementImmediately();
 
-    //DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 24, FColor::Red, false, 5.0f);
+    // DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 24, FColor::Red, false, 5.0f);
     if (!WeaponFXComponent)
     {
         Destroy();
@@ -75,11 +75,12 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *
     ExplosionParams.DamageAmountMin = DamageAmountMin;
     ExplosionParams.ExplosionStrength = ExplosionStrength;
     ExplosionParams.ExplosionStrengthMin = ExplosionStrengthMin;
-
-    STUUtils::ApplyRadialDamageWithLineOfSight(GetWorld(), GetActorLocation(), ExplosionParams, this,
-                                               Cast<ACharacter>(GetOwner())->Controller,
-                                               {this});
-
+    if (GetOwner())
+        STUUtils::ApplyRadialDamageWithLineOfSight(GetWorld(), GetActorLocation(), ExplosionParams, this,
+                                                   Cast<ACharacter>(GetOwner())->Controller, {this});
+    else
+        STUUtils::ApplyRadialDamageWithLineOfSight(GetWorld(), GetActorLocation(), ExplosionParams, this, nullptr,
+                                                   {this});
     Destroy();
 }
 AController *ASTUProjectile::GetController() const
