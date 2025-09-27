@@ -65,19 +65,17 @@ void USTUHealthActorComponent::UpdateHealthWidget(AActor *DamageCauser, float Ne
             const auto PlayerLocation = DamageCauser->GetActorLocation();
             const auto Distance = FVector::Distance(PlayerLocation, GetOwner()->GetActorLocation());
             HealthWidgetComponent->SetVisibility(Distance < HealthVisibilityDistance, true);
-            if (!HealthBarWidget)
-            {
-                HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
-                if (!HealthBarWidget)
-                    return;
-            }
-            HealthBarWidget->SetHealthPercent(NewHealth / MaxHealth);
         }
     }
 
-    
-    // if (DamageCauser == GetWorld()->GetFirstPlayerController())
-    
+    if (!HealthBarWidget)
+    {
+        HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
+        if (!HealthBarWidget)
+            return;
+    }
+    //if (DamageCauser == GetWorld()->GetFirstPlayerController())
+    HealthBarWidget->SetHealthPercent(NewHealth/MaxHealth);
 
     /*FString yes = HealthBarWidget->IsVisible() ? FString("YES") : FString("NO");
     UE_LOG(LogTemp, Warning, TEXT("Visibility of HEALTH WIDGET COMPONENT = %s HEALTH PERCENT IS %s"), *yes,
@@ -111,9 +109,7 @@ void USTUHealthActorComponent::ApplyDamageServer_Implementation(AActor *DamagedA
             !Cast<ACharacter>(GetOwner())->GetPlayerState()->GetUniqueID())
             return;
         const auto ControllerVictim = Cast<ACharacter>(GetOwner())->Controller;
-        AController *ControllerCauser = nullptr;
-        if (DamageCauser && Cast<ACharacter>(DamageCauser) && Cast<ACharacter>(DamageCauser)->Controller)
-            ControllerCauser = Cast<ACharacter>(DamageCauser)->Controller;
+        const auto ControllerCauser = Cast<ACharacter>(DamageCauser)->Controller;
         // OnDeath.Broadcast();
 
         DeathMulticast(Cast<ACharacter>(DamagedActor)->GetPlayerState()->GetUniqueID());

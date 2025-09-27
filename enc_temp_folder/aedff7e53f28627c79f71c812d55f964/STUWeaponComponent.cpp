@@ -251,7 +251,6 @@ bool USTUWeaponComponent::TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, i
 void USTUWeaponComponent::GetWeapons(int32 MaxRetries)
 {
     bool bAllWeaponsValid = true;
-    if (!Weapons.IsEmpty())
     for (auto Weapon : Weapons)
     {
         if (!Weapon || !IsValid(Weapon))
