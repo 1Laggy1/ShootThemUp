@@ -39,9 +39,13 @@ bool ASTUUseableActor::Use(FVector Location, FVector Rotation, AController *Inst
 }
 void ASTUUseableActor::UseFX_Multicast_Implementation()
 {
-	if (UseSound)
+	if (!UseSounds.IsEmpty())
 	{
-        UGameplayStatics::PlaySoundAtLocation(GetWorld(), UseSound, GetActorLocation());
+        for (USoundCue *Sound : UseSounds)
+		{
+            UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, GetActorLocation());
+		}
+        
 	}
 	if (NiagaraEffect)
 	{
