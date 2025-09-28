@@ -47,7 +47,7 @@ class SHOOTTHEMUP_API ASTUUseableActor : public AActor
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
     float HideSpeed = 0.5f;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
-    USoundCue *UseSound;
+    TArray<USoundCue*> UseSounds;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
     UNiagaraSystem *NiagaraEffect;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
