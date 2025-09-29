@@ -11,7 +11,7 @@ DECLARE_MULTICAST_DELEGATE(FOnAbilityCooldownFinished);
 class ACharacter;
 class SoundCue;
 class UNiagaraSystem;
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(Blueprintable)
 class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
 {
     GENERATED_BODY()
@@ -23,8 +23,6 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
     UFUNCTION(Server, Reliable)
     void StopUseAbility_Server();
 
-    
-
     virtual void TickComponent(float DeltaTime, ELevelTick TickType,
                                FActorComponentTickFunction *ThisTickFunction) override;
     float GetAbilityCooldownRemaining()
@@ -32,6 +30,15 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
         return GetWorld()->GetTimerManager().GetTimerRemaining(AbilityCooldownTimerHandle);
     }
     FOnAbilityCooldownFinished OnCooldownFinished;
+    virtual void CooldownFinished()
+    {
+        OnCooldownFinished.Broadcast();
+    }
+    int32 GetUseCount()
+    {
+        return UseCount;
+    }
+
   protected:
     virtual bool StartUseAbility();
     virtual bool StopUseAbility();
@@ -39,19 +46,23 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
     void AbilityCallback_Multicast();
     virtual void AbilityCallback();
 
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+    
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
     USoundCue *UseSound;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
     UNiagaraSystem *NiagaraEffect;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
+    float Cooldown;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats")
+    int32 UseCountDefault = 3;
+    UPROPERTY(Replicated)
+    int32 UseCount = UseCountDefault;
     FTimerHandle AbilityCooldownTimerHandle;
 
     virtual void BeginPlay() override;
-  private:
     ACharacter *MyPlayer;
 
-    void CooldownFinished()
-    {
-        OnCooldownFinished.Broadcast();
-    }
+  private:
 };

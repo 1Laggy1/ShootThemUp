@@ -1,11 +1,12 @@
 ﻿// Shoot THem Up Game. All Rights Reserved.
 
-#include "Components/STUPlayerAbilityUseComponent.h"
+#include "Components/Abilities/STUPlayerAbilityUseComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Sound/SoundCue.h"
+#include "Net/UnrealNetwork.h"
 
 USTUPlayerAbilityUseComponent::USTUPlayerAbilityUseComponent()
 {
@@ -27,7 +28,11 @@ void USTUPlayerAbilityUseComponent::AbilityCallback_Multicast_Implementation()
 {
     AbilityCallback();
 }
-
+void USTUPlayerAbilityUseComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    DOREPLIFETIME(USTUPlayerAbilityUseComponent, UseCount);
+}
 bool USTUPlayerAbilityUseComponent::StartUseAbility()
 {
     if (GetWorld()->GetTimerManager().IsTimerActive(AbilityCooldownTimerHandle))
