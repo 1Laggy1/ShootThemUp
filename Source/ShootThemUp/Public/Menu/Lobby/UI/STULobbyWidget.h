@@ -20,6 +20,7 @@ class UScrollBox;
 class USlider;
 class UEditableTextBox;
 class USTUWeaponItemWidget;
+class USTUAbilityItemWidget;
 UCLASS()
 class SHOOTTHEMUP_API USTULobbyWidget : public USTUBaseWidget
 {
@@ -38,6 +39,8 @@ class SHOOTTHEMUP_API USTULobbyWidget : public USTUBaseWidget
     UPROPERTY(meta = (BindWidget))
     UScrollBox *WeaponsItemsBox;
     UPROPERTY(meta = (BindWidget))
+    UScrollBox *AbilityItemsBox;
+    UPROPERTY(meta = (BindWidget))
     USlider *Slider_R;
     UPROPERTY(meta = (BindWidget))
     USlider *Slider_G;
@@ -51,6 +54,8 @@ class SHOOTTHEMUP_API USTULobbyWidget : public USTUBaseWidget
     TSubclassOf<UUserWidget> LevelItemWidgetClass;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     TSubclassOf<UUserWidget> WeaponWidgetClass;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    TSubclassOf<UUserWidget> AbilityWidgetClass;
     UPROPERTY(meta = (BindWidgetAnim), Transient)
     UWidgetAnimation *LoadAnim;
     UFUNCTION()
@@ -63,13 +68,17 @@ class SHOOTTHEMUP_API USTULobbyWidget : public USTUBaseWidget
     TArray<USTULevelItemWidget *> LevelItemWidgets;
     UPROPERTY()
     TArray<USTUWeaponItemWidget *> WeaponItemWidgets;
+    UPROPERTY()
+    TArray<USTUAbilityItemWidget *> AbilityItemWidgets;
     UFUNCTION()
     void OnStartGame();
     UFUNCTION()
     void OnQuitGame();
     void InitLevelItems();
     void InitWeaponsItems();
+    void InitAbilityItems();
     void OnLevelSelected(const FLevelData &Data);
     void OnWeaponSelected(const FWeaponItemData &Data);
+    void OnAbilitySelected(const FAbilityItemData &Data);
     USTUGameInstance *GetSTUGameInstance() const;
 };

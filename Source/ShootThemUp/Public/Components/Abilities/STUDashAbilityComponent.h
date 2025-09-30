@@ -1,4 +1,4 @@
-// Shoot THem Up Game. All Rights Reserved.
+﻿// Shoot THem Up Game. All Rights Reserved.
 
 #pragma once
 
@@ -16,7 +16,12 @@ class SHOOTTHEMUP_API USTUDashAbilityComponent : public USTUAbilityOnceComponent
   protected:
     virtual bool StartUseAbility() override;
     void Dash();
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Stats")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
     float DashStrength = 1000.f;
-
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
+    float DashUpStrength = 200.f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
+    float PitchUpMultiplier = 0.5f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
+    float PitchHorizontalReduction = 0.5f;
 };

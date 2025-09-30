@@ -409,10 +409,34 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
                                ? Controller->PlayerState->GetUniqueId()->ToString()
                                : TEXT("UnknownID");
         FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
-
+        NewCharacter->SpawnInfo = *PlayerInfo;
         NewCharacter->PlayerColor = PlayerInfo->Color;
         NewCharacter->PlayerName = Controller->PlayerState->GetPlayerName();
         NewCharacter->PlayerID = PlayerID;
+
+        UClass *AbilityClass = PlayerInfo->AbilityClass.Get();
+        if (!AbilityClass)
+            AbilityClass = PlayerInfo->AbilityClass.LoadSynchronous();
+        if (AbilityClass)
+        {
+            NewCharacter->AbilityComponent =
+                Cast<USTUPlayerAbilityUseComponent>(NewObject<UActorComponent>(NewCharacter, AbilityClass));
+            if (NewCharacter->AbilityComponent)
+            {
+                NewCharacter->AbilityComponent->SetIsReplicated(true);
+
+                NewCharacter->AbilityComponent->RegisterComponent();
+
+                NewCharacter->AbilityComponent->SetIsReplicated(true);
+
+                NewCharacter->AbilityComponent->InitializeComponent();
+                NewCharacter->AbilityComponent->Activate(true);
+            }
+        }
+
+        
+        
+
 
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
         // NewCharacter->OnRep_PlayerID();

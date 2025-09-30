@@ -12,7 +12,7 @@
 #include "Components/CapsuleComponent.h"
 
 #include "Components/PlayerUseComponent.h"
-
+#include "Components/Abilities/STUPlayerAbilityUseComponent.h"
 #include "Player/STUPlayerController.h"
 DEFINE_LOG_CATEGORY_STATIC(STUPlayerCharacter, All, All);
 ASTUPlayerCharacter::ASTUPlayerCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)
@@ -69,6 +69,10 @@ void ASTUPlayerCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInput
                                                           &USTUWeaponComponent::Zoom, false);
     PlayerInputComponent->BindAction("UseItem", EInputEvent::IE_Pressed, PlayerUseComponent,
                                      &UPlayerUseComponent::Use);
+    PlayerInputComponent->BindAction("Ability", EInputEvent::IE_Pressed, AbilityComponent,
+                                     &USTUPlayerAbilityUseComponent::StartUseAbility_Server);
+    PlayerInputComponent->BindAction("Ability", EInputEvent::IE_Released, AbilityComponent,
+                                     &USTUPlayerAbilityUseComponent::StopUseAbility_Server);
 }
 
 void ASTUPlayerCharacter::MoveForward(float Amount)

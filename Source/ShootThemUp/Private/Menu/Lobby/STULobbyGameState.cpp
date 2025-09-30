@@ -76,7 +76,6 @@ void ASTULobbyGameState::InitTeams()
 
 // ----- OnPostLogin / Spawn all -----
 
-
 void ASTULobbyGameState::OnPostLogin(APlayerController *PlayerController)
 {
     if (!HasAuthority() || !PlayerController || !PlayerController->PlayerState || !STUGameInstance)
@@ -317,6 +316,22 @@ void ASTULobbyGameState::ChangeWeapons_Server_Implementation(TSubclassOf<ASTUBas
         if (WeaponsToChoose.Contains(WeaponToChoose))
         {
             Player->WeaponClass = WeaponToChoose;
+            OnPlayerChanged_Multicast(*Player);
+        }
+    }
+}
+
+void ASTULobbyGameState::ChangeAbility_Server_Implementation(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityToChoose,
+                                                             const FString &PlayerID)
+{
+    if (!CheckSTUGameInstance())
+        return;
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+    if (Player && AbilityToChoose)
+    {
+        if (AbilitiesToChoose.Contains(AbilityToChoose))
+        {
+            Player->AbilityClass = TSoftClassPtr<USTUPlayerAbilityUseComponent>(AbilityToChoose.Get());
             OnPlayerChanged_Multicast(*Player);
         }
     }

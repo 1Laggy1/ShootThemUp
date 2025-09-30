@@ -63,6 +63,8 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     void RequestTeamNameChange_Server(const FString &NewName);
     UFUNCTION(Server, Reliable)
     void RequestWeaponsChange_Server(TSubclassOf<ASTUBaseWeapon> WeaponToChoose);
+    UFUNCTION(Server, Reliable)
+    void RequestAbilityChange_Server(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityToChoose);
   protected:
     FTimerHandle CheckWorldTimerHandle;
     //virtual void OnPossess(APawn *InPawn) override;

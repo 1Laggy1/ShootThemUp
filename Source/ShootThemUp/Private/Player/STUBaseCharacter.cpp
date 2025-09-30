@@ -20,6 +20,7 @@
 #include "Sound/SoundCue.h"
 #include "UI/STUHealthBarWidget.h"
 #include "Weapon/STUBaseWeapon.h"
+#include "Components/Abilities/STUPlayerAbilityUseComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
@@ -46,6 +47,7 @@ void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUBaseCharacter, PlayerName);
     DOREPLIFETIME(ASTUBaseCharacter, PlayerColor);
     DOREPLIFETIME(ASTUBaseCharacter, MovementEnabled);
+
 
 }
 
@@ -79,9 +81,12 @@ void ASTUBaseCharacter::InitPlayer()
     {
         UE_LOG(BaseCharacterLog, Display, TEXT("Yes! Requesting possess now"));
         Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController())->RequestPossess_Server(this);
-
-        
     }
+    InitAbility();
+}
+void ASTUBaseCharacter::InitAbility()
+{
+    
 }
 // Called when the game starts or when spawned
 void ASTUBaseCharacter::BeginPlay()

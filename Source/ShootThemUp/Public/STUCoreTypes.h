@@ -1,4 +1,5 @@
 #pragma once
+#include "Components/Abilities/STUPlayerAbilityUseComponent.h"
 #include "STUCoreTypes.generated.h"
 // weapon
 class ASTUBaseWeapon;
@@ -154,6 +155,8 @@ struct FPlayerInfo
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     TSoftClassPtr<ASTUBaseWeapon> WeaponClass;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
+    TSoftClassPtr<USTUPlayerAbilityUseComponent> AbilityClass;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     FString PlayerName;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnInfo")
     FString PlayerID;
@@ -232,10 +235,18 @@ struct FWeaponItemData : public FItemData
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
     TSubclassOf<ASTUBaseWeapon> WeaponClass;
 };
-
+USTRUCT(BlueprintType)
+struct FAbilityItemData : public FItemData
+{
+    GENERATED_USTRUCT_BODY()
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
+    TSubclassOf<USTUPlayerAbilityUseComponent> AbilityClass;
+};
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData &)
     DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponSelectedSignature,
                                         const FWeaponItemData &)
+        DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilitySelectedSignature,
+                                            const FAbilityItemData &)
     extern const FName NAME_STUSpectating;
 
 UENUM(BlueprintType)

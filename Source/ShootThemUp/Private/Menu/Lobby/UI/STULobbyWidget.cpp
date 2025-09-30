@@ -16,6 +16,7 @@
 #include "STUUtils.h"
 #include "Weapon/STUBaseWeapon.h"
 #include "Player/STUPlayerController.h"
+#include "Menu/UI/STUAbilityItemWidget.h"
 void USTULobbyWidget::NativeOnInitialized()
 {
     if (StartGameButton)
@@ -39,6 +40,7 @@ void USTULobbyWidget::NativeOnInitialized()
     }
     InitLevelItems();
     InitWeaponsItems();
+    InitAbilityItems();
 }
 
 void USTULobbyWidget::OnChangeColorClicked()
@@ -125,6 +127,32 @@ void USTULobbyWidget::InitWeaponsItems()
     OnWeaponSelected(STUGameInstance->GeWeaponsData()[0]);
 }
 
+void USTULobbyWidget::InitAbilityItems()
+{
+    const auto STUGameInstance = GetSTUGameInstance();
+    if (!STUGameInstance)
+        return;
+    checkf(STUGameInstance->GetAbilityData().Num() != 0, TEXT("Levels data cannot be empty"));
+
+    if (!AbilityItemsBox)
+        return;
+    AbilityItemsBox->ClearChildren();
+
+    for (auto AbilityData : STUGameInstance->GetAbilityData())
+    {
+        const auto AbilityItemWidget = CreateWidget<USTUAbilityItemWidget>(GetWorld(), AbilityWidgetClass);
+        if (!AbilityItemWidget)
+            continue;
+        AbilityItemWidget->SetAbilityData(AbilityData);
+        AbilityItemWidget->OnAbilitySelected.AddUObject(this, &USTULobbyWidget::OnAbilitySelected);
+
+        AbilityItemsBox->AddChild(AbilityItemWidget);
+        AbilityItemWidgets.Add(AbilityItemWidget);
+    }
+
+    OnAbilitySelected(STUGameInstance->GetAbilityData()[0]);
+}
+
 void USTULobbyWidget::OnLevelSelected(const FLevelData &Data)
 {
     const auto STUGameInstance = GetSTUGameInstance();
@@ -162,6 +190,28 @@ void USTULobbyWidget::OnWeaponSelected(const FWeaponItemData &Data)
         {
             const auto IsSelected = Data.WeaponClass == WeaponItemWidget->GetWeaponData().WeaponClass;
             WeaponItemWidget->SetSelected(IsSelected);
+        }
+    }
+}
+
+void USTULobbyWidget::OnAbilitySelected(const FAbilityItemData &Data)
+{
+    const auto STUGameInstance = GetSTUGameInstance();
+    if (!STUGameInstance)
+    {
+        return;
+    }
+
+    auto PC = Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController());
+    if (!GetWorld() || !GetWorld()->GetFirstPlayerController())
+        return;
+    PC->RequestAbilityChange_Server(Data.AbilityClass);
+    for (auto AbilityItemWidget : AbilityItemWidgets)
+    {
+        if (AbilityItemWidget)
+        {
+            const auto IsSelected = Data.AbilityClass == AbilityItemWidget->GetAbilityData().AbilityClass;
+            AbilityItemWidget->SetSelected(IsSelected);
         }
     }
 }

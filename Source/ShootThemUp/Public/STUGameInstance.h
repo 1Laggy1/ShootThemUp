@@ -43,6 +43,10 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
     {
         return WeaponsChooseData;
     }
+    TArray<FAbilityItemData> GetAbilityData() const
+    {
+        return AbilityChooseData;
+    }
     FName GetMainMenuLevelName()
     {
         return MainMenuLevelName;
@@ -76,6 +80,8 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
     TArray<FLevelData> LevelsData;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TArray<FWeaponItemData> WeaponsChooseData;
+    UPROPERTY(EditDefaultsOnly, Category = "Game")
+    TArray<FAbilityItemData> AbilityChooseData;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     FName StartupLevelName = NAME_None;
     UPROPERTY(EditDefaultsOnly, Category = "Game")

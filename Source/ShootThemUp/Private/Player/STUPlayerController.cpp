@@ -195,6 +195,8 @@ void ASTUPlayerController::CheckPlayerFullyLoadedWorld()
     }
 }
 
+
+
 void ASTUPlayerController::RequestColorChange_Server_Implementation(const FLinearColor &Color)
 {
     if (STULobbyGameState)
@@ -219,6 +221,15 @@ void ASTUPlayerController::RequestWeaponsChange_Server_Implementation(TSubclassO
     {
         STULobbyGameState->ChangeWeapons_Server(
             WeaponToChoose, PlayerState->GetUniqueId()->ToString());
+    }
+}
+
+void ASTUPlayerController::RequestAbilityChange_Server_Implementation(
+    TSubclassOf<USTUPlayerAbilityUseComponent> AbilityToChoose)
+{
+    if (STULobbyGameState)
+    {
+        STULobbyGameState->ChangeAbility_Server(AbilityToChoose, PlayerState->GetUniqueId()->ToString());
     }
 }
 

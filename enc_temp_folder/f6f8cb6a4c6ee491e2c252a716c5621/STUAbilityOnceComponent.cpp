@@ -9,8 +9,8 @@ bool USTUAbilityOnceComponent::StartUseAbility()
     bool result = Super::StartUseAbility();
     if (result && UseCount > 0)
     {
-        AbilityCallback_Multicast();
         UseCount--;
+        AbilityCallback_Multicast();
         return true;
     }
     return false;
@@ -20,9 +20,9 @@ void USTUAbilityOnceComponent::AbilityCallback()
 {
     if (!GetOwner())
         return;
-    if (UseCount == UseCountDefault)
+    
     GetWorld()->GetTimerManager().SetTimer(AbilityCooldownTimerHandle, this,
-                                           &USTUPlayerAbilityUseComponent::CooldownFinished, Cooldown, true);
+                                           &USTUPlayerAbilityUseComponent::CooldownFinished, Cooldown, false);
     if (UseSound)
     {
         UGameplayStatics::PlaySoundAtLocation(GetWorld(), UseSound, GetOwner()->GetActorLocation());
@@ -37,13 +37,5 @@ void USTUAbilityOnceComponent::AbilityCallback()
 void USTUAbilityOnceComponent::CooldownFinished()
 {
     Super::CooldownFinished();
-    if (UseCount < UseCountDefault)
-    {
-        UseCount++;
-        if (UseCount == UseCountDefault)
-        {
-            GetWorld()->GetTimerManager().ClearTimer(AbilityCooldownTimerHandle);
-        }
-    }
-    
+    UseCount++;
 }
