@@ -21,7 +21,7 @@
 #include "UI/STUHealthBarWidget.h"
 #include "Weapon/STUBaseWeapon.h"
 #include "Components/Abilities/STUPlayerAbilityUseComponent.h"
-
+#include "Components/Abilities/STUDashAbilityComponent.h"
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 // Sets default values
@@ -32,12 +32,49 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
+    bReplicateUsingRegisteredSubObjectList = true; 
     HealthComponent = CreateDefaultSubobject<USTUHealthActorComponent>("HealthComponent");
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
     if (HealthComponent->GetHealthWidgetComponent())
     {
         HealthComponent->GetHealthWidgetComponent()->SetupAttachment(RootComponent);
     }
+
+    //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
+
+    ActiveAbilityComponent = nullptr;
+
+}
+
+void ASTUBaseCharacter::SetAbilityByClass(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityClass)
+{
+    if (AbilityComponents.IsEmpty())
+    {
+        TArray<UActorComponent *> Components;
+        GetComponents(USTUPlayerAbilityUseComponent::StaticClass(), Components);
+
+        for (UActorComponent *Component : Components)
+        {
+            USTUPlayerAbilityUseComponent *AbilityComp = Cast<USTUPlayerAbilityUseComponent>(Component);
+            if (AbilityComp)
+            {
+                AbilityComp->SetActive(false);
+                AbilityComponents.Add(AbilityComp);
+            }
+        }
+    }
+
+    for (USTUPlayerAbilityUseComponent *AbilityOne : AbilityComponents)
+    {
+        if (AbilityOne && AbilityOne->GetClass() == AbilityClass)
+        {
+            ActiveAbilityComponent = AbilityOne;
+            AbilityOne->SetActive(true);
+            return;
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Ability class not found: %s"), *AbilityClass->GetName());
 }
 
 void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const

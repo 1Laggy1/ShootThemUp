@@ -11,6 +11,7 @@
 #include "Player/STUBaseCharacter.h"
 #include "Camera/CameraActor.h"
 
+#include "Player/STUPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "STUGameStateBase.h"
 #include "Player/STUPlayerState.h"
@@ -31,6 +32,19 @@ void ASTUPlayerController::OnRequestPossess_Client_Implementation(APawn *InPawn)
     // ControlledPawn = InPawn;
     OnNewPawnEvent.Broadcast(InPawn);
     SetInputMode(FInputModeGameOnly());
+    const auto CharacterPawn = Cast<ASTUBaseCharacter>(InPawn);
+    if (CharacterPawn)
+    {
+        if (CharacterPawn->ActiveAbilityComponent)
+        {
+            CharacterPawn->InputComponent->BindAction("Ability", EInputEvent::IE_Pressed,
+                                                      CharacterPawn->ActiveAbilityComponent,
+                                       &USTUPlayerAbilityUseComponent::StartUseAbility_Server);
+            CharacterPawn->InputComponent->BindAction("Ability", EInputEvent::IE_Released,
+                                                      CharacterPawn->ActiveAbilityComponent,
+                                       &USTUPlayerAbilityUseComponent::StopUseAbility_Server);
+        }
+    }
     if (InPawn->IsA<ASpectatorPawn>())
     {
         //

@@ -9,7 +9,7 @@
 DECLARE_MULTICAST_DELEGATE(FOnAbilityCooldownFinished);
 
 class ACharacter;
-class SoundCue;
+class USoundCue;
 class UNiagaraSystem;
 UCLASS(Blueprintable)
 class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent

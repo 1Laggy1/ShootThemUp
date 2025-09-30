@@ -69,10 +69,6 @@ void ASTUPlayerCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInput
                                                           &USTUWeaponComponent::Zoom, false);
     PlayerInputComponent->BindAction("UseItem", EInputEvent::IE_Pressed, PlayerUseComponent,
                                      &UPlayerUseComponent::Use);
-    PlayerInputComponent->BindAction("Ability", EInputEvent::IE_Pressed, AbilityComponent,
-                                     &USTUPlayerAbilityUseComponent::StartUseAbility_Server);
-    PlayerInputComponent->BindAction("Ability", EInputEvent::IE_Released, AbilityComponent,
-                                     &USTUPlayerAbilityUseComponent::StopUseAbility_Server);
 }
 
 void ASTUPlayerCharacter::MoveForward(float Amount)

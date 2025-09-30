@@ -15,7 +15,7 @@ class USTUWeaponComponent;
 class USoundCue;
 class UWidgetComponent;
 class USTUPlayerAbilityUseComponent;
-
+class USTUDashAbilityComponent;
 UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 {
     GENERATED_BODY()
@@ -103,8 +103,15 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FString PlayerID = "PlayerID";
     UPROPERTY(Replicated)
     bool MovementEnabled = true;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    USTUPlayerAbilityUseComponent *AbilityComponent;
+
+    //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
+    virtual void SetAbilityByClass(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityClass);
+
+    UPROPERTY(Replicated)
+    USTUPlayerAbilityUseComponent *ActiveAbilityComponent;
+
+    UPROPERTY()
+    TArray<USTUPlayerAbilityUseComponent *> AbilityComponents;
   private:
     
     

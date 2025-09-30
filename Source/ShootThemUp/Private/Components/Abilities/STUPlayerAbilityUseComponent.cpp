@@ -64,9 +64,10 @@ void USTUPlayerAbilityUseComponent::BeginPlay()
     Super::BeginPlay();
     if (GetOwner())
     {
+        
         MyPlayer = Cast<ACharacter>(GetOwner());
     }
-
+   
 }
 
 void USTUPlayerAbilityUseComponent::TickComponent(float DeltaTime, ELevelTick TickType,

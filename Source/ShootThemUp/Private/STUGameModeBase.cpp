@@ -413,32 +413,13 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
         NewCharacter->PlayerColor = PlayerInfo->Color;
         NewCharacter->PlayerName = Controller->PlayerState->GetPlayerName();
         NewCharacter->PlayerID = PlayerID;
-
-        UClass *AbilityClass = PlayerInfo->AbilityClass.Get();
-        if (!AbilityClass)
-            AbilityClass = PlayerInfo->AbilityClass.LoadSynchronous();
-        if (AbilityClass)
-        {
-            NewCharacter->AbilityComponent =
-                Cast<USTUPlayerAbilityUseComponent>(NewObject<UActorComponent>(NewCharacter, AbilityClass));
-            if (NewCharacter->AbilityComponent)
-            {
-                NewCharacter->AbilityComponent->SetIsReplicated(true);
-
-                NewCharacter->AbilityComponent->RegisterComponent();
-
-                NewCharacter->AbilityComponent->SetIsReplicated(true);
-
-                NewCharacter->AbilityComponent->InitializeComponent();
-                NewCharacter->AbilityComponent->Activate(true);
-            }
-        }
-
-        
-        
-
-
+        NewCharacter->SetAbilityByClass(PlayerInfo->AbilityClass.Get());
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
+        
+        
+
+
+        
         // NewCharacter->OnRep_PlayerID();
     }
     // auto STUPlayerController = Cast<ASTUPlayerController>(Controller);
