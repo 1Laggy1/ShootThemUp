@@ -24,13 +24,26 @@ Older videos:
 
 - This is the lobby, you can see every player here. Change your weapon, change team color, and team name. Also the host can change the level to play on:
 
-![Lobby](https://github.com/user-attachments/assets/2bd03367-5b88-4f6b-a379-200f52528f3f)
+![Lobby(2)](https://github.com/user-attachments/assets/7ef9622e-f5ef-4ff2-b254-c643aea93229)
+
 
 - Full movement, animations, weapons shooting, equiping, replication between clients, and host.
 
 https://github.com/user-attachments/assets/08498f1e-a5b4-4016-a251-f1b7824aec4c
 
 ![Multiplayer](https://github.com/user-attachments/assets/15a20c3f-78b4-4851-a782-56db97237731)
+
+- Ability system:
+
+Dash
+
+![Dash(1)](https://github.com/user-attachments/assets/4c2cb379-65f3-4d69-8422-e765aca4e423)
+
+
+Super Jump
+
+![SuperJump(2)](https://github.com/user-attachments/assets/7abd0723-037d-462a-8038-a13bd3671fef)
+
 
 - Complete third-person character with animations (`blendspaces`, `montages`, `notifies`, `ragdoll`, `aim offsets`, `F.A.B.R.I.K`).
 
@@ -110,7 +123,7 @@ AI Damage sense:
 
 ## Next steps
 - ~~Multiplayer (`Replication`, steam integration).~~ Done.
-- Add abilities to players that they can choose.
+~~- Add abilities to players that they can choose.~~ Done.
 - Add more weapons to players that they can choose.
 - Add random spawned weapons that players can pick up.
 - ~~Add main soccer like gamemode.~~ Done.
