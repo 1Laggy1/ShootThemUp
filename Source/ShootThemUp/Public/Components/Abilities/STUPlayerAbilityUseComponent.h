@@ -29,6 +29,14 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
     {
         return GetWorld()->GetTimerManager().GetTimerRemaining(AbilityCooldownTimerHandle);
     }
+    float GetAbilityCooldown()
+    {
+        return Cooldown;
+    }
+    float GetAbilityCooldownRemainingPrecents()
+    {
+        return GetAbilityCooldownRemaining() / Cooldown;
+    }
     FOnAbilityCooldownFinished OnCooldownFinished;
     virtual void CooldownFinished()
     {
@@ -38,7 +46,12 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
     {
         return UseCount;
     }
-
+    UTexture2D *GetAbilityIcon() const
+    {
+        return AbilityIcon;
+    }
+    UFUNCTION(Client, Reliable)
+    void StartTimer_Client(bool Start);
   protected:
     virtual bool StartUseAbility();
     virtual bool StopUseAbility();
@@ -47,7 +60,6 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
     virtual void AbilityCallback();
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
-    
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
     USoundCue *UseSound;
@@ -63,6 +75,9 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
 
     virtual void BeginPlay() override;
     ACharacter *MyPlayer;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+    UTexture2D *AbilityIcon;
 
   private:
 };

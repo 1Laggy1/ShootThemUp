@@ -1,18 +1,19 @@
 ﻿// Shoot THem Up Game. All Rights Reserved.
 
-
 #include "UI/STUPlayerHUDWidget.h"
+#include "Components/ProgressBar.h"
 #include "Components/STUHealthActorComponent.h"
 #include "Components/STUWeaponComponent.h"
-#include "STUUtils.h"
-#include "STUGameModeBase.h"
 #include "Player/STUPlayerState.h"
-#include "Components/ProgressBar.h"
-#include "STUGameStateBase.h"
 #include "STUCoreTypes.h"
-
-#include "Player/STUPlayerController.h"
+#include "STUGameModeBase.h"
+#include "STUGameStateBase.h"
+#include "STUUtils.h"
+#include "Player/STUBaseCharacter.h"
 #include "Components/TextBlock.h"
+#include "Player/STUPlayerController.h"
+#include "Components/Abilities/STUPlayerAbilityUseComponent.h"
+#include "Components/Image.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 void USTUPlayerHUDWidget::NativeOnInitialized()
@@ -20,14 +21,22 @@ void USTUPlayerHUDWidget::NativeOnInitialized()
     Super::NativeOnInitialized();
     if (GetOwningPlayer() && Cast<ASTUPlayerController>(GetOwningPlayer()))
     {
-        Cast<ASTUPlayerController>(GetOwningPlayer())->OnNewPawnEvent.AddUObject(
-            this, &USTUPlayerHUDWidget::OnNewPawn);
+        Cast<ASTUPlayerController>(GetOwningPlayer())->OnNewPawnEvent.AddUObject(this, &USTUPlayerHUDWidget::OnNewPawn);
         OnNewPawn(GetOwningPlayerPawn());
     }
-    
+
     CurrentGamemodeState = Cast<ASTUGameStateBase>(GetWorld()->GetGameState());
     CurrentGamemodeState->OnTimerChanged.AddUObject(this, &USTUPlayerHUDWidget::OnTimerChanged);
     return;
+}
+void USTUPlayerHUDWidget::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
+{
+    Super::NativeTick(MyGeometry, InDeltaTime);
+    if (MyAbility && GetWorld() && AbilityCountText)
+    {
+        AbilityProgressBar->SetPercent(MyAbility->GetAbilityCooldownRemainingPrecents());
+        AbilityCountText->SetText(FText::FromString(FString::FromInt(MyAbility->GetUseCount())));
+    }
 }
 void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
 {
@@ -42,6 +51,24 @@ void USTUPlayerHUDWidget::OnNewPawn(APawn *NewPawn)
         HealthComponent->OnDeath.AddUObject(this, &USTUPlayerHUDWidget::OnPlayerDeath);
     }
     UpdateHealthBar();
+    const auto CharacterPawn = Cast<ASTUBaseCharacter>(NewPawn);
+    if (CharacterPawn)
+    {
+        if (CharacterPawn->AbilityClass)
+        {
+            const auto Compon = CharacterPawn->GetComponentByClass(CharacterPawn->AbilityClass);
+            if (Compon)
+            {
+                MyAbility = Cast<USTUPlayerAbilityUseComponent>(Compon);
+                if (AbilityImage && MyAbility->GetAbilityIcon())
+                {
+                    FSlateBrush Brush;
+                    Brush.SetResourceObject(MyAbility->GetAbilityIcon());
+                    AbilityImage->SetBrush(Brush);
+                }
+            }
+        }
+    }
 }
 void USTUPlayerHUDWidget::OnHealthChanged(float Health)
 {
@@ -53,7 +80,7 @@ void USTUPlayerHUDWidget::UpdateHealthBar()
         return;
     HealthProgressBar->SetFillColorAndOpacity(GetHealthPercent() > PercentColorThreshold ? GoodColor : BadColor);
 }
-void USTUPlayerHUDWidget::OnDamaged(AActor * DamagedActor, float Damage, AActor *DamageCauser)
+void USTUPlayerHUDWidget::OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser)
 {
     if (!IsAnimationPlaying(DamageAnimation))
     {
@@ -79,11 +106,11 @@ FString USTUPlayerHUDWidget::GetCurrentAmmo() const
     }
     FString AmmoInfo = FString::FromInt(AmmoData.Bullets) + " / ";
     AmmoInfo += AmmoData.Infinite ? FString::Chr(0x221E) : FString::FromInt(AmmoData.Clips);
-    //UE_LOG(LogHudWidget, Warning, *Ammo);
+    // UE_LOG(LogHudWidget, Warning, *Ammo);
     return AmmoInfo;
 }
 
-bool USTUPlayerHUDWidget::GetWeaponUIData(FWeaponUIData& UIData) const
+bool USTUPlayerHUDWidget::GetWeaponUIData(FWeaponUIData &UIData) const
 {
     const auto WeaponComponent = STUUtils::GetSTUPlayerComponent<USTUWeaponComponent>(GetOwningPlayerPawn());
     if (!WeaponComponent)
@@ -93,7 +120,6 @@ bool USTUPlayerHUDWidget::GetWeaponUIData(FWeaponUIData& UIData) const
         return true;
     else
         return false;
-
 }
 
 bool USTUPlayerHUDWidget::isPlayerAlive() const
@@ -123,7 +149,8 @@ FString USTUPlayerHUDWidget::GetRoundsInfo()
 
 FString USTUPlayerHUDWidget::GetKills()
 {
-    if (!GetWorld() || !CurrentGamemodeState || !GetWorld()->GetFirstPlayerController())//!GetOwningPlayerPawn() || !GetOwningPlayerPawn()->Controller)
+    if (!GetWorld() || !CurrentGamemodeState ||
+        !GetWorld()->GetFirstPlayerController()) //! GetOwningPlayerPawn() || !GetOwningPlayerPawn()->Controller)
         return "Kills: 0";
     const auto PlayerState = Cast<ASTUPlayerState>(GetWorld()->GetFirstPlayerController()->PlayerState);
     if (!PlayerState)
@@ -153,10 +180,7 @@ FString USTUPlayerHUDWidget::GetCurrentTime()
         return "00:00";
     FString Time;
     int32 Minutes = CurrentGamemodeState->GetGameCountDown() / 60;
-    int32 Seconds = CurrentGamemodeState->GetGameCountDown() % 60;  
+    int32 Seconds = CurrentGamemodeState->GetGameCountDown() % 60;
     Time = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
     return Time;
 }
-
-
-

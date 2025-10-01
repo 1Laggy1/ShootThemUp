@@ -32,6 +32,19 @@ void USTUPlayerAbilityUseComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(USTUPlayerAbilityUseComponent, UseCount);
+
+}
+void USTUPlayerAbilityUseComponent::StartTimer_Client_Implementation(bool Start)
+{
+    if (Start)
+    {
+        GetWorld()->GetTimerManager().SetTimer(AbilityCooldownTimerHandle, this,
+                                               &USTUPlayerAbilityUseComponent::CooldownFinished, Cooldown, true);
+    }
+    else
+    {
+        GetWorld()->GetTimerManager().ClearTimer(AbilityCooldownTimerHandle);
+    }
 }
 bool USTUPlayerAbilityUseComponent::StartUseAbility()
 {
@@ -64,7 +77,7 @@ void USTUPlayerAbilityUseComponent::BeginPlay()
     Super::BeginPlay();
     if (GetOwner())
     {
-        
+        SetIsReplicated(true);
         MyPlayer = Cast<ACharacter>(GetOwner());
     }
    

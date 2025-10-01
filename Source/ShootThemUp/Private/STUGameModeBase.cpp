@@ -421,8 +421,6 @@ void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
         {
             NewCharacter->AbilityClass = PlayerInfo->AbilityClass.Get();
         }
-        UE_LOG(LogSTUGameModeBase, Display, TEXT("ASTUGameModeBase::ResetOnePlayer Setting AbilityClass for player %s"),
-               *NewCharacter->AbilityClass->GetFName().ToString());
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
         
         

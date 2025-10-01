@@ -15,6 +15,8 @@ class USTUHealthActorComponent;
 class UProgressBar;
 class ASTUGameStateBase;
 class UTextBlock;
+class UImage;
+class USTUPlayerAbilityUseComponent;
 UCLASS()
 class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
 {
@@ -51,6 +53,7 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
         isPlayerDead = true;
     }
     virtual void NativeOnInitialized() override;
+    virtual void NativeTick(const FGeometry &MyGeometry, float InDeltaTime) override;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
     float PercentColorThreshold = 0.3f;
 
@@ -63,13 +66,19 @@ class SHOOTTHEMUP_API USTUPlayerHUDWidget : public USTUBaseWidget
 
     UPROPERTY(meta = (BindWidget))
     UProgressBar *HealthProgressBar;
+    UPROPERTY(meta = (BindWidget))
+    UProgressBar *AbilityProgressBar;
     UPROPERTY(meta = (BindWidgetAnim), Transient)
     UWidgetAnimation *DamageAnimation;
     UPROPERTY(meta = (BindWidget))
     UTextBlock *TimerText;
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock *AbilityCountText;
     UPROPERTY(meta = (BindWidgetAnim), Transient)
     UWidgetAnimation *TimerAnimation;
-
+    UPROPERTY(meta = (BindWidget))
+    UImage *AbilityImage;
+    USTUPlayerAbilityUseComponent *MyAbility;
     bool isPlayerDead = false;
     void OnHealthChanged(float Health);
     void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
