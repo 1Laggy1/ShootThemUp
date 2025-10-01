@@ -105,11 +105,12 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     bool MovementEnabled = true;
 
     //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
-    virtual void SetAbilityByClass(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityClass);
+    virtual void SetAbilityByActive();
 
     UPROPERTY(Replicated)
     USTUPlayerAbilityUseComponent *ActiveAbilityComponent;
-
+    UPROPERTY(Replicated)
+    TSubclassOf<USTUPlayerAbilityUseComponent> AbilityClass;
     UPROPERTY()
     TArray<USTUPlayerAbilityUseComponent *> AbilityComponents;
   private:

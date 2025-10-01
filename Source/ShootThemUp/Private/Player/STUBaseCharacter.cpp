@@ -42,12 +42,13 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 
     //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
 
-    ActiveAbilityComponent = nullptr;
+    
 
 }
 
-void ASTUBaseCharacter::SetAbilityByClass(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityClass)
+void ASTUBaseCharacter::SetAbilityByActive()
 {
+    
     if (AbilityComponents.IsEmpty())
     {
         TArray<UActorComponent *> Components;
@@ -74,7 +75,6 @@ void ASTUBaseCharacter::SetAbilityByClass(TSubclassOf<USTUPlayerAbilityUseCompon
         }
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Ability class not found: %s"), *AbilityClass->GetName());
 }
 
 void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
@@ -84,6 +84,8 @@ void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUBaseCharacter, PlayerName);
     DOREPLIFETIME(ASTUBaseCharacter, PlayerColor);
     DOREPLIFETIME(ASTUBaseCharacter, MovementEnabled);
+    DOREPLIFETIME(ASTUBaseCharacter, ActiveAbilityComponent);
+    DOREPLIFETIME(ASTUBaseCharacter, AbilityClass);
 
 
 }
@@ -129,7 +131,7 @@ void ASTUBaseCharacter::InitAbility()
 void ASTUBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
-
+    SetAbilityByActive();
     if (HealthComponent)
     {
         OnHealthChanged(HealthComponent->GetHealth());

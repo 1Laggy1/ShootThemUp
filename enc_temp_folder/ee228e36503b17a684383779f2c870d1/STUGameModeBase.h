@@ -49,8 +49,6 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     {
         BallInstance = Ball;
     }
-    UPROPERTY(EditDefaultsOnly, Category = "Game")
-    TSubclassOf<USTUPlayerAbilityUseComponent> DefaultAbilityClass;
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);

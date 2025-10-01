@@ -1,21 +1,21 @@
 ﻿// Shoot THem Up Game. All Rights Reserved.
 
 #include "Player/STUPlayerController.h"
+#include "Camera/CameraActor.h"
 #include "Components/STURespawnComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpectatorPawn.h"
+#include "Net/UnrealNetwork.h"
+#include "Player/STUBaseCharacter.h"
 #include "STUGameModeBase.h"
 #include "STUGameStateBase.h"
-#include "Net/UnrealNetwork.h"
-#include "Components/WidgetComponent.h"
-#include "Player/STUBaseCharacter.h"
-#include "Camera/CameraActor.h"
 
-#include "Player/STUPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
-#include "STUGameStateBase.h"
-#include "Player/STUPlayerState.h"
 #include "Menu/Lobby/STULobbyGameState.h"
+#include "Player/STUPlayerCharacter.h"
+#include "Player/STUPlayerState.h"
+#include "STUGameStateBase.h"
 
 DECLARE_LOG_CATEGORY_CLASS(LogSTUPlayerController, All, All);
 
@@ -35,16 +35,26 @@ void ASTUPlayerController::OnRequestPossess_Client_Implementation(APawn *InPawn)
     const auto CharacterPawn = Cast<ASTUBaseCharacter>(InPawn);
     if (CharacterPawn)
     {
-        if (CharacterPawn->ActiveAbilityComponent)
+        if (CharacterPawn->AbilityClass)
         {
-            CharacterPawn->InputComponent->BindAction("Ability", EInputEvent::IE_Pressed,
-                                                      CharacterPawn->ActiveAbilityComponent,
-                                       &USTUPlayerAbilityUseComponent::StartUseAbility_Server);
-            CharacterPawn->InputComponent->BindAction("Ability", EInputEvent::IE_Released,
-                                                      CharacterPawn->ActiveAbilityComponent,
-                                       &USTUPlayerAbilityUseComponent::StopUseAbility_Server);
+            const auto Compon = CharacterPawn->GetComponentByClass(CharacterPawn->AbilityClass);
+            if (Compon && IsLocalPlayerController())
+            {
+                /*CharacterPawn->ActiveAbilityComponent = Cast<USTUPlayerAbilityUseComponent>(Compon);
+                CharacterPawn->SetAbilityByActive();*/
+                CharacterPawn->InputComponent->BindAction("Ability", EInputEvent::IE_Pressed,
+                                                          Cast<USTUPlayerAbilityUseComponent>(Compon),
+                                                          &USTUPlayerAbilityUseComponent::StartUseAbility_Server);
+                CharacterPawn->InputComponent->BindAction("Ability", EInputEvent::IE_Released,
+                                                          Cast<USTUPlayerAbilityUseComponent>(Compon),
+                                                          &USTUPlayerAbilityUseComponent::StopUseAbility_Server);
+            }
         }
     }
+    UE_LOG(
+        LogSTUPlayerController, Display,
+        TEXT("ASTUPlayerController::OnRequestPossess_Client_Implementation Possesing character. AbilityClass was %s"),
+        *CharacterPawn->AbilityClass->GetFName().ToString());
     if (InPawn->IsA<ASpectatorPawn>())
     {
         //
@@ -63,20 +73,20 @@ void ASTUPlayerController::RequestPossess_Server_Implementation(APawn *InPawn)
     OnRequestPossess_Client(InPawn);
 }
 
-//void ASTUPlayerController::Possess_Client_Implementation(APawn *InPawn)
+// void ASTUPlayerController::Possess_Client_Implementation(APawn *InPawn)
 //{
-//    if (InPawn == nullptr)
-//    {
-//        UE_LOG(LogSTUPlayerController, Warning, TEXT("Possess_Client: InPawn was nullptr"));
-//        return;
-//    }
-//    UE_LOG(LogSTUPlayerController, Display, TEXT("Possess_Client: Possesing %s"), *InPawn->GetFullName());
-//    Possess(InPawn);
-//}
+//     if (InPawn == nullptr)
+//     {
+//         UE_LOG(LogSTUPlayerController, Warning, TEXT("Possess_Client: InPawn was nullptr"));
+//         return;
+//     }
+//     UE_LOG(LogSTUPlayerController, Display, TEXT("Possess_Client: Possesing %s"), *InPawn->GetFullName());
+//     Possess(InPawn);
+// }
 
 void ASTUPlayerController::StartSpectatingMulticast_Implementation(APawn *PawnSpectator)
 {
-    
+
     UnPossess();
     Possess(PawnSpectator);
     SetViewTargetWithBlend(PawnSpectator, 0.0f);
@@ -87,49 +97,48 @@ void ASTUPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
 {
 
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    //DOREPLIFETIME(ASTUPlayerController, ControlledPawn);
+    // DOREPLIFETIME(ASTUPlayerController, ControlledPawn);
     DOREPLIFETIME(ASTUPlayerController, LobbyCamera);
 }
 
-//void ASTUPlayerController::OnRep_Possesed()
+// void ASTUPlayerController::OnRep_Possesed()
 //{
-//    
-//    
-//    FTimerHandle TempHandle;
-//    GetWorld()->GetTimerManager().SetTimer(
-//        TempHandle,
-//        [this]() {
-//            if (ControlledPawn)
-//            {
-//                Possess(ControlledPawn);
-//                //OnNewPawnEvent.Broadcast(ControlledPawn);
-//                UE_LOG(LogPlayerController, Display, TEXT("%s POSSESING %s"), *GetFullName(),
-//                       *ControlledPawn->GetFullName());
-//                return;
-//            }
-//            OnRep_Possesed();
-//        },
-//        0.5f, false);
-//}
+//
+//
+//     FTimerHandle TempHandle;
+//     GetWorld()->GetTimerManager().SetTimer(
+//         TempHandle,
+//         [this]() {
+//             if (ControlledPawn)
+//             {
+//                 Possess(ControlledPawn);
+//                 //OnNewPawnEvent.Broadcast(ControlledPawn);
+//                 UE_LOG(LogPlayerController, Display, TEXT("%s POSSESING %s"), *GetFullName(),
+//                        *ControlledPawn->GetFullName());
+//                 return;
+//             }
+//             OnRep_Possesed();
+//         },
+//         0.5f, false);
+// }
 
-
-//void ASTUPlayerController::OnPossess(APawn *InPawn)
+// void ASTUPlayerController::OnPossess(APawn *InPawn)
 //{
-//    if (InPawn == nullptr)
-//        return;
-//    bShowMouseCursor = false;
-//    //ControlledPawn = InPawn;
-//    Super::OnPossess(InPawn);
-//    OnNewPawnEvent.Broadcast(InPawn);
-//    if (InPawn->IsA<ASpectatorPawn>())
-//    {
-//        //
-//    }
-//    else if (InPawn->IsA<ACharacter>())
-//    {
-//        //
-//    }
-//}
+//     if (InPawn == nullptr)
+//         return;
+//     bShowMouseCursor = false;
+//     //ControlledPawn = InPawn;
+//     Super::OnPossess(InPawn);
+//     OnNewPawnEvent.Broadcast(InPawn);
+//     if (InPawn->IsA<ASpectatorPawn>())
+//     {
+//         //
+//     }
+//     else if (InPawn->IsA<ACharacter>())
+//     {
+//         //
+//     }
+// }
 
 void ASTUPlayerController::BeginPlay()
 {
@@ -159,14 +168,13 @@ void ASTUPlayerController::BeginPlay()
                            *Camera->GetActorLocation().ToString());
                     if (IsLocalController())
                     {
-                        
+
                         SetViewTarget(Cameras[0]);
                     }
                     break;
                 }
             }
         }
-        
     }
 }
 
@@ -186,9 +194,9 @@ void ASTUPlayerController::NotifyLoadedWorld(FName WorldPackageName, bool bFinal
     {
         UE_LOG(LogTemp, Warning, TEXT("I am Player %s has loaded world, notifying server"), *GetNameSafe(this));
         PlayerLoadedWorld();
-        //GetWorld()->GetTimerManager().SetTimer(CheckWorldTimerHandle, this,
-        //                                       &ASTUPlayerController::CheckPlayerFullyLoadedWorld,
-        //                                      0.5f, true);
+        // GetWorld()->GetTimerManager().SetTimer(CheckWorldTimerHandle, this,
+        //                                        &ASTUPlayerController::CheckPlayerFullyLoadedWorld,
+        //                                       0.5f, true);
     }
 }
 
@@ -209,14 +217,11 @@ void ASTUPlayerController::CheckPlayerFullyLoadedWorld()
     }
 }
 
-
-
 void ASTUPlayerController::RequestColorChange_Server_Implementation(const FLinearColor &Color)
 {
     if (STULobbyGameState)
     {
-        STULobbyGameState->ChangeTeamColor_Server(
-            PlayerState->GetUniqueId()->ToString(), Color);
+        STULobbyGameState->ChangeTeamColor_Server(PlayerState->GetUniqueId()->ToString(), Color);
     }
 }
 
@@ -224,8 +229,7 @@ void ASTUPlayerController::RequestTeamNameChange_Server_Implementation(const FSt
 {
     if (STULobbyGameState)
     {
-        STULobbyGameState->ChangeTeamName_Server(
-            PlayerState->GetUniqueId()->ToString(), NewName);
+        STULobbyGameState->ChangeTeamName_Server(PlayerState->GetUniqueId()->ToString(), NewName);
     }
 }
 
@@ -233,8 +237,7 @@ void ASTUPlayerController::RequestWeaponsChange_Server_Implementation(TSubclassO
 {
     if (STULobbyGameState)
     {
-        STULobbyGameState->ChangeWeapons_Server(
-            WeaponToChoose, PlayerState->GetUniqueId()->ToString());
+        STULobbyGameState->ChangeWeapons_Server(WeaponToChoose, PlayerState->GetUniqueId()->ToString());
     }
 }
 
@@ -277,7 +280,7 @@ void ASTUPlayerController::OnRep_SetCamera()
         [this]() {
             if (LobbyCamera)
             {
-                SetViewTarget(LobbyCamera); 
+                SetViewTarget(LobbyCamera);
                 return;
             }
             OnRep_SetCamera();
