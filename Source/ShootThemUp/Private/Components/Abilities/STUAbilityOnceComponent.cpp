@@ -6,8 +6,12 @@
 #include "Sound/SoundCue.h"
 bool USTUAbilityOnceComponent::StartUseAbility()
 {
-    bool result = Super::StartUseAbility();
-    if (result && UseCount > 0)
+    if (!(UseCount > 0))
+        return false;
+
+
+    bool result = Ability();
+    if (result)
     {
         AbilityCallback_Multicast();
         UseCount--;
