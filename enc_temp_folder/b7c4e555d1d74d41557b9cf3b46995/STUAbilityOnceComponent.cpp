@@ -41,7 +41,7 @@ void USTUAbilityOnceComponent::AbilityCallback()
 void USTUAbilityOnceComponent::CooldownFinished()
 {
     Super::CooldownFinished();
-
+    if (!GetOwner()->HasAuthority()) return;
     if (UseCount < UseCountDefault)
     {
         UseCount++;

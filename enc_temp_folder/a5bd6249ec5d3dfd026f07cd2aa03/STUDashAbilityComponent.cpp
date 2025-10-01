@@ -8,14 +8,17 @@
 bool USTUDashAbilityComponent::StartUseAbility()
 {
     bool result = Super::StartUseAbility();
-    return result;
+    if (!result)
+        return false;
+    Dash();
+    return true;
 }
 
-bool USTUDashAbilityComponent::Ability()
+void USTUDashAbilityComponent::Dash()
 {
     APlayerController *PC = Cast<APlayerController>(MyPlayer->GetController());
     if (!PC)
-        return false;
+        return;
 
     FVector CameraLocation;
     FRotator CameraRotation;
@@ -73,5 +76,4 @@ bool USTUDashAbilityComponent::Ability()
     NewVelocity.Z = DashUpStrength + PitchBoost;
 
     MyPlayer->LaunchCharacter(NewVelocity, /*bXYOverride=*/true, /*bZOverride=*/true);
-    return true;
 }

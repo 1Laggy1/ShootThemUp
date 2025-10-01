@@ -58,10 +58,7 @@ class SHOOTTHEMUP_API USTUPlayerAbilityUseComponent : public UActorComponent
     UFUNCTION(NetMulticast, Reliable)
     void AbilityCallback_Multicast();
     virtual void AbilityCallback();
-    virtual bool Ability()
-    {
-        return true;
-    }
+
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Use")
