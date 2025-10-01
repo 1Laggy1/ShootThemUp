@@ -37,7 +37,6 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     virtual void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser) override;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUPlayerCameraShake *STUPlayerCameraShake;
-
   public:
     virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 

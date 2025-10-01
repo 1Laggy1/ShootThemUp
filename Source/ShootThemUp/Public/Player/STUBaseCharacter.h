@@ -14,7 +14,8 @@ class ASTUBaseWeapon;
 class USTUWeaponComponent;
 class USoundCue;
 class UWidgetComponent;
-
+class USTUPlayerAbilityUseComponent;
+class USTUDashAbilityComponent;
 UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 {
     GENERATED_BODY()
@@ -23,6 +24,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUWeaponComponent* WeaponComponent;
+    
     
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage *DeathAnimMontage;
@@ -56,6 +58,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     
     
   public:
+
     ASTUBaseCharacter(const FObjectInitializer &ObjInit);
     virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
@@ -74,6 +77,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     void MulticastStartSprint(bool Start);
     AController *GetInstigatorControllerFromDamageCauser(AActor *DamageCauser);
     void InitPlayer();
+    void InitAbility();
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement", meta = (ClampMin = "1.1", ClampMax = "10.0"))
     float SprintSpeedMultiplier = 2.0f;
 
@@ -93,11 +97,22 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FLinearColor PlayerColor = FLinearColor::White;
     UPROPERTY(Replicated)
     FString PlayerName = "Player";
-
+    UPROPERTY(Replicated)
+    TSubclassOf<USTUPlayerAbilityUseComponent> Ability;
     UPROPERTY(Replicated)
     FString PlayerID = "PlayerID";
     UPROPERTY(Replicated)
     bool MovementEnabled = true;
+
+    //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
+    virtual void SetAbilityByActive();
+
+    UPROPERTY(Replicated)
+    USTUPlayerAbilityUseComponent *ActiveAbilityComponent;
+    UPROPERTY(Replicated)
+    TSubclassOf<USTUPlayerAbilityUseComponent> AbilityClass;
+    UPROPERTY()
+    TArray<USTUPlayerAbilityUseComponent *> AbilityComponents;
   private:
     
     

@@ -20,7 +20,8 @@
 #include "Sound/SoundCue.h"
 #include "UI/STUHealthBarWidget.h"
 #include "Weapon/STUBaseWeapon.h"
-
+#include "Components/Abilities/STUPlayerAbilityUseComponent.h"
+#include "Components/Abilities/STUDashAbilityComponent.h"
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 // Sets default values
@@ -31,12 +32,49 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
 
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
+    bReplicateUsingRegisteredSubObjectList = true; 
     HealthComponent = CreateDefaultSubobject<USTUHealthActorComponent>("HealthComponent");
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
     if (HealthComponent->GetHealthWidgetComponent())
     {
         HealthComponent->GetHealthWidgetComponent()->SetupAttachment(RootComponent);
     }
+
+    //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
+
+    
+
+}
+
+void ASTUBaseCharacter::SetAbilityByActive()
+{
+    
+    if (AbilityComponents.IsEmpty())
+    {
+        TArray<UActorComponent *> Components;
+        GetComponents(USTUPlayerAbilityUseComponent::StaticClass(), Components);
+
+        for (UActorComponent *Component : Components)
+        {
+            USTUPlayerAbilityUseComponent *AbilityComp = Cast<USTUPlayerAbilityUseComponent>(Component);
+            if (AbilityComp)
+            {
+                AbilityComp->SetActive(false);
+                AbilityComponents.Add(AbilityComp);
+            }
+        }
+    }
+
+    for (USTUPlayerAbilityUseComponent *AbilityOne : AbilityComponents)
+    {
+        if (AbilityOne && AbilityOne->GetClass() == AbilityClass)
+        {
+            ActiveAbilityComponent = AbilityOne;
+            AbilityOne->SetActive(true);
+            return;
+        }
+    }
+
 }
 
 void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
@@ -46,6 +84,9 @@ void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUBaseCharacter, PlayerName);
     DOREPLIFETIME(ASTUBaseCharacter, PlayerColor);
     DOREPLIFETIME(ASTUBaseCharacter, MovementEnabled);
+    DOREPLIFETIME(ASTUBaseCharacter, ActiveAbilityComponent);
+    DOREPLIFETIME(ASTUBaseCharacter, AbilityClass);
+
 
 }
 
@@ -79,15 +120,18 @@ void ASTUBaseCharacter::InitPlayer()
     {
         UE_LOG(BaseCharacterLog, Display, TEXT("Yes! Requesting possess now"));
         Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController())->RequestPossess_Server(this);
-
-        
     }
+    InitAbility();
+}
+void ASTUBaseCharacter::InitAbility()
+{
+    
 }
 // Called when the game starts or when spawned
 void ASTUBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
-
+    SetAbilityByActive();
     if (HealthComponent)
     {
         OnHealthChanged(HealthComponent->GetHealth());

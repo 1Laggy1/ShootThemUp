@@ -12,6 +12,7 @@
  */
 
 class ASTUBaseWeapon;
+class USTUPlayerAbilityUseComponent;
 class ASTUBaseCharacter;
 class USTUGameInstance;
 class ASTULobbyGameMode;
@@ -22,6 +23,8 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
   public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
     TArray<TSubclassOf<ASTUBaseWeapon>> WeaponsToChoose;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+    TArray<TSubclassOf<USTUPlayerAbilityUseComponent>> AbilitiesToChoose;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
     FPlayerInfo DefaultPlayerInfo;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -39,7 +42,8 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
 
     UFUNCTION(Server, Reliable)
     void ChangeWeapons_Server(TSubclassOf<ASTUBaseWeapon> WeaponToChoose, const FString &PlayerID);
-
+    UFUNCTION(Server, Reliable)
+    void ChangeAbility_Server(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityToChoose, const FString &PlayerID);
     UFUNCTION(NetMulticast, Reliable)
     void SpawnAllTeams_Multicast(const TArray<FTeamInfo> &TeamsInfo);
 

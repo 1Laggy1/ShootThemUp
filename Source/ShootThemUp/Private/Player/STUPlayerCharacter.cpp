@@ -12,7 +12,7 @@
 #include "Components/CapsuleComponent.h"
 
 #include "Components/PlayerUseComponent.h"
-
+#include "Components/Abilities/STUPlayerAbilityUseComponent.h"
 #include "Player/STUPlayerController.h"
 DEFINE_LOG_CATEGORY_STATIC(STUPlayerCharacter, All, All);
 ASTUPlayerCharacter::ASTUPlayerCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)
