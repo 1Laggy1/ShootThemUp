@@ -40,8 +40,6 @@ void ASTUPlayerController::OnRequestPossess_Client_Implementation(APawn *InPawn)
             const auto Compon = CharacterPawn->GetComponentByClass(CharacterPawn->AbilityClass);
             if (Compon && IsLocalPlayerController())
             {
-                /*CharacterPawn->ActiveAbilityComponent = Cast<USTUPlayerAbilityUseComponent>(Compon);
-                CharacterPawn->SetAbilityByActive();*/
                 CharacterPawn->InputComponent->BindAction("Ability", EInputEvent::IE_Pressed,
                                                           Cast<USTUPlayerAbilityUseComponent>(Compon),
                                                           &USTUPlayerAbilityUseComponent::StartUseAbility_Server);
