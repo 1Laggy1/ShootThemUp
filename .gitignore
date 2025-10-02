@@ -8,5 +8,6 @@ Saved/
 Config/
 Content/
 Backups/
+enc_temp_folder/
 ShootThemUp.code-workspace
 *sln
