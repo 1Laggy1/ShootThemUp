@@ -77,6 +77,7 @@ void USTUPlayerAbilityUseComponent::BeginPlay()
     Super::BeginPlay();
     if (GetOwner())
     {
+        UseCount = UseCountDefault;
         SetIsReplicated(true);
         MyPlayer = Cast<ACharacter>(GetOwner());
     }

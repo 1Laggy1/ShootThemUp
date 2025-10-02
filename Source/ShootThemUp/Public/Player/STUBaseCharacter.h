@@ -44,8 +44,9 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     USoundCue *DamageSound;
     
     FPlayerInfo* PlayerInfo;
-
-    
+    bool bIsLocallySprinting;
+    bool bWantToZoom;
+    bool bWantToShoot;
     //UPROPERTY(Replicated)
     FRotator AimRotation;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;

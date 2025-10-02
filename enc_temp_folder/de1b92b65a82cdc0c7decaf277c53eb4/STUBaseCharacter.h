@@ -44,7 +44,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     USoundCue *DamageSound;
     
     FPlayerInfo* PlayerInfo;
-
+    bool bIsChangingSprintZoom;
     
     //UPROPERTY(Replicated)
     FRotator AimRotation;
@@ -65,7 +65,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FPlayerInfo SpawnInfo;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUHealthActorComponent *HealthComponent;
-    void Zoom(bool Enabled);
+    virtual void Zoom(bool Enabled);
     void SetPlayerColor(const FLinearColor &Color);
     // Called every frame
     virtual void Tick(float DeltaTime) override;

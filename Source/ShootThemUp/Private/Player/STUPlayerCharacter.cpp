@@ -168,7 +168,7 @@ void ASTUPlayerCharacter::StopSprint()
 void ASTUPlayerCharacter::StopFire()
 {
     Super::StopFire();
-    if (bWantToSprint)
+    if (bWantToSprint && !bWantToZoom)
     {
         StartSprint();
     }
@@ -176,11 +176,14 @@ void ASTUPlayerCharacter::StopFire()
 
 void ASTUPlayerCharacter::Zoom(bool Enabled)
 {
-    Super::Zoom(Enabled);
-    if (!Enabled && bWantToSprint)
+    bWantToZoom = Enabled;
+    if (!Enabled && bWantToSprint && !bIsLocallySprinting && !bWantToShoot)
     {
         StartSprint();
+        return;
     }
+    Super::Zoom(Enabled);
+    
 }
 
 void ASTUPlayerCharacter::OnDeath()

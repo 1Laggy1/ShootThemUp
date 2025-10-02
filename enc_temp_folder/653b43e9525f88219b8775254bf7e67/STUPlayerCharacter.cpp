@@ -174,6 +174,17 @@ void ASTUPlayerCharacter::StopFire()
     }
 }
 
+void ASTUPlayerCharacter::Zoom(bool Enabled)
+{
+    if (!Enabled && bWantToSprint && !IsSprinting())
+    {
+        StartSprint();
+        return;
+    }
+    Super::Zoom(Enabled);
+    
+}
+
 void ASTUPlayerCharacter::OnDeath()
 {
     

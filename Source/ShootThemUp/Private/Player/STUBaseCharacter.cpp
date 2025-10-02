@@ -160,20 +160,24 @@ void ASTUBaseCharacter::Tick(float DeltaTime)
 
 void ASTUBaseCharacter::StartFire()
 {
+    bWantToShoot = true;
     if (IsSprinting())
     {
         StopSprint();
     }
     WeaponComponent->StartFire();
 }
+
 void ASTUBaseCharacter::StopFire()
 {
-    
+    bWantToShoot = false;
+    WeaponComponent->StopFire();
 }
-    // aCalled to bind functionality to input
+
 
 void ASTUBaseCharacter::StartSprint()
 {
+    bIsLocallySprinting = true;
     Zoom(false);
     WeaponComponent->StopFire();
     RequestSprintServer(true);
@@ -181,6 +185,7 @@ void ASTUBaseCharacter::StartSprint()
 
 void ASTUBaseCharacter::StopSprint()
 {
+    bIsLocallySprinting = false;
     RequestSprintServer(false);
 }
 
@@ -191,7 +196,7 @@ void ASTUBaseCharacter::MulticastStartSprint_Implementation(bool Start)
         if (!isSprintingPressed)
         {
             isSprintingPressed = true;
-            GetCharacterMovement()->MaxWalkSpeed *= SprintSpeedMultiplier; // Double the speed when sprinting
+            GetCharacterMovement()->MaxWalkSpeed *= SprintSpeedMultiplier;
         }
     }
     else
@@ -199,7 +204,7 @@ void ASTUBaseCharacter::MulticastStartSprint_Implementation(bool Start)
         if (isSprintingPressed)
         {
             isSprintingPressed = false;
-            GetCharacterMovement()->MaxWalkSpeed /= SprintSpeedMultiplier; // Reset the speed when stopping sprint
+            GetCharacterMovement()->MaxWalkSpeed /= SprintSpeedMultiplier;
         }
     }
 }
@@ -211,7 +216,7 @@ void ASTUBaseCharacter::RequestSprintServer_Implementation(bool Start)
 
 bool ASTUBaseCharacter::IsSprinting()
 {
-    return isSprintingPressed && isWalking; // Check if the character is both sprinting and walking
+    return isSprintingPressed && isWalking;
 }
 
 FRotator ASTUBaseCharacter::CalculateAimRotation()
