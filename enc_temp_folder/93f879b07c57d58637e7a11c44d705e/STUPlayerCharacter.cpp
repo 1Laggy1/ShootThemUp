@@ -174,15 +174,6 @@ void ASTUPlayerCharacter::StopFire()
     }
 }
 
-void ASTUPlayerCharacter::Zoom(bool Enabled)
-{
-    Super::Zoom(Enabled);
-    if (!Enabled && bWantToSprint)
-    {
-        StartSprint();
-    }
-}
-
 void ASTUPlayerCharacter::OnDeath()
 {
     

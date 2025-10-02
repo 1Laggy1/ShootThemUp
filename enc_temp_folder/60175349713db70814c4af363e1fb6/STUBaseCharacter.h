@@ -65,7 +65,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FPlayerInfo SpawnInfo;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUHealthActorComponent *HealthComponent;
-    virtual void Zoom(bool Enabled);
+    void Zoom(bool Enabled);
     void SetPlayerColor(const FLinearColor &Color);
     // Called every frame
     virtual void Tick(float DeltaTime) override;

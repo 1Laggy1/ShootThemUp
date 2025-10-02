@@ -42,7 +42,6 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     virtual void StartSprint() override;
     virtual void StopSprint() override;
     virtual void StopFire() override;
-    virtual void Zoom(bool Enabled) override;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
     TSubclassOf<UCameraShakeBase> LandShake;

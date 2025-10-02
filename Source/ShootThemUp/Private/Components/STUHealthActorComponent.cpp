@@ -76,13 +76,6 @@ void USTUHealthActorComponent::UpdateHealthWidget(AActor *DamageCauser, float Ne
             return;
     }
     HealthBarWidget->SetHealthPercent(NewHealth / MaxHealth, ShowHealth);
-    
-    // if (DamageCauser == GetWorld()->GetFirstPlayerController())
-    
-
-    /*FString yes = HealthBarWidget->IsVisible() ? FString("YES") : FString("NO");
-    UE_LOG(LogTemp, Warning, TEXT("Visibility of HEALTH WIDGET COMPONENT = %s HEALTH PERCENT IS %s"), *yes,
-           *FString::Printf(TEXT("%.2f"), GetHealthPercent()));*/
 }
 
 void USTUHealthActorComponent::BeginPlay()
