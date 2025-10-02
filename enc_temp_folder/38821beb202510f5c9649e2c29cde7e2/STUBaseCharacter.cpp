@@ -160,7 +160,6 @@ void ASTUBaseCharacter::Tick(float DeltaTime)
 
 void ASTUBaseCharacter::StartFire()
 {
-    bWantToShoot = true;
     if (IsSprinting())
     {
         StopSprint();
@@ -170,14 +169,12 @@ void ASTUBaseCharacter::StartFire()
 
 void ASTUBaseCharacter::StopFire()
 {
-    bWantToShoot = false;
-    WeaponComponent->StopFire();
+    
 }
 
 
 void ASTUBaseCharacter::StartSprint()
 {
-    bIsLocallySprinting = true;
     Zoom(false);
     WeaponComponent->StopFire();
     RequestSprintServer(true);
@@ -185,7 +182,6 @@ void ASTUBaseCharacter::StartSprint()
 
 void ASTUBaseCharacter::StopSprint()
 {
-    bIsLocallySprinting = false;
     RequestSprintServer(false);
 }
 

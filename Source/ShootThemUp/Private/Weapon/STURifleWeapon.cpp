@@ -23,19 +23,6 @@ void ASTURifleWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotat
 {
     MakeShotMulticast(ViewLocation, ViewRotation, TraceEnd, InstigatorID);
 
-    /*const FVector SocketLocation = GetMuzzleWorldLocation();
-    FHitResult HitResult;
-    MakeHit(HitResult, ViewLocation, TraceEnd);
-    FVector TraceFXEnd = TraceEnd;
-    if (HitResult.bBlockingHit)
-    {
-        TraceFXEnd = HitResult.ImpactPoint;
-        WeaponFXComponent->PlayImpactFX(HitResult);
-        if (HitResult.GetActor())
-        {
-            MakeDamage(HitResult);
-        }
-    }*/
 }
 
 void ASTURifleWeapon::MakeShotFX(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd)
@@ -96,12 +83,7 @@ void ASTURifleWeapon::MakeShot()
     FVector ViewLocation = FVector();
     FRotator ViewRotator = FRotator();
     GetPlayerViewPoint(ViewLocation, ViewRotator);
-    /*if (!GetOwner()->HasAuthority())
-    {
-       */
-
     DecreaseAmmo();
-    //}
     const FVector SocketLocation = GetMuzzleWorldLocation();
     FVector TraceEnd = GetTraceData(ViewLocation, ViewRotator);
 
@@ -160,7 +142,11 @@ void ASTURifleWeapon::Zoom(bool Enable)
     const auto Controllerr = Cast<APlayerController>(GetController());
     if (!Controllerr || !Controllerr->PlayerCameraManager)
         return;
-
+    if (Enable)
+        BulletSpread = 0.f;
+    else
+        BulletSpread = BulletSpreadDefault;
+    IsZoomed = Enable;
     const TInterval<float> FOV(ZoomFOV, NoZoomFOV);
     Controllerr->PlayerCameraManager->SetFOV(Enable ? FOV.Min : FOV.Max);
 }
@@ -168,6 +154,7 @@ void ASTURifleWeapon::Zoom(bool Enable)
 FVector ASTURifleWeapon::GetTraceData(FVector ViewLocation, FRotator ViewRotation) const
 {
     const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
+
     const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
     FVector TraceEnd = ViewLocation + ShootDirection * TraceMaxDistance;
 
@@ -175,9 +162,27 @@ FVector ASTURifleWeapon::GetTraceData(FVector ViewLocation, FRotator ViewRotatio
 }
 void ASTURifleWeapon::MakeDamage_Server_Implementation(const FHitResult &HitResult)
 {
+    if (!HitResult.GetActor())
+        return;
+
+    FVector TraceStart = GetMuzzleWorldLocation();
+    float Distance = FVector::Dist(TraceStart, HitResult.ImpactPoint);
+
+    float ActualDamage = Damage;
+
+    if (Distance > DamageDistanceStartFalloff)
+    {
+        float Alpha = (Distance - DamageDistanceStartFalloff) / (DamageDistanceEndFalloff - DamageDistanceStartFalloff);
+
+        Alpha = FMath::Clamp(Alpha, 0.0f, 1.0f);
+
+        ActualDamage = FMath::Lerp(Damage, MinDamage, Alpha);
+    }
+
     FPointDamageEvent PointDamageEvent;
     PointDamageEvent.HitInfo = HitResult;
-    HitResult.GetActor()->TakeDamage(Damage, PointDamageEvent, Cast<ACharacter>(GetOwner())->Controller, this);
+
+    HitResult.GetActor()->TakeDamage(ActualDamage, PointDamageEvent, Cast<ACharacter>(GetOwner())->Controller, this);
 }
 
 void ASTURifleWeapon::InitMuzzleFX()

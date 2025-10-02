@@ -24,10 +24,10 @@ void USTUPlayerCameraShake::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 }
 
-void USTUPlayerCameraShake::PlayCameraShake(APlayerController *pc)
+void USTUPlayerCameraShake::PlayCameraShake(APlayerController *pc, TSubclassOf<UCameraShakeBase> CameraShake, float Scale)
 {
-    if (!pc || !DefaultCameraShake)
+    if (!pc)
         return;
-
-    pc->PlayerCameraManager->StartCameraShake(DefaultCameraShake);
+	
+    pc->PlayerCameraManager->StartCameraShake(CameraShake, Scale);
 }

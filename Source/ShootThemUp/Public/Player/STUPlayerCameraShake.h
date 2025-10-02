@@ -25,5 +25,5 @@ class SHOOTTHEMUP_API USTUPlayerCameraShake : public UActorComponent
   public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType,
                                FActorComponentTickFunction *ThisTickFunction) override;
-    void PlayCameraShake(APlayerController* pc);
+    void PlayCameraShake(APlayerController *pc, TSubclassOf<UCameraShakeBase> CameraShake, float Scale = 1.f);
 };

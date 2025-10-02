@@ -21,7 +21,8 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     GENERATED_BODY()
   public:
     ASTUPlayerCharacter(const FObjectInitializer &ObjInit); 
-    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    USTUPlayerCameraShake *STUPlayerCameraShake;
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USpringArmComponent *SpringArmComponent;
@@ -35,8 +36,21 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     virtual void BeginPlay() override;
     void SnapCamera();
     virtual void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser) override;
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    USTUPlayerCameraShake *STUPlayerCameraShake;
+    virtual void Landed(const FHitResult &Hit) override;
+    void SprintPressed();
+    void SprintUnPressed();
+    virtual void StartSprint() override;
+    virtual void StopSprint() override;
+    virtual void StopFire() override;
+    virtual void Zoom(bool Enabled) override;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
+    TSubclassOf<UCameraShakeBase> LandShake;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
+    TSubclassOf<UCameraShakeBase> DamageShake;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
+    TSubclassOf<UCameraShakeBase> RunningShake;
+    bool bWantToSprint;
   public:
     virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
@@ -52,4 +66,6 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     void OnCameraCollisionEndOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor,
                                      UPrimitiveComponent * OtherComp, int32 OtherBodyIndex);
     void CheckCameraOverlap();
+
+    
 };
