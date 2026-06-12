@@ -8,6 +8,8 @@
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h" 
+#include "TimerManager.h"
+
 void ASTUUseableActor::ShowItem()
 {
     TimeToHideRemaining = TimeAfterHide;
@@ -30,8 +32,10 @@ ASTUUseableActor::ASTUUseableActor()
 bool ASTUUseableActor::Use(FVector Location, FVector Rotation, AController *InstigatedBy)
 {
     if (CooldownRemaining > 0.0f)
+    {
         return false;
-	CooldownRemaining = CooldownTime;
+    }
+    CooldownRemaining = CooldownTime;
     GetWorldTimerManager().SetTimer(CooldownTimerHandle, this, &ASTUUseableActor::CooldownTick, 0.1f, true);
     UseFX_Multicast();
     return true;
@@ -58,24 +62,25 @@ void ASTUUseableActor::UseFX_Multicast_Implementation()
 void ASTUUseableActor::Tick(float DeltaTime)
 {
     if (!IsWidgetShown)
+    {
         return;
+    }
 
-	if (TimeToHideRemaining > 0.0f)
-	{
-        TimeToHideRemaining -= DeltaTime;
-	}
-	else
-	{
-		if (ItemWidget->GetRenderOpacity() > 0.0f)
-		{
-            ItemWidget->SetRenderOpacity(ItemWidget->GetRenderOpacity() - (DeltaTime * HideSpeed));
-		}
-		else
-		{
-            IsWidgetShown = false;
-		}
-        
-	}
+    if (TimeToHideRemaining > 0.0f)
+    {
+	    TimeToHideRemaining -= DeltaTime;
+    }
+    else
+    {
+	    if (ItemWidget->GetRenderOpacity() > 0.0f)
+	    {
+		    ItemWidget->SetRenderOpacity(ItemWidget->GetRenderOpacity() - (DeltaTime * HideSpeed));
+	    }
+	    else
+	    {
+		    IsWidgetShown = false;
+	    }
+    }
 }
 
 void ASTUUseableActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const

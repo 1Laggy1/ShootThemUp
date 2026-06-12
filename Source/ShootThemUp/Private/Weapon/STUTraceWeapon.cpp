@@ -13,6 +13,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Player/STUPlayerState.h"
 #include "Sound/SoundCue.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Weapon/Components/STUWeaponFXComponent.h"
 
 ASTUTraceWeapon::ASTUTraceWeapon()

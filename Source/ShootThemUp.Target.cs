@@ -10,6 +10,8 @@ public class ShootThemUpTarget : TargetRules
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
         bUsesSteam = true;
+		bUsePCHFiles = false;
+		bUseSharedPCHs = false;
         ExtraModuleNames.AddRange( new string[] { "ShootThemUp" } );
 	}
 }

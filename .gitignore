@@ -2,6 +2,8 @@
 .vscode
 Binaries/
 Build/
+Builds/
+Plugins/
 DerivedDataCache/
 Intermediate/
 Saved/

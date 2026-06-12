@@ -2,7 +2,7 @@
 
 
 #include "UI/STUPauseWidget.h"
-#include "Gameframework/GameModeBase.h"
+#include "GameFramework/GameModeBase.h"
 #include "Components/Button.h"
 void USTUPauseWidget::NativeOnInitialized()
 {

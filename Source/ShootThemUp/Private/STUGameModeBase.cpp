@@ -1,4 +1,4 @@
-﻿// Shoot THem Up Game. All Rights Reserved.
+// Shoot THem Up Game. All Rights Reserved.
 
 #include "STUGameModeBase.h"
 #include "AIController.h"
@@ -82,6 +82,7 @@ void ASTUGameModeBase::StartPlay()
 {
 
     Super::StartPlay();
+    
     if (!GetWorld() || !GetWorld()->HasBegunPlay())
     {
         UE_LOG(LogTemp, Warning, TEXT("World not ready in StartPlay"));
@@ -98,6 +99,7 @@ void ASTUGameModeBase::StartPlay()
         {
             PlayersNum += Team.PlayersInfos.Num();
             UE_LOG(LogTemp, Warning, TEXT("Team has %d players"), Team.PlayersInfos.Num());
+            
         }
     }
     GetTeamsStarts();
@@ -107,8 +109,8 @@ void ASTUGameModeBase::StartPlay()
     // STUGameStateBase->CurrentRound = 0;
     //  SpawnBots();
     //  CreateTeamsInfo();
+    
 }
-
 void ASTUGameModeBase::GetTeamsStarts()
 {
     if (!GetWorld())

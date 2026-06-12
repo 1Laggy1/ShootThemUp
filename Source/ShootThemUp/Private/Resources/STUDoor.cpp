@@ -5,9 +5,10 @@
 
 ASTUDoor::ASTUDoor()
 {
-    // Could be too high or too low. Needs testing
-    NetUpdateFrequency = 100.f;
-    MinNetUpdateFrequency = 30.f;
+    	// Could be too high or too low. Needs testing
+    	SetNetUpdateFrequency(100.f);
+
+	SetMinNetUpdateFrequency(30.f);
 }
 
 void ASTUDoor::Tick(float DeltaTime)

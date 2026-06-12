@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "STUMenuHUD.generated.h"
 
+class UUserWidget;
+
 /**
  * 
  */

@@ -21,10 +21,14 @@ DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
 ASTUBaseWeapon::ASTUBaseWeapon()
 {
+
     PrimaryActorTick.bCanEverTick = false;
     bReplicates = true;
+    USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+    SetRootComponent(SceneRoot);
     WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
-    SetRootComponent(WeaponMesh);
+    WeaponMesh->SetupAttachment(SceneRoot);
+    
 }
 
 void ASTUBaseWeapon::BeginPlay()

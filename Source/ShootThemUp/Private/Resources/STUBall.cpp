@@ -12,6 +12,8 @@
 #include "STUUtils.h"
 #include "UI/STUBallWidget.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Components/MeshComponent.h"
 
 ASTUBall::ASTUBall()
 {
@@ -39,8 +41,8 @@ ASTUBall::ASTUBall()
     BallWidgetComponent->SetupAttachment(RootComponent);
     SetReplicates(true);
     SetReplicateMovement(true);
-    NetUpdateFrequency = 200.f;
-    MinNetUpdateFrequency = 33.f;
+    SetNetUpdateFrequency(200.f);
+    SetMinNetUpdateFrequency(33.f);
 }
 
 void ASTUBall::BeginPlay()

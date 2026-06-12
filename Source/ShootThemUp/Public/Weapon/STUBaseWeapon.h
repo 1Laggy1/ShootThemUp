@@ -8,7 +8,7 @@
 #include "STUBaseWeapon.generated.h"
 
 
-class USkeletalMeshComponents;
+class USkeletalMeshComponent;
 class UNiagaraSystem;
 class UNiagaraComponent;
 class USoundCue;
@@ -43,7 +43,7 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
     UAnimMontage *ReloadAnimMontage;
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    UMeshComponent *WeaponMesh;
+    USkeletalMeshComponent *WeaponMesh;
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
     FName MuzzleSocketName = "MuzzleFlashSocket";
     UPROPERTY(EditAnywhere, Category = "Stats")

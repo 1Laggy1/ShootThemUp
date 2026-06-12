@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "STUCoreTypes.h"
 #include "STUGameInstance.h"
+#include "GameFramework/DamageType.h"
 
 class STUUtils
 {
