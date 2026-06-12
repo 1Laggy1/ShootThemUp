@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "STUCoreTypes.h"
+#include "Engine/HitResult.h"
 #include "STUWeaponFXComponent.generated.h"
 
 

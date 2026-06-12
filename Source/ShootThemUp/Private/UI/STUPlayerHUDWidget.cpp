@@ -14,6 +14,7 @@
 #include "Player/STUPlayerController.h"
 #include "Components/Abilities/STUPlayerAbilityUseComponent.h"
 #include "Components/Image.h"
+#include "Engine/Texture2D.h"
 DEFINE_LOG_CATEGORY_STATIC(LogHudWidget, All, All)
 
 void USTUPlayerHUDWidget::NativeOnInitialized()

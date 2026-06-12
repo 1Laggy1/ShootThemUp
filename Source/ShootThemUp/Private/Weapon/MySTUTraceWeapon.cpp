@@ -1,6 +1,5 @@
 // Shoot THem Up Game. All Rights Reserved.
 
-#pragma once
 
-#include "CoreMinimal.h"
+#include "Weapon/MySTUTraceWeapon.h"
 

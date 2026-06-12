@@ -10,7 +10,9 @@
     /**
      *
      */
-    class USTUBaseWidget;
+class USTUBaseWidget;
+class UUserWidget;
+
     UCLASS()
 class SHOOTTHEMUP_API ASTUGameHUD : public AHUD
 {

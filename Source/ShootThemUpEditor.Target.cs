@@ -9,7 +9,8 @@ public class ShootThemUpEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
-
+		bUsePCHFiles = false;
+		bUseSharedPCHs = false;
 		ExtraModuleNames.AddRange( new string[] { "ShootThemUp" } );
 	}
 }

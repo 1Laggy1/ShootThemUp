@@ -4,7 +4,10 @@
 
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
 #include "STUPlayerAbilityUseComponent.generated.h"
+
 
 DECLARE_MULTICAST_DELEGATE(FOnAbilityCooldownFinished);
 

@@ -65,8 +65,8 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     float XDifference;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     float YDifference;
-    float XNow = XStart;
-    float YNow = YStart;
+    float XNow = 0.0f;
+    float YNow = 0.0f;
     int Row = 1;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
     int RowMax = 3;

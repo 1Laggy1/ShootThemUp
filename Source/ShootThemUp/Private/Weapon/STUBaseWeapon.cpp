@@ -21,10 +21,14 @@ DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
 
 ASTUBaseWeapon::ASTUBaseWeapon()
 {
+
     PrimaryActorTick.bCanEverTick = false;
     bReplicates = true;
+    USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+    SetRootComponent(SceneRoot);
     WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
-    SetRootComponent(WeaponMesh);
+    WeaponMesh->SetupAttachment(SceneRoot);
+    
 }
 
 void ASTUBaseWeapon::BeginPlay()
@@ -38,7 +42,6 @@ void ASTUBaseWeapon::BeginPlay()
 void ASTUBaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    //DOREPLIFETIME(ASTUBaseWeapon, CurrentAmmo);
 }
 
 void ASTUBaseWeapon::StartFire()
@@ -50,7 +53,6 @@ void ASTUBaseWeapon::StopFire()
 void ASTUBaseWeapon::MakeShotServer_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
                                                    int32 InstigatorID)
 {
-    //MakeShotMulticast(ViewLocation, ViewRotation, InstigatorID);
 }
 
 void ASTUBaseWeapon::MakeShotMulticast_Implementation(FVector ViewLocation, FRotator ViewRotation, FVector TraceEnd,
@@ -150,7 +152,6 @@ void ASTUBaseWeapon::ChangeClip()
         CurrentAmmo.Clips--;
     }
     CurrentAmmo.Bullets = DefaultAmmo.Bullets;
-    //UE_LOG(LogBaseWeapon, Display, TEXT("-------------------- Change Clip ---------------------"));
 }
 bool ASTUBaseWeapon::CanReload() const
 {
@@ -225,6 +226,6 @@ void ASTUBaseWeapon::MakeHit(FHitResult &HitResult, const FVector &TraceStart, c
     CollisionParams.AddIgnoredActor(this);
     CollisionParams.bReturnPhysicalMaterial = true;
     GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility,
-                                         CollisionParams); // CollisionParams);
+                                         CollisionParams);
 }
 

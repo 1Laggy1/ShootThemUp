@@ -22,6 +22,8 @@
 #include "Sound/SoundCue.h"
 #include "UI/STUHealthBarWidget.h"
 #include "Weapon/STUBaseWeapon.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)

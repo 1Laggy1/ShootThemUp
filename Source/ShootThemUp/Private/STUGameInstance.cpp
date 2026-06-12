@@ -22,7 +22,6 @@ void USTUGameInstance::Init()
         GEngine->Exec(nullptr, TEXT("r.DynamicRes.Operation 0"));
         Settings->ApplySettings(false);
     }
-    
 
     InitSteamSocketsNetDriver();
     Subsystem = IOnlineSubsystem::Get(TEXT("STEAM"));
