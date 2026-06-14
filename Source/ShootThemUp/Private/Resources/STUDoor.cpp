@@ -11,6 +11,14 @@ ASTUDoor::ASTUDoor()
 	SetMinNetUpdateFrequency(30.f);
 }
 
+void ASTUDoor::BeginPlay()
+{
+    Super::BeginPlay();
+
+    ClosedLocation = GetActorLocation();
+    OpenedLocation = ClosedLocation + OpenDifference;
+}
+
 void ASTUDoor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -18,7 +26,7 @@ void ASTUDoor::Tick(float DeltaTime)
     if (AnimDone)
         return;
 
-    FVector Target = IsClosed ? ClosedLocation : OpenLocation;
+    FVector Target = IsClosed ? ClosedLocation : OpenedLocation;
     FVector Current = GetActorLocation();
 
     FVector Direction = (Target - Current).GetSafeNormal();
@@ -44,7 +52,7 @@ bool ASTUDoor::Use(FVector Location, FVector Rotation, AController *InstigatedBy
     bool IsUsed = Super::Use(Location, Rotation, InstigatedBy);
     if (!IsUsed)
         return false;
-    AnimDone = false;
     IsClosed = !IsClosed;
+    AnimDone = false;
     return true;
 }

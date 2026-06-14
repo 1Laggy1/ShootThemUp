@@ -63,7 +63,6 @@ void ASTURailgunWeapon::Tick(float DeltaTime)
         Charge -= DeltaTime;
         ChargePercent = FMath::Clamp(Charge / TimeToCharge, 0.0f, 1.0f);
     }
-    UE_LOG(LogRailgunWeapon, Warning, TEXT("Charge: %f"), Charge);
     if (ChargePercentPrevious != ChargePercent)
     {
        

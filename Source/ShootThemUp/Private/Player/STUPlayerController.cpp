@@ -10,7 +10,7 @@
 #include "Player/STUBaseCharacter.h"
 #include "STUGameModeBase.h"
 #include "STUGameStateBase.h"
-
+#include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Menu/Lobby/STULobbyGameState.h"
 #include "Player/STUPlayerCharacter.h"
@@ -71,17 +71,6 @@ void ASTUPlayerController::RequestPossess_Server_Implementation(APawn *InPawn)
     OnRequestPossess_Client(InPawn);
 }
 
-// void ASTUPlayerController::Possess_Client_Implementation(APawn *InPawn)
-//{
-//     if (InPawn == nullptr)
-//     {
-//         UE_LOG(LogSTUPlayerController, Warning, TEXT("Possess_Client: InPawn was nullptr"));
-//         return;
-//     }
-//     UE_LOG(LogSTUPlayerController, Display, TEXT("Possess_Client: Possesing %s"), *InPawn->GetFullName());
-//     Possess(InPawn);
-// }
-
 void ASTUPlayerController::StartSpectatingMulticast_Implementation(APawn *PawnSpectator)
 {
 
@@ -99,44 +88,31 @@ void ASTUPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
     DOREPLIFETIME(ASTUPlayerController, LobbyCamera);
 }
 
-// void ASTUPlayerController::OnRep_Possesed()
-//{
-//
-//
-//     FTimerHandle TempHandle;
-//     GetWorld()->GetTimerManager().SetTimer(
-//         TempHandle,
-//         [this]() {
-//             if (ControlledPawn)
-//             {
-//                 Possess(ControlledPawn);
-//                 //OnNewPawnEvent.Broadcast(ControlledPawn);
-//                 UE_LOG(LogPlayerController, Display, TEXT("%s POSSESING %s"), *GetFullName(),
-//                        *ControlledPawn->GetFullName());
-//                 return;
-//             }
-//             OnRep_Possesed();
-//         },
-//         0.5f, false);
-// }
+void ASTUPlayerController::TogglePauseMenu()
+{
+    if (!PauseMenuWidgetClass)
+        return;
 
-// void ASTUPlayerController::OnPossess(APawn *InPawn)
-//{
-//     if (InPawn == nullptr)
-//         return;
-//     bShowMouseCursor = false;
-//     //ControlledPawn = InPawn;
-//     Super::OnPossess(InPawn);
-//     OnNewPawnEvent.Broadcast(InPawn);
-//     if (InPawn->IsA<ASpectatorPawn>())
-//     {
-//         //
-//     }
-//     else if (InPawn->IsA<ACharacter>())
-//     {
-//         //
-//     }
-// }
+    if (!PauseMenuWidget)
+    {
+        PauseMenuWidget = CreateWidget<UUserWidget>(this, PauseMenuWidgetClass);
+    }
+
+    if (!PauseMenuWidget->IsInViewport())
+    {
+        PauseMenuWidget->AddToViewport(99);
+
+        bShowMouseCursor = true;
+        MovementEnabled = false;
+    }
+    else
+    {
+        PauseMenuWidget->RemoveFromParent();
+
+        bShowMouseCursor = false;
+        MovementEnabled = true;
+    }
+}
 
 void ASTUPlayerController::BeginPlay()
 {
@@ -160,7 +136,7 @@ void ASTUPlayerController::BeginPlay()
 
             for (AActor *Camera : Cameras)
             {
-                if (Camera->Tags.Contains("LobbyCamera")) // or check by name
+                if (Camera->Tags.Contains("LobbyCamera"))
                 {
                     UE_LOG(LogSTUPlayerController, Warning, TEXT("Lobby Camera pos: %s"),
                            *Camera->GetActorLocation().ToString());
@@ -182,7 +158,7 @@ void ASTUPlayerController::SetupInputComponent()
     if (!InputComponent)
         return;
 
-    InputComponent->BindAction("PauseGame", IE_Pressed, this, &ASTUPlayerController::OnPauseGame);
+    InputComponent->BindAction("PauseGame", IE_Pressed, this, &ASTUPlayerController::TogglePauseMenu);
 }
 
 void ASTUPlayerController::NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest)
@@ -192,9 +168,6 @@ void ASTUPlayerController::NotifyLoadedWorld(FName WorldPackageName, bool bFinal
     {
         UE_LOG(LogTemp, Warning, TEXT("I am Player %s has loaded world, notifying server"), *GetNameSafe(this));
         PlayerLoadedWorld();
-        // GetWorld()->GetTimerManager().SetTimer(CheckWorldTimerHandle, this,
-        //                                        &ASTUPlayerController::CheckPlayerFullyLoadedWorld,
-        //                                       0.5f, true);
     }
 }
 
@@ -248,13 +221,6 @@ void ASTUPlayerController::RequestAbilityChange_Server_Implementation(
     }
 }
 
-void ASTUPlayerController::OnPauseGame()
-{
-    if (!GetWorld() || !GetWorld()->GetAuthGameMode())
-        return;
-
-    // GetWorld()->GetAuthGameMode()->SetPause(this, FCanUnpause());
-}
 
 void ASTUPlayerController::OnMatchStateChanged(ESTUMatchState State)
 {
@@ -272,18 +238,7 @@ void ASTUPlayerController::OnMatchStateChanged(ESTUMatchState State)
 
 void ASTUPlayerController::OnRep_SetCamera()
 {
-    /*FTimerHandle TempHandle;
-    GetWorld()->GetTimerManager().SetTimer(
-        TempHandle,
-        [this]() {
-            if (LobbyCamera)
-            {
-                SetViewTarget(LobbyCamera);
-                return;
-            }
-            OnRep_SetCamera();
-        },
-        0.5f, false);*/
+
     if (!LobbyCamera)
         return;
 
