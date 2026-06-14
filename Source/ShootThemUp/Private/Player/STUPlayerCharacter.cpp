@@ -11,6 +11,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/PlayerUseComponent.h"
 #include "Components/Abilities/STUPlayerAbilityUseComponent.h"
 #include "Player/STUPlayerController.h"
@@ -49,8 +50,8 @@ void ASTUPlayerCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInput
         return;
     PlayerInputComponent->BindAxis("MoveForward", this, &ASTUPlayerCharacter::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &ASTUPlayerCharacter::MoveRight);
-    PlayerInputComponent->BindAxis("LookUp", this, &ASTUPlayerCharacter::AddControllerPitchInput);
-    PlayerInputComponent->BindAxis("TurnAround", this, &ASTUPlayerCharacter::AddControllerYawInput);
+    PlayerInputComponent->BindAxis("LookUp", this, &ASTUPlayerCharacter::LookUp);
+    PlayerInputComponent->BindAxis("TurnAround", this, &ASTUPlayerCharacter::Turn);
     PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ASTUBaseCharacter::Jump);
     PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ASTUPlayerCharacter::SprintPressed);
     PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ASTUPlayerCharacter::SprintUnPressed);
@@ -184,6 +185,20 @@ void ASTUPlayerCharacter::Zoom(bool Enabled)
     }
     Super::Zoom(Enabled);
     
+}
+
+void ASTUPlayerCharacter::Turn(float Value)
+{
+    float CurrentSensitivity = bWantToZoom ? (BaseSensitivity * AimSensitivityMultiplier) : BaseSensitivity;
+    UE_LOG(LogTemp, Warning, TEXT("BaseSens: %f | CurrentSens: %f | Final Math: %f"), BaseSensitivity,
+           CurrentSensitivity, (CurrentSensitivity / 50.0f) * SensitivityMultiplier);
+    AddControllerYawInput(Value * (CurrentSensitivity/50)*SensitivityMultiplier);
+}
+
+void ASTUPlayerCharacter::LookUp(float Value)
+{
+    float CurrentSensitivity = bWantToZoom ? (BaseSensitivity * AimSensitivityMultiplier) : BaseSensitivity;
+    AddControllerPitchInput(Value * (CurrentSensitivity / 50) * SensitivityMultiplier);
 }
 
 void ASTUPlayerCharacter::OnDeath()

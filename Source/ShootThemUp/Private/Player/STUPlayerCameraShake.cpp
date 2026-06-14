@@ -3,6 +3,7 @@
 
 #include "Player/STUPlayerCameraShake.h"
 #include "Camera/CameraShakeBase.h"
+#include "GameFramework/PlayerController.h"
 
 USTUPlayerCameraShake::USTUPlayerCameraShake()
 {

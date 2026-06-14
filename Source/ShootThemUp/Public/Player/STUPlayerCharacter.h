@@ -23,6 +23,20 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     ASTUPlayerCharacter(const FObjectInitializer &ObjInit); 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUPlayerCameraShake *STUPlayerCameraShake;
+    UFUNCTION(BlueprintCallable, Category = "Controls")
+    void SetBaseSensitivity(float NewSensitivity)
+    {
+        BaseSensitivity = NewSensitivity;
+    }
+
+    UFUNCTION(BlueprintCallable, Category = "Controls")
+    void SetAimSensitivityMultiplier(float NewMultiplier)
+    {
+        AimSensitivityMultiplier = NewMultiplier;
+    }
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Controls")
+    float SensitivityMultiplier = 1;
   protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USpringArmComponent *SpringArmComponent;
@@ -32,6 +46,11 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     USphereComponent *CameraCollisionComponent;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UPlayerUseComponent *PlayerUseComponent;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Controls", meta = (ClampMin = "0.0", ClampMax = "100.0"))
+    float BaseSensitivity = 50.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Controls", meta = (ClampMin = "0", ClampMax = "3.0"))
+    float AimSensitivityMultiplier = 1.0f;
     virtual void OnDeath() override;
     virtual void BeginPlay() override;
     void SnapCamera();
@@ -43,6 +62,8 @@ class SHOOTTHEMUP_API ASTUPlayerCharacter : public ASTUBaseCharacter
     virtual void StopSprint() override;
     virtual void StopFire() override;
     virtual void Zoom(bool Enabled) override;
+    void Turn(float Value);
+    void LookUp(float Value);
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
     TSubclassOf<UCameraShakeBase> LandShake;

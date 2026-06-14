@@ -8,6 +8,7 @@
 
 
 class UCameraComponent;
+class UCameraShakeBase;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SHOOTTHEMUP_API USTUPlayerCameraShake : public UActorComponent
 {

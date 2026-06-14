@@ -16,6 +16,7 @@ class ASTUBaseCharacter;
 class UCameraComponent;
 class ASTUGameStateBase;
 class ASTULobbyGameState;
+class UUserWidget;
 UCLASS()
 class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
 {
@@ -65,6 +66,8 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     void RequestWeaponsChange_Server(TSubclassOf<ASTUBaseWeapon> WeaponToChoose);
     UFUNCTION(Server, Reliable)
     void RequestAbilityChange_Server(TSubclassOf<USTUPlayerAbilityUseComponent> AbilityToChoose);
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void TogglePauseMenu();
   protected:
     FTimerHandle CheckWorldTimerHandle;
     //virtual void OnPossess(APawn *InPawn) override;
@@ -75,9 +78,12 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     virtual void BeginPlay() override;
     virtual void SetupInputComponent() override;
     virtual void NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest) override;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+    TSubclassOf<UUserWidget> PauseMenuWidgetClass;
   private:
     bool MovementEnabled = true;
-    void OnPauseGame();
+    UPROPERTY()
+    UUserWidget *PauseMenuWidget;
     void OnMatchStateChanged(ESTUMatchState State);
     ASTULobbyGameState *STULobbyGameState;
     
