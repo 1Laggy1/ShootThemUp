@@ -55,6 +55,7 @@ void ASTULobbyGameState::BeginPlay()
     {
         OnPostLogin(GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr);
     }
+    
 }
 
 void ASTULobbyGameState::InitTeams()
@@ -370,77 +371,41 @@ void ASTULobbyGameState::RespawnPlayer(FPlayerInfo *PlayerInfo)
 
     FVector StartPosition = PreviousPosition;
     SpawnPlayer(PlayerInfo, StartPosition);
-    /*FTransform NewTransform(StartRotation, StartPosition);
-    if (!CharacterClass)
-    {
-        UE_LOG(LogSTULobbyGameState, Error,
-               TEXT("ASTULobbyGameState::RespawnPlayer CharacterClass is NULL! Cannot spawn actor"));
-        return;
-    }
-    ASTUBaseCharacter *PlayerCharacter = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
-        CharacterClass, NewTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-    if (PlayerCharacter)
-    {
-        PlayerCharacter->SpawnInfo = DefaultPlayerInfo;
-        UGameplayStatics::FinishSpawningActor(PlayerCharacter, NewTransform);
-    }*/
 }
-// ----- Spawn lobby character -----
-//
-//void ASTULobbyGameState::SpawnLobbyCharacter(APlayerController *Player)
-//{
-//    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Spawning lobby character"));
-//    if (!Player)
-//        return;
-//
-//    FVector StartPosition = GetNextPlayerStart();
-//    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Start position: %s"),
-//           *StartPosition.ToString());
-//    FTransform NewTransform(StartRotation, StartPosition);
-//    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnLobbyCharacter - Rotation: %s"),
-//           *StartRotation.ToString());
-//    if (!CharacterClass)
-//    {
-//        UE_LOG(LogSTULobbyGameState, Error,
-//               TEXT(" ASTULobbyGameState::SpawnLobbyCharacter CharacterClass is NULL! Cannot spawn actor"));
-//        return;
-//    }
-//    ASTULobbyCharacter *PlayerCharacter = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
-//        CharacterClass, NewTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-//    if (PlayerCharacter)
-//    {
-//        PlayerCharacter->SpawnInfo = DefaultPlayerInfo;
-//        UGameplayStatics::FinishSpawningActor(PlayerCharacter, NewTransform);
-//
-//        const auto STUPlayerController =
-//            Cast<ASTULobbyPlayerController>(PlayerCharacter->SpawnInfo.ThisPlayerController);
-//        if (STUPlayerController)
-//        {
-//            STUPlayerController->SetCamera(StartPosition + RelatedCameraPosition, RelatedCameraRotation);
-//        }
-//
-//        
-//    }
-//}
-//void ASTULobbyGameState::SetCamera(FVector PlayerLocation)
-//{
-//    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SetCamera - Setting lobby camera"));
-//    TArray<AActor *> Cameras;
-//    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), Cameras);
-//    LobbyCamera = Cast<ACameraActor>(Cameras[0]);
-//    APlayerController *PC = GetWorld()->GetFirstPlayerController();
-//    
-//    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-//    {
-//        APlayerController *PC = It->Get();
-//        if (PC)
-//        {
-//            UE_LOG(LogSTULobbyGameState, Display,
-//                   TEXT("ASTULobbyGameState::SetCamera - Setting view target for player"));
-//            
-//            PC->SetViewTarget(LobbyCamera);
-//        }
-//    }
-//}
-// ----- Find helpers -----
 
+void ASTULobbyGameState::SpawnFakePlayers(int32 Count)
+{
+    if (!HasAuthority() || !STUGameInstance)
+        return;
+
+    UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::SpawnFakePlayers - Generating %d fake players"),
+           Count);
+
+    for (int32 i = 0; i < Count; ++i)
+    {
+        FPlayerInfo FakePlayerInfo = DefaultPlayerInfo;
+
+        FakePlayerInfo.PlayerID = FString::Printf(TEXT("FakeBotID_%d"), FMath::RandRange(10000, 99999));
+        FakePlayerInfo.PlayerName = FString::Printf(TEXT("TestBot_%d"), i + 1);
+
+        if (STUGameInstance->Teams.IsValidIndex(TeamIndex))
+        {
+            FakePlayerInfo.Color = STUGameInstance->Teams[TeamIndex].TeamColor;
+            FakePlayerInfo.TeamID = STUGameInstance->Teams[TeamIndex].TeamID;
+            STUGameInstance->Teams[TeamIndex].PlayersInfos.Add(FakePlayerInfo);
+        }
+        else if (STUGameInstance->Teams.Num() > 0)
+        {
+            FakePlayerInfo.Color = STUGameInstance->Teams[0].TeamColor;
+            FakePlayerInfo.TeamID = STUGameInstance->Teams[0].TeamID;
+            STUGameInstance->Teams[0].PlayersInfos.Add(FakePlayerInfo);
+        }
+
+        AddTeamIndex();
+    }
+
+
+    FirstSpawnPosition = true;
+
+    SpawnAllTeams_Multicast(STUGameInstance->Teams);
+}

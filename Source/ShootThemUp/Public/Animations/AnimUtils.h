@@ -1,4 +1,5 @@
 #pragma once
+#include "Animation/AnimSequenceBase.h"
 
 class AnimUtils
 {

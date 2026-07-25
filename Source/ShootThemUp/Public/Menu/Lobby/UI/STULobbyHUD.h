@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+
 #include "STULobbyHUD.generated.h"
 
-/**
- * 
- */
+class UUserWidget;
 UCLASS()
 class SHOOTTHEMUP_API ASTULobbyHUD : public AHUD
 {

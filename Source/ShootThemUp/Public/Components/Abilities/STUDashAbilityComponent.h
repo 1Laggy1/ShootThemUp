@@ -17,9 +17,9 @@ class SHOOTTHEMUP_API USTUDashAbilityComponent : public USTUAbilityOnceComponent
     virtual bool StartUseAbility() override;
     virtual bool Ability() override;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
-    float DashStrength = 1000.f;
+    float DashStrength = 2300.f;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
-    float DashUpStrength = 200.f;
+    float DashUpStrength = 2700.f;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")
     float PitchUpMultiplier = 0.5f;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dash")

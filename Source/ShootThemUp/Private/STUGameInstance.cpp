@@ -11,6 +11,8 @@
 #include "GameFramework/GameUserSettings.h"
 #include <Online/OnlineSessionNames.h>
 
+#include "UObject/Package.h"
+
 void USTUGameInstance::Init()
 {
     Super::Init();
@@ -54,8 +56,7 @@ void USTUGameInstance::InitSteamSocketsNetDriver()
     if (World->GetNetDriver())
         return;
 
-    USteamSocketsNetDriver *NetDriver =
-        NewObject<USteamSocketsNetDriver>(GetTransientPackage(), USteamSocketsNetDriver::StaticClass());
+    USteamSocketsNetDriver *NetDriver = NewObject<USteamSocketsNetDriver>(GetTransientPackage(), USteamSocketsNetDriver::StaticClass());
     NetDriver->SetWorld(World);
 
     NetDriver->RecentlyDisconnectedTrackingTime = 10.0f;

@@ -28,7 +28,7 @@ DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)
 {
-
+    
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
     bReplicateUsingRegisteredSubObjectList = true;
