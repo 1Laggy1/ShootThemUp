@@ -26,19 +26,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     virtual UClass *GetDefaultPawnClassForController_Implementation(AController *InController) override;
     void Killed(AController *KillerActor, AController *DiedActor);
 
-  //  FGameData GetGameData()
-  //  {
-  //      return GameData;
-  //  }
-  //  int32 GetCurrentRound()
-  //  {
-  //      return CurrentRound;
-  //}
-  //  int32 GetRoundCountDown()
-  //  {
-  //      return RoundCountDown;
-  //}
-    void RespawnRequest(AController *Controller);
+    void RespawnRequest(FString PlayerID);
 
     virtual bool SetPause(APlayerController *PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
     virtual bool ClearPause() override;
@@ -56,6 +44,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
     TSoftClassPtr<USTUPlayerAbilityUseComponent> DebugAbilityClass;
     bool isDebug;
+    void SpawnDummy(int32 count);
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
@@ -85,7 +74,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void BetweenGoalsTimerUpdate();
     void AfterGoalTimerUpdate();
     void ResetPlayers();
-    void ResetOnePlayer(AController *Controller);
+    void ResetOnePlayer(FPlayerInfo& PlayerInfo);
     void SetPlayerColor(AActor *Character, FLinearColor TeamColor);
     /*void SetPlayerInfo(APlayerController *Controller);*/
     void LogPlayerInfo();

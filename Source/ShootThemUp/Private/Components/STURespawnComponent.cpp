@@ -50,7 +50,15 @@ void USTURespawnComponent::RespawnTimerUpdate()
         const auto Gamemode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
         if (!Gamemode)
             return;
-        Gamemode->RespawnRequest(Cast<AController>(GetOwner()));
+        FString OwnerIDString = TEXT("");
+
+        AController* Controller = Cast<AController>(GetOwner());
+        if (Controller)
+        {
+        
+            OwnerIDString = FString::FromInt(Controller->GetUniqueID());
+        }
+        Gamemode->RespawnRequest(OwnerIDString);
     }
 }
 

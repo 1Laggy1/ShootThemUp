@@ -142,12 +142,14 @@ void ASTUGameModeBase::StartDebug()
     FTeamInfo TI2;
     TI2.TeamID = 2;
 
+    
+
+    PlayersNum++;
     FPlayerInfo playerInfo;
     playerInfo.WeaponClass = DebugWeaponClass;
     playerInfo.AbilityClass = DebugAbilityClass;
     playerInfo.PlayerName = TEXT("DebugPlayer");
     playerInfo.TeamID = 1;
-
     if (GetWorld())
     {
         APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -170,9 +172,28 @@ void ASTUGameModeBase::StartDebug()
     TI.PlayersInfos.Add(playerInfo);
     TIA.Add(TI);
     TIA.Add(TI2);
-    
     STUGameStateBase->SetGameData(GameData, TIA);
-    PlayersNum = 1;
+}   
+
+void ASTUGameModeBase::SpawnDummy(int32 count)
+{
+    for (int i = 1; i <= count; i++)
+    {
+        PlayersNum++;
+        FPlayerInfo playerInfo;
+        playerInfo.WeaponClass = DebugWeaponClass;
+        playerInfo.AbilityClass = DebugAbilityClass;
+        playerInfo.PlayerName = TEXT("DebugPlayer");
+        playerInfo.TeamID = PlayersNum % 2 == 0 ? 2 : 1;
+        playerInfo.Color = playerInfo.TeamID == 1 ? FLinearColor::White : FLinearColor::Black;
+        
+        FString RandomStr = FGuid::NewGuid().ToString();
+        playerInfo.PlayerID = RandomStr;
+        FTeamInfo *Team = STUUtils::FindTeamByTeamID(playerInfo.TeamID, STUGameStateBase->TeamsStats);
+        Team->PlayersInfos.Add(playerInfo);
+        ResetOnePlayer(playerInfo);
+    }
+    
 }
 
 void ASTUGameModeBase::GetTeamsStarts()
@@ -443,86 +464,58 @@ void ASTUGameModeBase::ResetPlayers()
     if (!GetWorld())
         return;
 
-    for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
+    if (STUGameStateBase && !STUGameStateBase->TeamsStats.IsEmpty())
     {
-        ResetOnePlayer(It->Get());
+        for (FTeamInfo& Team : STUGameStateBase->TeamsStats)
+        {
+            for (FPlayerInfo& Player : Team.PlayersInfos)
+            {
+                ResetOnePlayer(Player);
+            }
+
+        }
+        
     }
 }
 
-void ASTUGameModeBase::ResetOnePlayer(AController *Controller)
+void ASTUGameModeBase::ResetOnePlayer(FPlayerInfo& PlayerInfo)
 {
-    if (Controller->GetPawn())
-    {
-        Controller->GetPawn()->Destroy();
-    }
-    const auto PlayerState = Cast<ASTUPlayerState>(Controller->PlayerState);
-    if (PlayerState)
-    {
-        PlayerState->SetSTUPlayerState(STUPlayerStateEnum::Gaming);
-    }
-    /*UE_LOG(LogGameMode, Error, TEXT("----------------------PlayerState is %s, %s"),
-           *FindPlayerStart(Controller)->GetFullName(), *FindPlayerStart(Controller)->GetActorLocation().ToString());
 
-    RestartPlayer(Controller);*/
-    /*AActor* Spawn = GetRandomSpawnPoint(GetWorld());
-    APawn *NewDefaultPawn = SpawnDefaultPawnFor(Controller, Spawn);*/
-    if (!PlayerState)
+    if (PlayerInfo.ThisPlayerController && PlayerInfo.ThisPlayerController->GetPawn())
     {
-        return;
+        PlayerInfo.ThisPlayerController->GetPawn()->Destroy();
+        const auto PlayerState = Cast<ASTUPlayerState>(PlayerInfo.ThisPlayerController->PlayerState);
+        if (PlayerState)
+        {
+            PlayerState->SetSTUPlayerState(STUPlayerStateEnum::Gaming);
+        }
     }
-    FPlayerInfo* pi = STUUtils::FindPlayerByPlayerID(PlayerState->GetUniqueId()->ToString(), STUGameStateBase->TeamsStats);
-    if (!pi)
-    {
-        return;
-    }
-    AActor *Spawn = GetRandomTeamStart(
-        STUUtils::FindPlayerByPlayerID(PlayerState->GetUniqueId()->ToString(), STUGameStateBase->TeamsStats)->TeamID);
+    AActor *Spawn = GetRandomTeamStart(PlayerInfo.TeamID);
     FVector SpawnLocation = Spawn ? Spawn->GetActorLocation() : FVector::Zero();
     FRotator SpawnRotation = Spawn ? Spawn->GetActorRotation() : FRotator::ZeroRotator;
     FTransform SpawnTransform(SpawnRotation, SpawnLocation);
-
     ASTUBaseCharacter *NewCharacter = GetWorld()->SpawnActorDeferred<ASTUBaseCharacter>(
-        DefaultCharacterClass, SpawnTransform, Controller, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-    NewCharacter->SetReplicates(true);
+        DefaultCharacterClass, SpawnTransform, PlayerInfo.ThisPlayerController, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+    
     if (NewCharacter)
     {
 
-        FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
-                               ? Controller->PlayerState->GetUniqueId()->ToString()
-                               : TEXT("UnknownID");
-        FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameStateBase->TeamsStats);
-        NewCharacter->SpawnInfo = *PlayerInfo;
-        NewCharacter->PlayerColor = PlayerInfo->Color;
-        NewCharacter->PlayerName = Controller->PlayerState->GetPlayerName();
-        NewCharacter->PlayerID = PlayerID;
-        if (!PlayerInfo->AbilityClass.Get())
+        NewCharacter->SetReplicates(true);
+        NewCharacter->SpawnInfo = PlayerInfo;
+        NewCharacter->PlayerColor = PlayerInfo.Color;
+        NewCharacter->PlayerName = PlayerInfo.PlayerName;
+        NewCharacter->PlayerID = PlayerInfo.PlayerID;
+        if (!PlayerInfo.AbilityClass.Get())
         {
             NewCharacter->AbilityClass = DefaultAbilityClass.Get();
         }
         else
         {
-            NewCharacter->AbilityClass = PlayerInfo->AbilityClass.Get();
+            NewCharacter->AbilityClass = PlayerInfo.AbilityClass.Get();
         }
         UGameplayStatics::FinishSpawningActor(NewCharacter, SpawnTransform);
         
-        
-        
-
-
-        
-        // NewCharacter->OnRep_PlayerID();
     }
-    // auto STUPlayerController = Cast<ASTUPlayerController>(Controller);
-    // if (!STUPlayerController)
-    //     return;
-    // STUPlayerController->Possess(NewCharacter);
-    // STUPlayerController->ControlledPawn = NewCharacter;
-    // STUPlayerController->OnRep_Possesed();
-    /*FString PlayerID = Controller->PlayerState->GetUniqueId().IsValid()
-                           ? Controller->PlayerState->GetUniqueId()->ToString()
-                           : TEXT("UnknownID");*/
-    // STUGameStateBase->InitPlayer_Multicast(PlayerID, NewCharacter);
-    //  Controller->Possess(NewCharacter);
 }
 
 void ASTUGameModeBase::SetPlayerColor(AActor *Player, FLinearColor TeamColor)
@@ -628,9 +621,14 @@ void ASTUGameModeBase::GameOver()
     ChangeState(ESTUMatchState::GameOver);
 }
 
-void ASTUGameModeBase::RespawnRequest(AController *Controller)
+void ASTUGameModeBase::RespawnRequest(FString PlayerID)
 {
-    ResetOnePlayer(Controller);
+    FPlayerInfo* PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameStateBase->TeamsStats);
+    if (PlayerInfo)
+    {
+        ResetOnePlayer(*PlayerInfo);
+    }
+   
 }
 
 void ASTUGameModeBase::Killed(AController *KillerActor, AController *DiedActor)

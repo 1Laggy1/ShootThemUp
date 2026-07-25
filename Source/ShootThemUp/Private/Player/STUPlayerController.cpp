@@ -15,6 +15,7 @@
 #include "Menu/Lobby/STULobbyGameState.h"
 #include "Player/STUPlayerCharacter.h"
 #include "Player/STUPlayerState.h"
+#include "Dev/STUCheatManager.h"
 #include "STUGameStateBase.h"
 
 DECLARE_LOG_CATEGORY_CLASS(LogSTUPlayerController, All, All);
@@ -22,6 +23,7 @@ DECLARE_LOG_CATEGORY_CLASS(LogSTUPlayerController, All, All);
 ASTUPlayerController::ASTUPlayerController()
 {
     STURespawnComponent = CreateDefaultSubobject<USTURespawnComponent>("RespawnComponent");
+    CheatClass = USTUCheatManager::StaticClass();
 }
 
 void ASTUPlayerController::OnRequestPossess_Client_Implementation(APawn *InPawn)
