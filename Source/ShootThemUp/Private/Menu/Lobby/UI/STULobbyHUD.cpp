@@ -3,6 +3,9 @@
 
 #include "Menu/Lobby/UI/STULobbyHUD.h"
 #include "UI/STUBaseWidget.h"
+#include "GameFramework/Actor.h"
+#include "Blueprint/UserWidget.h"
+#include "GameFramework/Actor.h"
 
 void ASTULobbyHUD::BeginPlay()
 {

@@ -3,6 +3,11 @@
 
 #include "Components/PlayerUseComponent.h"
 #include "Resources/STUUseableActor.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
+#include "Engine/HitResult.h"
+#include "CollisionQueryParams.h"
+#include "Engine/World.h"
 
 UPlayerUseComponent::UPlayerUseComponent()
 {

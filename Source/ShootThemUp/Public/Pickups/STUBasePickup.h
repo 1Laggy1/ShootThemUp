@@ -4,29 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Resources/STUInteractable.h"
 #include "STUBasePickup.generated.h"
 
-class USphereComponent;
-class USoundCue;
+
+class USoundBase;
 UCLASS()
-class SHOOTTHEMUP_API ASTUBasePickup : public AActor
+class SHOOTTHEMUP_API ASTUBasePickup : public ASTUInteractable
 {
     GENERATED_BODY()
 
   public:
     ASTUBasePickup();
-    bool CouldBeTaken();
+    
 
   protected:
-    UPROPERTY(VisibleAnywhere, Category = "Pickup")
-    USphereComponent *CollisionComponent;
-    UPROPERTY(VisibleAnywhere, Category = "Pickup")
-    float RespawnTime = 5.0f;
+    
+    
     UPROPERTY(EditDefaultsOnly, Category = "Sound")
-    USoundCue *PickupSound;
+    USoundBase *PickupSound;
     virtual void BeginPlay() override;
-    virtual void NotifyActorBeginOverlap(AActor *OtherActor) override;
-    FTimerHandle RespawnTimerHandle;
+    virtual void Interact(AActor *OtherActor) override;
+    virtual void Cooldown() override;
 
   public:
     virtual void Tick(float DeltaTime) override;

@@ -47,6 +47,9 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     UFUNCTION(NetMulticast, Reliable)
     void SpawnAllTeams_Multicast(const TArray<FTeamInfo> &TeamsInfo);
 
+    UFUNCTION(BlueprintCallable, Category = "STU|Debug")
+    void SpawnFakePlayers(int32 Count);
+
     TMap<FString, ASTUBaseCharacter *> Characters;
 
     UFUNCTION()

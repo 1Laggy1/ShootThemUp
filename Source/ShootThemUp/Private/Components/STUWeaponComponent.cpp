@@ -11,8 +11,12 @@
 #include "Player/STUPlayerState.h"
 #include "Weapon/STUBaseWeapon.h"
 
+#include "Animation/AnimSequenceBase.h"
+#include "Components/SkeletalMeshComponent.h"
+
 #include "STUCoreTypes.h"
 #include "STUUtils.h"
+#include "Animation/AnimMontage.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All, All)
 

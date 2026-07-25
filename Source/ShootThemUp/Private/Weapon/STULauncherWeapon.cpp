@@ -6,6 +6,8 @@
 #include "Player/STUPlayerState.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/STUProjectile.h"
+#include "Sound/SoundCue.h"
+#include "Components/SkeletalMeshComponent.h"
 
 void ASTULauncherWeapon::StartFire()
 {

@@ -4,6 +4,7 @@
 #include "Dev/STUDevDamageActor.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 // Sets default values
 ASTUDevDamageActor::ASTUDevDamageActor()
@@ -22,7 +23,6 @@ void ASTUDevDamageActor::BeginPlay()
 	
 }
 
-// Called every frame
 void ASTUDevDamageActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

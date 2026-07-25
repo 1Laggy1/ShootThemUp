@@ -1,0 +1,7 @@
+CompileFlags:
+  Compiler: clang++
+  Add: [-std=c++20, -Wno-unknown-typename]
+
+Diagnostics:
+  Suppress:
+    - unknown_typename_suggest

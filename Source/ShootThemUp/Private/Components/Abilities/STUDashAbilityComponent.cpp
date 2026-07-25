@@ -4,6 +4,7 @@
 #include "Components/Abilities/STUDashAbilityComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 
 bool USTUDashAbilityComponent::StartUseAbility()
 {
