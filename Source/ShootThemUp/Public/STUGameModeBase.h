@@ -51,6 +51,11 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     }
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<USTUPlayerAbilityUseComponent> DefaultAbilityClass;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug")
+    TSoftClassPtr<ASTUBaseWeapon> DebugWeaponClass;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+    TSoftClassPtr<USTUPlayerAbilityUseComponent> DebugAbilityClass;
+    bool isDebug;
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
@@ -106,4 +111,5 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 
     void SetPlayerStatsToAllPlayers();
     void SetMovement(bool Active);
+    void StartDebug();
 };

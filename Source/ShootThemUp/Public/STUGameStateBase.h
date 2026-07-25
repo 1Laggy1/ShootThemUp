@@ -39,6 +39,7 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     void PlayerConnected(APlayerController *PC);
     UPROPERTY(ReplicatedUsing = OnRep_TimerChanged)
     float WaitingTimeNow = 30.0f;
+    
     /*UFUNCTION(NetMulticast, Reliable)
     void InitPlayer_Multicast(const FString &PlayerID, ASTUBaseCharacter* Character);*/
     /*void WaitForPlayer(ASTUBaseCharacter *Character);*/
@@ -95,8 +96,12 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     }
     UFUNCTION()
     void OnRep_TimerChanged();
+
+    
   protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+  private:
+    
     
     
 };
