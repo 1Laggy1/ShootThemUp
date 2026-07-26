@@ -7,8 +7,9 @@
 /DerivedDataCache
 /Intermediate
 /Plugins.bak
-/Saved
 /.vscode
+/.cache
+/Saved
 /Plugins/VisualStudioTools/Docs
 /Plugins/VisualStudioTools/Intermediate
 /Plugins/VisualStudioTools/Scripts

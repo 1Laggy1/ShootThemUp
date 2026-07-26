@@ -6,6 +6,7 @@
 #include "Animations/STUEquipFinishedAnimNotify.h"
 #include "Animations/STUReloadFinishedAnimNotify.h"
 #include "GameFramework/Character.h"
+#include "STUGameStateBase.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/STUBaseCharacter.h"
 #include "Player/STUPlayerState.h"
@@ -65,10 +66,10 @@ void USTUWeaponComponent::SpawnWeapons_Implementation()
     Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
     UE_LOG(LogWeaponComponent, Display, TEXT("SpawnInfo: %s"), *Character->PlayerID);
     UClass *WeaponClassLoaded; 
-    if (!GetWorld()->GetGameInstance<USTUGameInstance>()->Teams.IsEmpty())
+    if (!GetWorld()->GetGameState<ASTUGameStateBase>()->TeamsStats.IsEmpty())
     {
         FPlayerInfo *PlayerInfo =
-            STUUtils::FindPlayerByPlayerID(Character->PlayerID, GetWorld()->GetGameInstance<USTUGameInstance>()->Teams);
+            STUUtils::FindPlayerByPlayerID(Character->PlayerID, GetWorld()->GetGameState<ASTUGameStateBase>()->TeamsStats);
         WeaponClassLoaded = PlayerInfo->WeaponClass.LoadSynchronous();
     }
     else
