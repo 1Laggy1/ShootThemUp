@@ -107,11 +107,14 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UPROPERTY(Replicated)
     FString PlayerID = "PlayerID";
     UPROPERTY(Replicated)
+    int TeamID = 1;
+    UPROPERTY(Replicated)
     bool MovementEnabled = true;
 
     //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
     virtual void SetAbilityByActive();
 
+    
     UPROPERTY(Replicated)
     USTUPlayerAbilityUseComponent *ActiveAbilityComponent;
     UPROPERTY(Replicated)
@@ -121,7 +124,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 
     virtual void Landed(const FHitResult &Hit) override;
   private:
-    
+    void UpdateOutlineState();
     
     
 

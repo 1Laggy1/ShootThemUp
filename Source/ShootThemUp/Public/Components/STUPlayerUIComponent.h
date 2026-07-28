@@ -21,6 +21,10 @@ class SHOOTTHEMUP_API USTUPlayerUIComponent : public UActorComponent
 
         UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
         float UiVisibilityDistance = 10000.0f;
+
+        void SetPlayerName(FString PlayerName);
+        void SetPlayerColor(const FLinearColor& Color);
+
         void OnDamaged(AActor *DamagedActor, float HealthPercent, AActor *DamageCauser);
     protected:
         UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

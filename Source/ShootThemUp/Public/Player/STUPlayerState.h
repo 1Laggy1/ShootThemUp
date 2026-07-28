@@ -85,14 +85,6 @@ class SHOOTTHEMUP_API ASTUPlayerState : public APlayerState
     STUPlayerStateEnum PlayerStateNow = STUPlayerStateEnum::None;
     bool LoadedAndNotifiedServer = false;
   private:
-    /*UPROPERTY(Replicated)
-    int32 TeamID;
-    UPROPERTY(Replicated)
-    FLinearColor TeamColor;
-    UPROPERTY(Replicated)
-    int32 KillsNum = 0;
-    UPROPERTY(Replicated)
-    int32 DeathsNum = 0;*/
     FPlayerInfo *Stats;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 };

@@ -21,7 +21,7 @@ void ASTUPlayerState::SetPlayerStats_Implementation(const FString &SetPlayerID)
     if (!GetWorld() || !GetWorld()->GetGameState<ASTUGameStateBase>())
         return;
     ASTUGameStateBase *GameStateBase = GetWorld()->GetGameState<ASTUGameStateBase>();
-    Stats = STUUtils::FindPlayerByPlayerID(SetPlayerID, GameStateBase->TeamsStats);
+    Stats = STUUtils::FindPlayerByPlayerID(SetPlayerID, GameStateBase->GetTeams());
     UE_LOG(LogSTUPlayerState, Display, TEXT("SetPlayerStats_Implementation called for %s"), *SetPlayerID);
 }
 

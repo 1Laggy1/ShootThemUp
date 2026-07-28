@@ -9,6 +9,10 @@
 #include "STUGameModeBase.h"
 #include "STUUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Player/STUPlayerController.h"
+
 void ASTUGameStateBase::OnRep_TimerChanged()
 {
     int32 TimeNow = WaitingTimeNow + BetweenGoalsCountDown;
@@ -18,7 +22,6 @@ void ASTUGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    // Replicate current health.
     DOREPLIFETIME(ASTUGameStateBase, GameData);
     // DOREPLIFETIME(ASTUGameStateBase, CurrentRound);
     DOREPLIFETIME(ASTUGameStateBase, GameCountDown);
@@ -37,18 +40,11 @@ void ASTUGameStateBase::BeginPlay()
     Super::BeginPlay();
     SetReplicates(true);
     bReplicates = true;
-    PlayerConnected(GetWorld()->GetFirstPlayerController());
+    GetWorld()->GetTimerManager().SetTimer(WaitForOutlineColorsTimerHandle, this, &ASTUGameStateBase::SetOutlineColors,
+                                           1.0f, true);
+    //PlayerConnected(GetWorld()->GetFirstPlayerController());
 }
 
-void ASTUGameStateBase::PlayerConnected_Implementation(APlayerController *PC)
-{
-    GetWorld()->GetAuthGameMode<ASTUGameModeBase>()->PlayerConnected(PC);
-}
-
-// void ASTUGameStateBase::OnRep_MatchStateChanged()
-//{
-//     OnMatchStateChanged.Broadcast(MatchState);
-// }
 void ASTUGameStateBase::ResetOnePlayerMulticast_Implementation(AActor *DiedActor, AActor *Spawn)
 {
     /*if (DiedActor && Cast<ACharacter>(DiedActor) && Cast<ACharacter>(DiedActor)->Controller)
@@ -59,43 +55,56 @@ void ASTUGameStateBase::ResetOnePlayerMulticast_Implementation(AActor *DiedActor
         DiedActor->SetActorRotation(Spawn->GetActorRotation());
     }*/
 }
-// void ASTUGameStateBase::SetPlayerColorMulticast_Implementation(AActor *Player, FLinearColor TeamColor)
-//{
-//     if (!Player)
-//         return;
-//
-//     const auto Character = Cast<ASTUBaseCharacter>(Player);
-//     if (!Character)
-//         return;
-//
-//     Character->SetPlayerColor(TeamColor);
-// }
-//
-// void ASTUGameStateBase::InitPlayer_Multicast_Implementation(const FString &PlayerID, ASTUBaseCharacter *Character)
-//{
-//
-//     FTimerHandle TempHandle;
-//     GetWorld()->GetTimerManager().SetTimer(
-//         TempHandle,
-//         [this, Character, PlayerID, TempHandle]() mutable {
-//             if (!Character || !GetWorld() || !IsValid(Character) || !Character->HasActorBegunPlay() ||
-//             !Character->GetWorld())
-//                 InitPlayer_Multicast_Implementation(PlayerID, Character);
-//
-//             auto STUGameInstance = GetWorld()->GetGameInstance<USTUGameInstance>();
-//             if (!STUGameInstance)
-//                 InitPlayer_Multicast_Implementation(PlayerID, Character);
-//
-//             FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
-//             if (!PlayerInfo)
-//                 InitPlayer_Multicast_Implementation(PlayerID, Character);
-//
-//             //Character->InitPlayer(PlayerID, GetWorld());
-//             Character->SetPlayerColor(PlayerInfo->Color);
-//
-//             GetWorld()->GetTimerManager().ClearTimer(TempHandle);
-//         },
-//         0.5f, false);
-//
-//
-// }
+
+void ASTUGameStateBase::OnRep_TeamsStats()
+{
+    //SetOutlineColors();
+}
+
+void ASTUGameStateBase::SetOutlineColors()
+{
+
+  if (!OutlineColorsMPC || TeamsStats.IsEmpty())
+  {
+        return;
+  }
+    
+    
+    int32 LocalPlayerTeamID = 1;
+    ASTUPlayerController *PC =
+        Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController());
+    if (PC && PC->PlayerState) {
+      ASTUPlayerState *PS = PC->GetPlayerState<ASTUPlayerState>();
+      LocalPlayerTeamID = PS->GetTeamID();
+    }
+
+    if (LocalPlayerTeamID == 0)
+    {
+        return;
+    }
+      
+
+    int32 EnemyTeamID = (LocalPlayerTeamID == 1) ? 2 : 1;
+
+    FTeamInfo *LocalTeam =
+        STUUtils::FindTeamByTeamID(LocalPlayerTeamID, TeamsStats);
+    FTeamInfo *EnemyTeam = STUUtils::FindTeamByTeamID(EnemyTeamID, TeamsStats);
+
+    if (LocalTeam && EnemyTeam) {
+
+      UKismetMaterialLibrary::SetVectorParameterValue(
+          GetWorld(), OutlineColorsMPC, FName("Team1Color"),
+          LocalTeam->TeamColor);
+
+      UKismetMaterialLibrary::SetVectorParameterValue(
+          GetWorld(), OutlineColorsMPC, FName("Team2Color"),
+          EnemyTeam->TeamColor);
+          GetWorld()->GetTimerManager().ClearTimer(WaitForOutlineColorsTimerHandle);
+    }
+  
+}
+
+void ASTUGameStateBase::SetTeams(const TArray<FTeamInfo>& NewTeams)
+{
+    TeamsStats = NewTeams;
+}

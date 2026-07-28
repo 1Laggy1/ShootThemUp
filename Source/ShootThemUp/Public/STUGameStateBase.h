@@ -33,35 +33,25 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     int32 AfterGoalCountDown = 0;
     UPROPERTY(ReplicatedUsing = OnRep_MatchState, EditAnywhere, BlueprintReadWrite)
     ESTUMatchState MatchState = ESTUMatchState::WaitingToStart;
-    UPROPERTY(Replicated)
-    TArray<FTeamInfo> TeamsStats;
-    UFUNCTION(Server, Reliable)
-    void PlayerConnected(APlayerController *PC);
+    UFUNCTION()
+    void OnRep_TeamsStats();
+    // UFUNCTION(Server, Reliable)
+    // void PlayerConnected(APlayerController *PC);
     UPROPERTY(ReplicatedUsing = OnRep_TimerChanged)
     float WaitingTimeNow = 30.0f;
+    TArray<FTeamInfo>& GetTeams() { return TeamsStats; }
+    void SetTeams(const TArray<FTeamInfo>& NewTeams);
+    void SetOutlineColors();
+    FTimerHandle WaitForOutlineColorsTimerHandle;
     
-    /*UFUNCTION(NetMulticast, Reliable)
-    void InitPlayer_Multicast(const FString &PlayerID, ASTUBaseCharacter* Character);*/
-    /*void WaitForPlayer(ASTUBaseCharacter *Character);*/
-    
-    /*UPROPERTY(Replicated)
-    FMatchStatistics Statistics;
-    UFUNCTION()
-    void OnRep_MatchStateChanged();
-    FMatchStatistics GetMatchStatistics() {
-        return Statistics;
-    };
 
-    UPROPERTY(ReplicatedUsing = MatchStatisticsBroadcast)
-    FMatchStatistics MatchStatistics;*/
-    /*UFUNCTION()
-    void MatchStatisticsBroadcast()
-    {
-        OnMatchStatistics.Broadcast(&MatchStatistics);
-    }*/
-    //FOnMatchStatistics OnMatchStatistics;
     FOnMatchStateChanged OnMatchStateChanged;
     FOnTimerChanged OnTimerChanged;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Materials")
+    UMaterialParameterCollection* OutlineColorsMPC;
+    bool isOutlineColorsChanged = false;
+
   public:
     /*UFUNCTION(NetMulticast, Reliable)
     void SetPlayerColorMulticast(AActor *Player, FLinearColor TeamColor);*/
@@ -101,7 +91,8 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
   protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
   private:
-    
+    UPROPERTY(ReplicatedUsing = OnRep_TeamsStats)
+    TArray<FTeamInfo> TeamsStats;
     
     
 };

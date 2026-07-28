@@ -62,7 +62,8 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
     void OnInviteAccepted(const bool bWasSuccessful, int32 ControllerId, TSharedPtr<const FUniqueNetId> UserId,
                           const FOnlineSessionSearchResult &InviteResult);
     
-    TArray<FTeamInfo> Teams;
+    void SetTeams(const TArray<FTeamInfo>& NewTeams);
+    TArray<FTeamInfo>& GetTeams() { return Teams; }
     
   protected:
     IOnlineSessionPtr SessionInterface;
@@ -95,4 +96,6 @@ class SHOOTTHEMUP_API USTUGameInstance : public UGameInstance
   private:
     UPROPERTY(EditDefaultsOnly, Category = "Sound")
     USoundClass *MasterSoundClass;
+
+    TArray<FTeamInfo> Teams;
 };

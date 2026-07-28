@@ -3,6 +3,7 @@
 #include "Player/STUPlayerController.h"
 #include "Camera/CameraActor.h"
 #include "Components/STURespawnComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpectatorPawn.h"
@@ -50,19 +51,13 @@ void ASTUPlayerController::OnRequestPossess_Client_Implementation(APawn *InPawn)
                                                           &USTUPlayerAbilityUseComponent::StopUseAbility_Server);
             }
         }
+        CharacterPawn->GetMesh()->SetRenderCustomDepth(false);
     }
     UE_LOG(
         LogSTUPlayerController, Display,
         TEXT("ASTUPlayerController::OnRequestPossess_Client_Implementation Possesing character. AbilityClass was %s"),
         *CharacterPawn->AbilityClass->GetFName().ToString());
-    if (InPawn->IsA<ASpectatorPawn>())
-    {
-        //
-    }
-    else if (InPawn->IsA<ACharacter>())
-    {
-        //
-    }
+    
 }
 
 void ASTUPlayerController::RequestPossess_Server_Implementation(APawn *InPawn)
@@ -166,28 +161,11 @@ void ASTUPlayerController::SetupInputComponent()
 void ASTUPlayerController::NotifyLoadedWorld(FName WorldPackageName, bool bFinalDest)
 {
     Super::NotifyLoadedWorld(WorldPackageName, bFinalDest);
-    if (WorldPackageName != "LobbyLevel" && IsLocalController() && bFinalDest)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("I am Player %s has loaded world, notifying server"), *GetNameSafe(this));
-        PlayerLoadedWorld();
-    }
-}
-
-void ASTUPlayerController::CheckPlayerFullyLoadedWorld()
-{
-    auto Gamestate = GetWorld()->GetGameState<ASTUGameStateBase>();
-    if (Gamestate)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("I am Player %s has fully loaded world, notifying server"), *GetNameSafe(this));
-        GetWorld()->GetTimerManager().ClearTimer(CheckWorldTimerHandle);
-        PlayerLoadedWorld();
-
-        return;
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("I am Player %s not loaded fully yet, waiting..."), *GetNameSafe(this));
-    }
+    // if (WorldPackageName != "LobbyLevel" && IsLocalController() && bFinalDest)
+    // {
+    //     UE_LOG(LogTemp, Warning, TEXT("I am Player %s has loaded world, notifying server"), *GetNameSafe(this));
+    //     PlayerLoadedWorld();
+    // }
 }
 
 void ASTUPlayerController::RequestColorChange_Server_Implementation(const FLinearColor &Color)
@@ -246,20 +224,4 @@ void ASTUPlayerController::OnRep_SetCamera()
 
     UE_LOG(LogTemp, Warning, TEXT("Switching view to camera: %s"), *GetNameSafe(LobbyCamera));
     SetViewTarget(LobbyCamera);
-}
-
-void ASTUPlayerController::PlayerLoadedWorld_Implementation()
-{
-    UE_LOG(LogTemp, Warning, TEXT("Player %s loaded world, getting gamemode"), *GetNameSafe(this));
-    auto GamemodeBase = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
-    if (!GamemodeBase)
-        return;
-    UE_LOG(LogTemp, Warning, TEXT("Player %s loaded world, informing gamemode"), *GetNameSafe(this));
-    if (Cast<ASTUPlayerState>(PlayerState)->LoadedAndNotifiedServer)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Player %s already informed gamemode"), *GetNameSafe(this));
-        return;
-    }
-    GamemodeBase->PlayerConnected(this);
-    Cast<ASTUPlayerState>(PlayerState)->LoadedAndNotifiedServer = true;
 }

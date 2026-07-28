@@ -66,10 +66,14 @@ void USTUWeaponComponent::SpawnWeapons_Implementation()
     Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
     UE_LOG(LogWeaponComponent, Display, TEXT("SpawnInfo: %s"), *Character->PlayerID);
     UClass *WeaponClassLoaded; 
-    if (!GetWorld()->GetGameState<ASTUGameStateBase>()->TeamsStats.IsEmpty())
+    if (!GetWorld() || !GetWorld()->GetGameInstance<USTUGameInstance>())
+{
+    return;
+}
+    if (!GetWorld()->GetGameInstance<USTUGameInstance>()->GetTeams().IsEmpty())
     {
         FPlayerInfo *PlayerInfo =
-            STUUtils::FindPlayerByPlayerID(Character->PlayerID, GetWorld()->GetGameState<ASTUGameStateBase>()->TeamsStats);
+            STUUtils::FindPlayerByPlayerID(Character->PlayerID, GetWorld()->GetGameInstance<USTUGameInstance>()->GetTeams());
         WeaponClassLoaded = PlayerInfo->WeaponClass.LoadSynchronous();
     }
     else

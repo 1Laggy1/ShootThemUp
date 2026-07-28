@@ -166,7 +166,8 @@ struct FPlayerInfo
     int32 Kills = 0;
     UPROPERTY()
     int32 Deaths;
-    APlayerController *ThisPlayerController;
+    UPROPERTY()
+    APlayerController *ThisPlayerController = nullptr;
 
 };
 

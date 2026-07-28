@@ -190,8 +190,6 @@ void ASTUPlayerCharacter::Zoom(bool Enabled)
 void ASTUPlayerCharacter::Turn(float Value)
 {
     float CurrentSensitivity = bWantToZoom ? (BaseSensitivity * AimSensitivityMultiplier) : BaseSensitivity;
-    UE_LOG(LogTemp, Warning, TEXT("BaseSens: %f | CurrentSens: %f | Final Math: %f"), BaseSensitivity,
-           CurrentSensitivity, (CurrentSensitivity / 50.0f) * SensitivityMultiplier);
     AddControllerYawInput(Value * (CurrentSensitivity/50)*SensitivityMultiplier);
 }
 

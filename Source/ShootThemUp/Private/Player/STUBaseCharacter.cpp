@@ -36,7 +36,7 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
     HealthComponent = CreateDefaultSubobject<USTUHealthActorComponent>("HealthComponent");
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
     PlayerUIComponent = CreateDefaultSubobject<USTUPlayerUIComponent>("Player UI Component");
-    if (PlayerUIComponent->GetPlayerUIWidgetComponent())
+    if (PlayerUIComponent && PlayerUIComponent->GetPlayerUIWidgetComponent())
     {
         PlayerUIComponent->GetPlayerUIWidgetComponent()->SetupAttachment(RootComponent);
     }
@@ -100,6 +100,12 @@ void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float HealthPercent, AAc
 void ASTUBaseCharacter::InitPlayer()
 {
     SetPlayerColor(PlayerColor);
+    if (PlayerUIComponent)
+    {
+        PlayerUIComponent->SetPlayerColor(PlayerColor);
+        PlayerUIComponent->SetPlayerName(PlayerName);
+    }
+    UpdateOutlineState();
     if (GetWorld() && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "LobbyLevel")
     {
         return;
@@ -114,7 +120,29 @@ void ASTUBaseCharacter::InitPlayer()
         Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController())->RequestPossess_Server(this);
     }
     InitAbility();
+    
 }
+
+void ASTUBaseCharacter::UpdateOutlineState()
+{
+    ASTUPlayerController* PC = Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController());
+    if (!PC) return;
+
+    if (PC->PlayerState)
+    {
+        ASTUPlayerState* STUPlayerState = PC->GetPlayerState<ASTUPlayerState>();
+        
+        if (STUPlayerState->GetTeamID() == TeamID)
+        {
+            GetMesh()->SetCustomDepthStencilValue(1);
+        }
+        else
+        {
+            GetMesh()->SetCustomDepthStencilValue(2);
+        }
+    }
+}
+
 void ASTUBaseCharacter::InitAbility()
 {
 }

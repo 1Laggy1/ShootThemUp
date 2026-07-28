@@ -61,6 +61,39 @@ void USTUPlayerUIComponent::UpdateHealthWidget(AActor *DamageCauser, float Healt
     
 }
 
+void USTUPlayerUIComponent::SetPlayerName(FString PlayerName)
+{
+    if (!PlayerUIWidget)
+    {
+        if (PlayerUIWidgetComponent)
+        {
+            PlayerUIWidgetComponent->InitWidget();
+            PlayerUIWidget = Cast<USTUPlayerUIWidget>(PlayerUIWidgetComponent->GetUserWidgetObject());
+        }
+    }
+
+    if (PlayerUIWidget)
+    {
+        PlayerUIWidget->SetPlayerName(PlayerName);
+    }
+}
+void USTUPlayerUIComponent::SetPlayerColor(const FLinearColor& Color)
+{
+    if (!PlayerUIWidget)
+    {
+        if (PlayerUIWidgetComponent)
+        {
+            PlayerUIWidgetComponent->InitWidget();
+            PlayerUIWidget = Cast<USTUPlayerUIWidget>(PlayerUIWidgetComponent->GetUserWidgetObject());
+        }
+    }
+
+    if (PlayerUIWidget)
+    {
+        PlayerUIWidget->SetPlayerColor(Color);
+    }
+}
+
 void USTUPlayerUIComponent::OnDamaged(AActor *DamagedActor, float HealthPercent, AActor *DamageCauser)
 {
     UpdateHealthWidget(DamageCauser, HealthPercent);

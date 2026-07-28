@@ -2,6 +2,7 @@
 
 
 #include "Components/STURespawnComponent.h"
+#include "GameFramework/PlayerState.h"
 #include "STUGameModeBase.h"
 #include "Net/UnrealNetwork.h"
 
@@ -53,10 +54,10 @@ void USTURespawnComponent::RespawnTimerUpdate()
         FString OwnerIDString = TEXT("");
 
         AController* Controller = Cast<AController>(GetOwner());
-        if (Controller)
+        if (Controller && Controller->PlayerState)
         {
         
-            OwnerIDString = FString::FromInt(Controller->GetUniqueID());
+            OwnerIDString = Controller->PlayerState->GetUniqueId()->ToString();
         }
         Gamemode->RespawnRequest(OwnerIDString);
     }
