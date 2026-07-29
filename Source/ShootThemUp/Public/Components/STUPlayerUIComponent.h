@@ -26,6 +26,7 @@ class SHOOTTHEMUP_API USTUPlayerUIComponent : public UActorComponent
         void SetPlayerColor(const FLinearColor& Color);
 
         void OnDamaged(AActor *DamagedActor, float HealthPercent, AActor *DamageCauser);
+
     protected:
         UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
         UWidgetComponent *PlayerUIWidgetComponent;
@@ -46,6 +47,8 @@ class SHOOTTHEMUP_API USTUPlayerUIComponent : public UActorComponent
 
     private:
         virtual void BeginPlay() override;
+        FTimerHandle OcclusionTimerHandle;
+        void CheckOcclusion();
 
 
 };

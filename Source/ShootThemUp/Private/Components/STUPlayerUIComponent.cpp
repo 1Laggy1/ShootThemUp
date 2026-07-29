@@ -28,6 +28,14 @@ void USTUPlayerUIComponent::ShowUI()
         TimeToShow,
         false
     );
+
+    GetWorld()->GetTimerManager().SetTimer(
+        OcclusionTimerHandle, 
+        this, 
+        &USTUPlayerUIComponent::CheckOcclusion, 
+        0.1f, 
+        true
+    );
 }
 
 void USTUPlayerUIComponent::HideUI()
@@ -35,7 +43,10 @@ void USTUPlayerUIComponent::HideUI()
     if (PlayerUIWidgetComponent)
     {
         PlayerUIWidgetComponent->SetVisibility(false, true);
+        GetWorld()->GetTimerManager().ClearTimer(OcclusionTimerHandle);
     }
+    GetWorld()->GetTimerManager().ClearTimer(OcclusionTimerHandle);
+    GetWorld()->GetTimerManager().ClearTimer(HideUITimerHandle);
     
 }
 void USTUPlayerUIComponent::ToShowOrNotToShow(AActor *DamageCauser)
@@ -43,7 +54,8 @@ void USTUPlayerUIComponent::ToShowOrNotToShow(AActor *DamageCauser)
     if (DamageCauser)
     {
         const auto ControllerCauser = STUUtils::GetInstigatorControllerFromDamageCauser(DamageCauser);
-        if (ControllerCauser)
+        
+        if (ControllerCauser && ControllerCauser->IsLocalController())
         {
             ShowUI();
         }
@@ -97,4 +109,40 @@ void USTUPlayerUIComponent::SetPlayerColor(const FLinearColor& Color)
 void USTUPlayerUIComponent::OnDamaged(AActor *DamagedActor, float HealthPercent, AActor *DamageCauser)
 {
     UpdateHealthWidget(DamageCauser, HealthPercent);
+}
+void USTUPlayerUIComponent::CheckOcclusion()
+{
+    if (!GetOwner() || !GetWorld() || !PlayerUIWidgetComponent) return;
+
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC || !PC->PlayerCameraManager) return;
+
+    FVector CameraLocation = PC->PlayerCameraManager->GetCameraLocation();
+    FVector TargetLocation = GetOwner()->GetActorLocation()+ FVector(0,0,50);
+
+    FHitResult HitResult;
+    FCollisionQueryParams CollisionParams;
+    CollisionParams.AddIgnoredActor(GetOwner());
+    
+    if (APawn* LocalPawn = PC->GetPawn())
+    {
+        CollisionParams.AddIgnoredActor(LocalPawn);
+    }
+
+    bool bHit = GetWorld()->LineTraceSingleByChannel(
+        HitResult,
+        CameraLocation,
+        TargetLocation,
+        ECC_Visibility,
+        CollisionParams
+    );
+
+    if (bHit)
+    {
+        PlayerUIWidgetComponent->SetVisibility(false, true);
+    }
+    else
+    {
+        PlayerUIWidgetComponent->SetVisibility(true, true);
+    }
 }
