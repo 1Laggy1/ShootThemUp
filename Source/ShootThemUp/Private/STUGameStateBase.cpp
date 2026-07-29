@@ -40,9 +40,8 @@ void ASTUGameStateBase::BeginPlay()
     Super::BeginPlay();
     SetReplicates(true);
     bReplicates = true;
-    GetWorld()->GetTimerManager().SetTimer(WaitForOutlineColorsTimerHandle, this, &ASTUGameStateBase::SetOutlineColors,
+    GetWorld()->GetTimerManager().SetTimer(WaitForReplicateTimerHandle, this, &ASTUGameStateBase::WaitForReplicate,
                                            1.0f, true);
-    //PlayerConnected(GetWorld()->GetFirstPlayerController());
 }
 
 void ASTUGameStateBase::ResetOnePlayerMulticast_Implementation(AActor *DiedActor, AActor *Spawn)
@@ -61,26 +60,66 @@ void ASTUGameStateBase::OnRep_TeamsStats()
     //SetOutlineColors();
 }
 
-void ASTUGameStateBase::SetOutlineColors()
+void ASTUGameStateBase::WaitForReplicate()
 {
-
-  if (!OutlineColorsMPC || TeamsStats.IsEmpty())
-  {
+    
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC)
+    {
         return;
-  }
+    }
+
+    ASTUPlayerController* STUPC = Cast<ASTUPlayerController>(PC);
+    if (!STUPC)
+    {
+        return;
+    }
+
+    if (SetIntroCameraView(STUPC) && SetOutlineColors(STUPC))
+    {
+        GetWorld()->GetTimerManager().ClearTimer(WaitForReplicateTimerHandle);
+        
+        if (PC->GetPawn())
+        {
+            ASTUBaseCharacter* BC = Cast<ASTUBaseCharacter>(PC->GetPawn());
+            if (BC)
+            {
+                PC->SetViewTargetWithBlend(PC->GetPawn(), 1);
+            }
+            
+        }
+    }
+
+}
+ bool ASTUGameStateBase::SetIntroCameraView(ASTUPlayerController *PC)
+{
+    if (!PC || !IsValid(IntroCamera))
+    {
+        return false;
+    }
+    PC->SetViewTargetWithBlend(IntroCamera);
+    return true;
+
+}
+bool ASTUGameStateBase::SetOutlineColors(ASTUPlayerController *PC)
+{
+    if (!OutlineColorsMPC || TeamsStats.IsEmpty())
+    {
+        return false;
+    }
     
     
     int32 LocalPlayerTeamID = 1;
-    ASTUPlayerController *PC =
-        Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController());
-    if (PC && PC->PlayerState) {
+    if (!PC || !PC->PlayerState) {
+        return false;
+    }
       ASTUPlayerState *PS = PC->GetPlayerState<ASTUPlayerState>();
       LocalPlayerTeamID = PS->GetTeamID();
-    }
+    
 
     if (LocalPlayerTeamID == 0)
     {
-        return;
+        return false;
     }
       
 
@@ -90,7 +129,9 @@ void ASTUGameStateBase::SetOutlineColors()
         STUUtils::FindTeamByTeamID(LocalPlayerTeamID, TeamsStats);
     FTeamInfo *EnemyTeam = STUUtils::FindTeamByTeamID(EnemyTeamID, TeamsStats);
 
-    if (LocalTeam && EnemyTeam) {
+    if (!LocalTeam || !EnemyTeam) {
+        return false;
+    }
 
       UKismetMaterialLibrary::SetVectorParameterValue(
           GetWorld(), OutlineColorsMPC, FName("Team1Color"),
@@ -99,9 +140,12 @@ void ASTUGameStateBase::SetOutlineColors()
       UKismetMaterialLibrary::SetVectorParameterValue(
           GetWorld(), OutlineColorsMPC, FName("Team2Color"),
           EnemyTeam->TeamColor);
-          GetWorld()->GetTimerManager().ClearTimer(WaitForOutlineColorsTimerHandle);
-    }
-  
+    
+    return true;
+
+    
+
+    
 }
 
 void ASTUGameStateBase::SetTeams(const TArray<FTeamInfo>& NewTeams)

@@ -10,6 +10,7 @@
 #include "GameFramework/GameState.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/SpectatorPawn.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSubsystem.h"
 #include "Player/STUBaseCharacter.h"
@@ -77,6 +78,17 @@ void ASTUGameModeBase::StartPlay()
         return;
     }
 
+    if (IntroCameras.IsEmpty())
+        {
+            UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("IntroCamera"), IntroCameras);
+        }
+        if (IntroCameras.Num() > 0)
+        {
+            int32 RandomIndex = FMath::RandHelper(IntroCameras.Num());  
+            AActor* RandomCamera = IntroCameras[RandomIndex];
+            STUGameStateBase->IntroCamera = RandomCamera;
+        }
+
     TransferGameData();
     
     GetTeamsStarts();
@@ -117,7 +129,9 @@ void ASTUGameModeBase::TransferGameData()
         else {
             StartDebug();
         }
-        STUGameStateBase->SetOutlineColors();
+
+        
+        
     }
     
     
@@ -374,9 +388,14 @@ void ASTUGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 
 void ASTUGameModeBase::RegisterPlayer(AController* Controller)
 {
+    
     APlayerController* PC = Cast<APlayerController>(Controller);
-    if (PC && PC->PlayerState)
+    if (!PC || !PC->PlayerState)
     {
+        return;
+    }
+
+    
         FString PlayerUniqueID = PC->PlayerState->GetUniqueId()->ToString();
 
         if (!PlayersReadyIDs.Contains(PlayerUniqueID))
@@ -397,7 +416,7 @@ void ASTUGameModeBase::RegisterPlayer(AController* Controller)
                 
             }
         }
-    }
+    
 }
 
 void ASTUGameModeBase::SpawnBots()

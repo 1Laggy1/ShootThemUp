@@ -15,6 +15,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnTimerChanged, int32);
  * 
  */
 class ASTUBaseCharacter;
+class ASTUPlayerController;
 UCLASS()
 class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
 {
@@ -41,9 +42,12 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     float WaitingTimeNow = 30.0f;
     TArray<FTeamInfo>& GetTeams() { return TeamsStats; }
     void SetTeams(const TArray<FTeamInfo>& NewTeams);
-    void SetOutlineColors();
-    FTimerHandle WaitForOutlineColorsTimerHandle;
-    
+
+    void WaitForReplicate();
+    FTimerHandle WaitForReplicateTimerHandle;
+
+    bool SetIntroCameraView(ASTUPlayerController *PC);
+    bool SetOutlineColors(ASTUPlayerController *PC);
 
     FOnMatchStateChanged OnMatchStateChanged;
     FOnTimerChanged OnTimerChanged;
@@ -51,6 +55,9 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     UPROPERTY(EditDefaultsOnly, Category = "Materials")
     UMaterialParameterCollection* OutlineColorsMPC;
     bool isOutlineColorsChanged = false;
+
+    UPROPERTY(Replicated)
+    AActor* IntroCamera;
 
   public:
     /*UFUNCTION(NetMulticast, Reliable)

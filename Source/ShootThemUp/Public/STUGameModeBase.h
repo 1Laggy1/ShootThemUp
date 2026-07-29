@@ -47,6 +47,10 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     
     void SpawnDummy(int32 count);
     void ChangeOutlineColors();
+
+
+    
+
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
@@ -104,4 +108,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void SetMovement(bool Active);
     void StartDebug();
     void TransferGameData();
+
+    TArray<AActor*> IntroCameras;
+    
 };

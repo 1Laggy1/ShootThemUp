@@ -52,11 +52,13 @@ void ASTUPlayerController::OnRequestPossess_Client_Implementation(APawn *InPawn)
             }
         }
         CharacterPawn->GetMesh()->SetRenderCustomDepth(false);
+        SetViewTargetWithBlend(CharacterPawn, 0.5f);
     }
     UE_LOG(
         LogSTUPlayerController, Display,
         TEXT("ASTUPlayerController::OnRequestPossess_Client_Implementation Possesing character. AbilityClass was %s"),
         *CharacterPawn->AbilityClass->GetFName().ToString());
+        
     
 }
 
