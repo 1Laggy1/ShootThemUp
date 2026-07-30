@@ -29,26 +29,6 @@ void ASTULobbyGameMode::StartPlay()
 }
 
 
-
-//void ASTULobbyGameMode::BeginFindPlayerStarts()
-//{
-//    TArray<AActor *> FoundStarts;
-//    UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), FoundStarts);
-//
-//    for (AActor *Actor : FoundStarts)
-//    {
-//        if (Actor)
-//        {
-//            const auto Start = Cast<ASTULobbyPlayerStart>(Actor);
-//            if (Start)
-//            {
-//                PlayerStarts.Add(Start);
-//            }
-//        }
-//    }
-//}
-
-
 void ASTULobbyGameMode::PostLogin(APlayerController *NewPlayer)
 {
     Super::PostLogin(NewPlayer);

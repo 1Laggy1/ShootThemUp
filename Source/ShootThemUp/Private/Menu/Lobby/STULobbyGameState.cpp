@@ -63,7 +63,7 @@ void ASTULobbyGameState::InitTeams()
     if (!STUGameInstance)
         return;
 
-    STUGameInstance->Teams.Empty();
+    STUGameInstance->GetTeams().Empty();
 
     TArray<FTeamInfo> LocalTeams;
     for (int32 i = 1; i <= TeamNumbers; ++i)
@@ -72,7 +72,7 @@ void ASTULobbyGameState::InitTeams()
         LocalTeams.Add(TeamInfo);
     }
     UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::InitTeams - Teams initialized"));
-    STUGameInstance->Teams = LocalTeams;
+    STUGameInstance->GetTeams() = LocalTeams;
 }
 
 // ----- OnPostLogin / Spawn all -----
@@ -81,6 +81,19 @@ void ASTULobbyGameState::OnPostLogin(APlayerController *PlayerController)
 {
     if (!HasAuthority() || !PlayerController || !PlayerController->PlayerState || !STUGameInstance)
         return;
+
+    FString CurrentPlayerID = TEXT("UnknownID");
+    if (PlayerController->PlayerState->GetUniqueId().IsValid())
+    {
+        CurrentPlayerID = PlayerController->PlayerState->GetUniqueId()->ToString();
+    }
+
+    FPlayerInfo* ExistingPlayer = STUUtils::FindPlayerByPlayerID(CurrentPlayerID, STUGameInstance->GetTeams());
+    if (ExistingPlayer)
+    {
+        return; 
+    }
+
     FirstSpawnPosition = true;
     UE_LOG(LogSTULobbyGameState, Display, TEXT("ASTULobbyGameState::OnPostLogin - Player logged in"));
     FPlayerInfo NewPlayerInfo = DefaultPlayerInfo;
@@ -94,24 +107,24 @@ void ASTULobbyGameState::OnPostLogin(APlayerController *PlayerController)
     }
     NewPlayerInfo.ThisPlayerController = PlayerController;
     NewPlayerInfo.PlayerName = PlayerController->PlayerState->GetPlayerName();
-    if (STUGameInstance->Teams.IsValidIndex(TeamIndex))
+    if (STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams()))
     {
-        NewPlayerInfo.Color = STUGameInstance->Teams[TeamIndex].TeamColor;
-        NewPlayerInfo.TeamID = STUGameInstance->Teams[TeamIndex].TeamID;
-        STUGameInstance->Teams[TeamIndex].PlayersInfos.Add(NewPlayerInfo);
+        NewPlayerInfo.Color = STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->TeamColor;
+        NewPlayerInfo.TeamID = STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->TeamID;
+        STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->PlayersInfos.Add(NewPlayerInfo);
     }
     else
     {
-        if (STUGameInstance->Teams.Num() > 0)
+        if (STUGameInstance->GetTeams().Num() > 0)
         {
-            NewPlayerInfo.Color = STUGameInstance->Teams[0].TeamColor;
-            NewPlayerInfo.TeamID = STUGameInstance->Teams[0].TeamID;
-            STUGameInstance->Teams[0].PlayersInfos.Add(NewPlayerInfo);
+            NewPlayerInfo.Color = STUUtils::FindTeamByTeamID(1, STUGameInstance->GetTeams())->TeamColor;
+            NewPlayerInfo.TeamID = STUUtils::FindTeamByTeamID(1, STUGameInstance->GetTeams())->TeamID;
+            STUUtils::FindTeamByTeamID(1, STUGameInstance->GetTeams())->PlayersInfos.Add(NewPlayerInfo);
         }
     }
-    AddTeamIndex();
+    AddTeamID();
 
-    SpawnAllTeams_Multicast(STUGameInstance->Teams);
+    SpawnAllTeams_Multicast(STUGameInstance->GetTeams());
 }
 
 void ASTULobbyGameState::SpawnAllTeams_Multicast_Implementation(const TArray<FTeamInfo> &TeamsInfo)
@@ -132,13 +145,13 @@ void ASTULobbyGameState::SpawnAllTeams_Multicast_Implementation(const TArray<FTe
     }
     if (STUGameInstance)
     {
-        STUGameInstance->Teams = TeamsInfo;
+        STUGameInstance->SetTeams(TeamsInfo);
     }
 
     if (HasAuthority())
     {
         
-        for (FTeamInfo &Team : STUGameInstance->Teams)
+        for (FTeamInfo &Team : STUGameInstance->GetTeams())
         {
             SpawnTeam(Team);
         }
@@ -247,7 +260,7 @@ void ASTULobbyGameState::OnTeamChanged_Multicast_Implementation(FTeamInfo NewTea
         return;
     UE_LOG(LogSTULobbyGameState, Display,
            TEXT("ASTULobbyGameState::OnTeamChanged_Multicast_Implementation - Team %s changed"), *NewTeam.TeamName);
-    FTeamInfo *Team = STUUtils::FindTeamByTeamID(NewTeam.TeamID, STUGameInstance->Teams);
+    FTeamInfo *Team = STUUtils::FindTeamByTeamID(NewTeam.TeamID, STUGameInstance->GetTeams());
     if (Team)
     {
         *Team = NewTeam;
@@ -262,7 +275,7 @@ void ASTULobbyGameState::OnPlayerChanged_Multicast_Implementation(FPlayerInfo Pl
     UE_LOG(LogSTULobbyGameState, Display,
            TEXT("ASTULobbyGameState::OnPlayerChanged_Multicast_Implementation - Player %s changed"),
            *PlayerChanged.PlayerName);
-    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerChanged.PlayerID, STUGameInstance->Teams);
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerChanged.PlayerID, STUGameInstance->GetTeams());
     if (Player)
     {
         *Player = PlayerChanged;
@@ -274,11 +287,11 @@ void ASTULobbyGameState::ChangeTeamName_Server_Implementation(const FString &Pla
 {
     if (!CheckSTUGameInstance())
         return;
-    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->GetTeams());
     if (!Player)
         return;
     FTeamInfo* CurrentTeam =
-        STUGameInstance->Teams.FindByPredicate([&](const FTeamInfo &T) { return T.TeamID == Player->TeamID; });
+        STUGameInstance->GetTeams().FindByPredicate([&](const FTeamInfo &T) { return T.TeamID == Player->TeamID; });
     if (CurrentTeam)
     {
         CurrentTeam->TeamName = NewTeamName;
@@ -290,11 +303,11 @@ void ASTULobbyGameState::ChangeTeamColor_Server_Implementation(const FString &Pl
 {
     if (!CheckSTUGameInstance())
         return;
-    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->GetTeams());
     if (!Player)
         return;
     FTeamInfo *CurrentTeam =
-        STUGameInstance->Teams.FindByPredicate([&](const FTeamInfo &T) { return T.TeamID == Player->TeamID; });
+        STUGameInstance->GetTeams().FindByPredicate([&](const FTeamInfo &T) { return T.TeamID == Player->TeamID; });
     if (CurrentTeam)
     {
         CurrentTeam->TeamColor = Color;
@@ -311,7 +324,7 @@ void ASTULobbyGameState::ChangeWeapons_Server_Implementation(TSubclassOf<ASTUBas
 {
     if (!CheckSTUGameInstance())
         return;
-    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->GetTeams());
     if (Player && WeaponToChoose)
     {
         if (WeaponsToChoose.Contains(WeaponToChoose))
@@ -327,7 +340,7 @@ void ASTULobbyGameState::ChangeAbility_Server_Implementation(TSubclassOf<USTUPla
 {
     if (!CheckSTUGameInstance())
         return;
-    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->Teams);
+    FPlayerInfo *Player = STUUtils::FindPlayerByPlayerID(PlayerID, STUGameInstance->GetTeams());
     if (Player && AbilityToChoose)
     {
         if (AbilitiesToChoose.Contains(AbilityToChoose))
@@ -388,24 +401,24 @@ void ASTULobbyGameState::SpawnFakePlayers(int32 Count)
         FakePlayerInfo.PlayerID = FString::Printf(TEXT("FakeBotID_%d"), FMath::RandRange(10000, 99999));
         FakePlayerInfo.PlayerName = FString::Printf(TEXT("TestBot_%d"), i + 1);
 
-        if (STUGameInstance->Teams.IsValidIndex(TeamIndex))
+        if (STUGameInstance->GetTeams().IsValidIndex(TeamID))
         {
-            FakePlayerInfo.Color = STUGameInstance->Teams[TeamIndex].TeamColor;
-            FakePlayerInfo.TeamID = STUGameInstance->Teams[TeamIndex].TeamID;
-            STUGameInstance->Teams[TeamIndex].PlayersInfos.Add(FakePlayerInfo);
+            FakePlayerInfo.Color = STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->TeamColor;
+            FakePlayerInfo.TeamID = STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->TeamID;
+            STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->PlayersInfos.Add(FakePlayerInfo);
         }
-        else if (STUGameInstance->Teams.Num() > 0)
+        else if (STUGameInstance->GetTeams().Num() > 0)
         {
-            FakePlayerInfo.Color = STUGameInstance->Teams[0].TeamColor;
-            FakePlayerInfo.TeamID = STUGameInstance->Teams[0].TeamID;
-            STUGameInstance->Teams[0].PlayersInfos.Add(FakePlayerInfo);
+            FakePlayerInfo.Color = STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->TeamColor;
+            FakePlayerInfo.TeamID = STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->TeamID;
+            STUUtils::FindTeamByTeamID(TeamID, STUGameInstance->GetTeams())->PlayersInfos.Add(FakePlayerInfo);
         }
 
-        AddTeamIndex();
+        AddTeamID();
     }
 
 
     FirstSpawnPosition = true;
 
-    SpawnAllTeams_Multicast(STUGameInstance->Teams);
+    SpawnAllTeams_Multicast(STUGameInstance->GetTeams());
 }

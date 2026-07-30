@@ -139,12 +139,12 @@ bool USTUPlayerHUDWidget::isPlayerSpectating() const
 
 FString USTUPlayerHUDWidget::GetRoundsInfo()
 {
-    if (!GetWorld() || !CurrentGamemodeState || CurrentGamemodeState->TeamsStats.IsEmpty())
+    if (!GetWorld() || !CurrentGamemodeState || CurrentGamemodeState->GetTeams().IsEmpty())
         return "Rounds: 0/0";
     FString RoundsInfo = "";
-    RoundsInfo += FString::FromInt(CurrentGamemodeState->TeamsStats[0].Score);
+    RoundsInfo += FString::FromInt(STUUtils::FindTeamByTeamID(1, CurrentGamemodeState->GetTeams())->Score);
     RoundsInfo += "/";
-    RoundsInfo += FString::FromInt(CurrentGamemodeState->TeamsStats[1].Score);
+    RoundsInfo += FString::FromInt(STUUtils::FindTeamByTeamID(2, CurrentGamemodeState->GetTeams())->Score);
     return RoundsInfo;
 }
 

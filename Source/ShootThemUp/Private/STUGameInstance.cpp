@@ -237,3 +237,8 @@ void USTUGameInstance::ToggleVolume()
 {
     USTUSoundFunctionLibrary::ToggleSoundClassVolume(MasterSoundClass);
 }
+
+void USTUGameInstance::SetTeams(const TArray<FTeamInfo>& NewTeams)
+{
+    Teams = NewTeams;
+}

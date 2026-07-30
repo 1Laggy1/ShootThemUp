@@ -132,7 +132,7 @@ void ASTUBall::PickUpBall(ASTUBaseCharacter *Character)
     {
 
         FPlayerInfo *PlayerInfo = STUUtils::FindPlayerByPlayerID(
-            PlayerController->PlayerState->GetUniqueId()->ToString(), STUGameInstance->Teams);
+            PlayerController->PlayerState->GetUniqueId()->ToString(), STUGameInstance->GetTeams());
         FLinearColor PlayerColor = PlayerInfo->Color;
         ChangeBallColor(PlayerColor);
     }

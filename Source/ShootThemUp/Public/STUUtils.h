@@ -168,4 +168,32 @@ class STUUtils
             }
         }
     }
+    static void DebugPrintAllTeams(const TArray<FTeamInfo>& Teams)
+    {
+        if (Teams.IsEmpty())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("DebugPrintAllTeams: Teams Empty"));
+            return;
+        }
+
+        UE_LOG(LogTemp, Display, TEXT("################# ALL TEAMS #################"));
+        for (const FTeamInfo& Team : Teams)
+        {
+            UE_LOG(LogTemp, Display, TEXT("Team [%s] (ID: %d) - Players: %d"), *Team.TeamName, Team.TeamID, Team.PlayersInfos.Num());
+            
+            if (Team.PlayersInfos.IsEmpty())
+            {
+                UE_LOG(LogTemp, Display, TEXT("  -> Team in empty"));
+            }
+            else
+            {
+                for (const FPlayerInfo& Player : Team.PlayersInfos)
+                {
+                    UE_LOG(LogTemp, Display, TEXT("  -> Player: %s (ID: %s)"), *Player.PlayerName, *Player.PlayerID);
+                }
+            }
+            UE_LOG(LogTemp, Display, TEXT("-----------------------------------------------"));
+        }
+        UE_LOG(LogTemp, Display, TEXT("###############################################"));
+    }
 };

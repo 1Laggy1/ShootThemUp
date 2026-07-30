@@ -56,9 +56,6 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     UFUNCTION()
     void OnRep_SetCamera();
     UFUNCTION(Server, Reliable)
-    void PlayerLoadedWorld();
-    void CheckPlayerFullyLoadedWorld();
-    UFUNCTION(Server, Reliable)
     void RequestColorChange_Server(const FLinearColor &Color);
     UFUNCTION(Server, Reliable)
     void RequestTeamNameChange_Server(const FString &NewName);
@@ -69,7 +66,6 @@ class SHOOTTHEMUP_API ASTUPlayerController : public APlayerController
     UFUNCTION(BlueprintCallable, Category = "UI")
     void TogglePauseMenu();
   protected:
-    FTimerHandle CheckWorldTimerHandle;
     //virtual void OnPossess(APawn *InPawn) override;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
     USTURespawnComponent *STURespawnComponent;

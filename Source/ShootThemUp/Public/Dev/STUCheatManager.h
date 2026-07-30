@@ -12,4 +12,10 @@ class SHOOTTHEMUP_API USTUCheatManager : public UCheatManager
 public:
     UFUNCTION(Exec)
     void SpawnDummy();
+    UFUNCTION(Exec)
+    void Kill();
+    UFUNCTION(Exec)
+    void PrintTeamsStats();
+    UFUNCTION(Exec)
+    void PrintTeams();
 };

@@ -40,20 +40,22 @@ void USTUGameOverWidget::UpdatePlayersStat()
     PlayerStatBox->ClearChildren();
     int32 HighestScore = 0;
     FTeamInfo* WinnerTeam = nullptr;
+    bool bIsDraw = false;
     TArray<FPlayerInfo> MyPlayersInfo;
 
-    for (FTeamInfo &Info : GameState->TeamsStats)
+    for (FTeamInfo &Info : GameState->GetTeams())
     {
         UE_LOG(LogTemp, Display, TEXT("USTUGameOverWidget::UpdatePlayersStat: Team %d score is %d"), Info.TeamID,
                Info.Score);
         if (Info.Score > HighestScore)
         {
+            HighestScore = Info.Score;
             WinnerTeam = &Info;
         }
-        for (FPlayerInfo& PlayerInfo : Info.PlayersInfos)
+        else if (Info.Score == HighestScore)
         {
-            MyPlayersInfo.Add(PlayerInfo);
-            
+            bIsDraw = true;
+            WinnerTeam = nullptr; 
         }
     }
     MyPlayersInfo.Sort([](const FPlayerInfo &A, const FPlayerInfo &B) { return A.Kills > B.Kills; });
@@ -73,7 +75,7 @@ void USTUGameOverWidget::UpdatePlayersStat()
         PlayerStatRowWidget->SetRowInfo(RowInfo);
     }
     FString WinnerName = "";
-    if (WinnerTeam)
+    if (WinnerTeam && !bIsDraw)
     {
         WinnerName = WinnerTeam->TeamName + " WON";
         

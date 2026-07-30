@@ -55,9 +55,9 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     UFUNCTION()
     void OnPostLogin(APlayerController *PlayerController);
 
-    void AddTeamIndex()
+    void AddTeamID()
     {
-        TeamIndex = (TeamIndex + 1) % TeamNumbers;
+        TeamID = (TeamID % TeamNumbers) + 1;
     }
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerSpawn")
@@ -93,7 +93,7 @@ class SHOOTTHEMUP_API ASTULobbyGameState : public AGameStateBase
     AActor *LobbyCamera;
 
   private:
-    int TeamIndex = 0;
+    int TeamID = 1;
     int TeamNumbers = 2;
     ASTULobbyGameMode *STULobbyGamemode;
     USTUGameInstance* STUGameInstance;

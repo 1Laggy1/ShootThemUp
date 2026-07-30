@@ -45,17 +45,14 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     FOnDeath OnDeath;
     FOnHealthChanged OnHealthChanged;
     FOnDamaged OnDamaged;
-    UWidgetComponent* GetHealthWidgetComponent()
-    {
-        return HealthWidgetComponent;
-    }
+     
     UFUNCTION()
     void Rep_HealthChanged()
     {
-        UpdateHealthWidget(nullptr, Health, false);
+        //UpdateHealthWidget(nullptr, Health, false);
         OnHealthChanged.Broadcast(Health);
     }
-    void UpdateHealthWidget(AActor* DamageCauser, float NewHealth, bool ShowHealth);
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     bool AutoHeal;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
@@ -65,17 +62,15 @@ class SHOOTTHEMUP_API USTUHealthActorComponent : public UActorComponent
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal",
               meta = (ClampMin = "0", EditCondition = "AutoHeal"))
     float HealAmount = 1.0f;
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-    float HealthVisibilityDistance = 10000.0f;
+    
   protected:
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    UWidgetComponent *HealthWidgetComponent;
+    
       UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Heal")
     TMap<UPhysicalMaterial *, float> DamageModifiers;
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ClampMin = "0"))
     float MaxHealth = 100.0f;
     virtual void BeginPlay() override;
-    USTUHealthBarWidget *HealthBarWidget;
+    
   private:
 
     UPROPERTY(Replicated)//Using = Rep_HealthChanged)

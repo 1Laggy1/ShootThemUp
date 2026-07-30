@@ -1,7 +1,7 @@
 // Shoot THem Up Game. All Rights Reserved.
 
 #include "Components/STUHealthActorComponent.h"
-#include "Components/WidgetComponent.h"
+
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
@@ -11,7 +11,7 @@
 #include "STUGameModeBase.h"
 #include "STUUtils.h"
 
-#include "UI/STUHealthBarWidget.h"
+
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
 
 USTUHealthActorComponent::USTUHealthActorComponent()
@@ -19,8 +19,6 @@ USTUHealthActorComponent::USTUHealthActorComponent()
     PrimaryComponentTick.bCanEverTick = true;
     Health = MaxHealth;
     SetIsReplicatedByDefault(true);
-    HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("HealthWidgetComponent");
-    HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 void USTUHealthActorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -53,40 +51,13 @@ float USTUHealthActorComponent::TakeHeal(float amount)
     return Health;
 }
 
-void USTUHealthActorComponent::UpdateHealthWidget(AActor *DamageCauser, float NewHealth, bool ShowHealth)
-{
-    if (!GetOwner() || !HealthWidgetComponent)
-        return;
 
-    if (DamageCauser)
-    {
-        const auto ControllerCauser = STUUtils::GetInstigatorControllerFromDamageCauser(DamageCauser);
-        if (ControllerCauser)
-        {
-            const auto PlayerLocation = DamageCauser->GetActorLocation();
-            const auto Distance = FVector::Distance(PlayerLocation, GetOwner()->GetActorLocation());
-            HealthWidgetComponent->SetVisibility(Distance < HealthVisibilityDistance, true);
-            
-            
-        }
-    }
-    if (!HealthBarWidget)
-    {
-        HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
-        if (!HealthBarWidget)
-            return;
-    }
-    HealthBarWidget->SetHealthPercent(NewHealth / MaxHealth, ShowHealth);
-}
 
 void USTUHealthActorComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    HealthBarWidget = Cast<USTUHealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
-    // Health = MaxHealth;
-    // HealthChangedMulticast(Health);
-    // OnHealthChanged.Broadcast(Health);
+    
     AActor *ComponentOwner = GetOwner();
     if (ComponentOwner)
     {
@@ -121,16 +92,8 @@ void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *Damag
                                                                    AActor *DamageCauser, float NewHealth)
 {
     const auto ControllerCauser = STUUtils::GetInstigatorControllerFromDamageCauser(DamageCauser);
-    if (ControllerCauser == GetWorld()->GetFirstPlayerController())
-    {
-        UpdateHealthWidget(DamageCauser, NewHealth, true);
-        
-    }
-    else
-    {
-        UpdateHealthWidget(DamageCauser, NewHealth, false);
-    }
-    OnDamaged.Broadcast(DamagedActor, Damage, DamageCauser);
+
+    OnDamaged.Broadcast(DamagedActor, NewHealth/MaxHealth, DamageCauser);
     OnHealthChanged.Broadcast(NewHealth);
     HealDelayCurrent = 0;
     IsVaunded = true;
@@ -138,13 +101,13 @@ void USTUHealthActorComponent::ApplyDamageMulticast_Implementation(AActor *Damag
 
 void USTUHealthActorComponent::DeathMulticast_Implementation(int32 PlayerID)
 {
-    HealthWidgetComponent->SetVisibility(false, true);
+    //HealthWidgetComponent->SetVisibility(false, true);
     OnDeath.Broadcast();
 }
 
 void USTUHealthActorComponent::HealthChangedMulticast_Implementation(float NewHealth)
 {
-    UpdateHealthWidget(nullptr, NewHealth, false);
+    //UpdateHealthWidget(nullptr, NewHealth, false);
     OnHealthChanged.Broadcast(NewHealth);
 }
 

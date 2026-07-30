@@ -30,7 +30,7 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
 
     virtual bool SetPause(APlayerController *PC, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
     virtual bool ClearPause() override;
-    void PlayerConnected(APlayerController *PC);
+    //void PlayerConnected(APlayerController *PC);
     //FLinearColor DetermineColorByTeamID(int32 TeamID) const;
     void Goal(ASTUBall *Ball, ASTUGoal* Goal);
     void SetBallInstance(AActor* Ball)
@@ -44,7 +44,13 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
     TSoftClassPtr<USTUPlayerAbilityUseComponent> DebugAbilityClass;
     bool isDebug;
+    
     void SpawnDummy(int32 count);
+    void ChangeOutlineColors();
+
+
+    
+
   protected:
     void ChangeState(ESTUMatchState NewState);
     void RespawnAsSpectator(AController *Controller, FVector DeathLocation, FRotator DeathRotation);
@@ -56,8 +62,8 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     FGameData GameData;
     UPROPERTY(EditDefaultsOnly, Category = "Game")
     TSubclassOf<APawn> DefaultCharacterClass;
-    FPlayerInfo *FindPlayerByPlayerID(const FString &PlayerID);
-    void PostSeamlessTravel() override;
+    virtual void HandleSeamlessTravelPlayer(AController*& C) override;
+    void RegisterPlayer(AController* Controller);
   private:
     
     virtual void PostLogin(APlayerController *NewPlayer) override;
@@ -101,4 +107,8 @@ class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
     void SetPlayerStatsToAllPlayers();
     void SetMovement(bool Active);
     void StartDebug();
+    void TransferGameData();
+
+    TArray<AActor*> IntroCameras;
+    
 };

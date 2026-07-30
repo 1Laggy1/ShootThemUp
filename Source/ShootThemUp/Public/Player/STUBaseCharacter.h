@@ -16,6 +16,7 @@ class USoundCue;
 class UWidgetComponent;
 class USTUPlayerAbilityUseComponent;
 class USTUDashAbilityComponent;
+class USTUPlayerUIComponent;
 UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 {
     GENERATED_BODY()
@@ -50,7 +51,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     //UPROPERTY(Replicated)
     FRotator AimRotation;
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
-    virtual void OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser);
+    virtual void OnDamaged(AActor *DamagedActor, float HealthPercent, AActor *DamageCauser);
     virtual void OnDeath();
     // Called when the game starts or when spawned
     
@@ -66,6 +67,8 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     FPlayerInfo SpawnInfo;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     USTUHealthActorComponent *HealthComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    USTUPlayerUIComponent *PlayerUIComponent;
     virtual void Zoom(bool Enabled);
     void SetPlayerColor(const FLinearColor &Color);
     // Called every frame
@@ -104,11 +107,14 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
     UPROPERTY(Replicated)
     FString PlayerID = "PlayerID";
     UPROPERTY(Replicated)
+    int TeamID = 1;
+    UPROPERTY(Replicated)
     bool MovementEnabled = true;
 
     //// Ability components. Component Pool for now as I will have easier and faster for me approach then GAS:
     virtual void SetAbilityByActive();
 
+    
     UPROPERTY(Replicated)
     USTUPlayerAbilityUseComponent *ActiveAbilityComponent;
     UPROPERTY(Replicated)
@@ -118,7 +124,7 @@ UCLASS() class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 
     virtual void Landed(const FHitResult &Hit) override;
   private:
-    
+    void UpdateOutlineState();
     
     
 

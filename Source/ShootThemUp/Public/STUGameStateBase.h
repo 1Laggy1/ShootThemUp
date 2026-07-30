@@ -15,6 +15,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnTimerChanged, int32);
  * 
  */
 class ASTUBaseCharacter;
+class ASTUPlayerController;
 UCLASS()
 class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
 {
@@ -33,35 +34,31 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
     int32 AfterGoalCountDown = 0;
     UPROPERTY(ReplicatedUsing = OnRep_MatchState, EditAnywhere, BlueprintReadWrite)
     ESTUMatchState MatchState = ESTUMatchState::WaitingToStart;
-    UPROPERTY(Replicated)
-    TArray<FTeamInfo> TeamsStats;
-    UFUNCTION(Server, Reliable)
-    void PlayerConnected(APlayerController *PC);
+    UFUNCTION()
+    void OnRep_TeamsStats();
+    // UFUNCTION(Server, Reliable)
+    // void PlayerConnected(APlayerController *PC);
     UPROPERTY(ReplicatedUsing = OnRep_TimerChanged)
     float WaitingTimeNow = 30.0f;
-    
-    /*UFUNCTION(NetMulticast, Reliable)
-    void InitPlayer_Multicast(const FString &PlayerID, ASTUBaseCharacter* Character);*/
-    /*void WaitForPlayer(ASTUBaseCharacter *Character);*/
-    
-    /*UPROPERTY(Replicated)
-    FMatchStatistics Statistics;
-    UFUNCTION()
-    void OnRep_MatchStateChanged();
-    FMatchStatistics GetMatchStatistics() {
-        return Statistics;
-    };
+    TArray<FTeamInfo>& GetTeams() { return TeamsStats; }
+    void SetTeams(const TArray<FTeamInfo>& NewTeams);
 
-    UPROPERTY(ReplicatedUsing = MatchStatisticsBroadcast)
-    FMatchStatistics MatchStatistics;*/
-    /*UFUNCTION()
-    void MatchStatisticsBroadcast()
-    {
-        OnMatchStatistics.Broadcast(&MatchStatistics);
-    }*/
-    //FOnMatchStatistics OnMatchStatistics;
+    void WaitForReplicate();
+    FTimerHandle WaitForReplicateTimerHandle;
+
+    bool SetIntroCameraView(ASTUPlayerController *PC);
+    bool SetOutlineColors(ASTUPlayerController *PC);
+
     FOnMatchStateChanged OnMatchStateChanged;
     FOnTimerChanged OnTimerChanged;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Materials")
+    UMaterialParameterCollection* OutlineColorsMPC;
+    bool isOutlineColorsChanged = false;
+
+    UPROPERTY(Replicated)
+    AActor* IntroCamera;
+
   public:
     /*UFUNCTION(NetMulticast, Reliable)
     void SetPlayerColorMulticast(AActor *Player, FLinearColor TeamColor);*/
@@ -101,7 +98,8 @@ class SHOOTTHEMUP_API ASTUGameStateBase : public AGameStateBase
   protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
   private:
-    
+    UPROPERTY(ReplicatedUsing = OnRep_TeamsStats)
+    TArray<FTeamInfo> TeamsStats;
     
     
 };

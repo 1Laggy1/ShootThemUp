@@ -20,10 +20,11 @@
 #include "STUGameStateBase.h"
 #include "STUUtils.h"
 #include "Sound/SoundCue.h"
-#include "UI/STUHealthBarWidget.h"
+#include "UI/STUPlayerUIWidget.h"
 #include "Weapon/STUBaseWeapon.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Components/STUPlayerUIComponent.h"
 DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(ObjInit)
@@ -34,9 +35,10 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjInit) : Super(
     bReplicateUsingRegisteredSubObjectList = true;
     HealthComponent = CreateDefaultSubobject<USTUHealthActorComponent>("HealthComponent");
     WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("Weapon Component");
-    if (HealthComponent->GetHealthWidgetComponent())
+    PlayerUIComponent = CreateDefaultSubobject<USTUPlayerUIComponent>("Player UI Component");
+    if (PlayerUIComponent && PlayerUIComponent->GetPlayerUIWidgetComponent())
     {
-        HealthComponent->GetHealthWidgetComponent()->SetupAttachment(RootComponent);
+        PlayerUIComponent->GetPlayerUIWidgetComponent()->SetupAttachment(RootComponent);
     }
 }
 void ASTUBaseCharacter::Zoom(bool Enabled)
@@ -88,7 +90,7 @@ void ASTUBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &Ou
     DOREPLIFETIME(ASTUBaseCharacter, AbilityClass);
 }
 
-void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor *DamageCauser)
+void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float HealthPercent, AActor *DamageCauser)
 {
     if (HealthComponent->isDead() || !GetController())
         return;
@@ -98,6 +100,12 @@ void ASTUBaseCharacter::OnDamaged(AActor *DamagedActor, float Damage, AActor *Da
 void ASTUBaseCharacter::InitPlayer()
 {
     SetPlayerColor(PlayerColor);
+    if (PlayerUIComponent)
+    {
+        PlayerUIComponent->SetPlayerColor(PlayerColor);
+        PlayerUIComponent->SetPlayerName(PlayerName);
+    }
+    UpdateOutlineState();
     if (GetWorld() && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "LobbyLevel")
     {
         return;
@@ -112,7 +120,29 @@ void ASTUBaseCharacter::InitPlayer()
         Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController())->RequestPossess_Server(this);
     }
     InitAbility();
+    
 }
+
+void ASTUBaseCharacter::UpdateOutlineState()
+{
+    ASTUPlayerController* PC = Cast<ASTUPlayerController>(GetWorld()->GetFirstPlayerController());
+    if (!PC) return;
+
+    if (PC->PlayerState)
+    {
+        ASTUPlayerState* STUPlayerState = PC->GetPlayerState<ASTUPlayerState>();
+        
+        if (STUPlayerState->GetTeamID() == TeamID)
+        {
+            GetMesh()->SetCustomDepthStencilValue(1);
+        }
+        else
+        {
+            GetMesh()->SetCustomDepthStencilValue(2);
+        }
+    }
+}
+
 void ASTUBaseCharacter::InitAbility()
 {
 }
@@ -131,6 +161,7 @@ void ASTUBaseCharacter::BeginPlay()
         HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
         HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
         HealthComponent->OnDamaged.AddUObject(this, &ASTUBaseCharacter::OnDamaged);
+        HealthComponent->OnDamaged.AddUObject(PlayerUIComponent, &USTUPlayerUIComponent::OnDamaged);
     }
 
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), RespawnSound, GetActorLocation());
